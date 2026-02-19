@@ -253,10 +253,11 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
               >
                 {mitra.logo_url ? (
                   <div className="w-32 h-20 relative">
-                    <img 
+                    <SmartImage 
                       src={mitra.logo_url} 
                       alt={mitra.nama} 
-                      className="w-full h-full object-contain"
+                      fill
+                      className="object-contain"
                     />
                   </div>
                 ) : (
@@ -283,7 +284,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
                   </div>
                   <div>
                     <h4 className="text-white font-bold text-lg">{item.nama}</h4>
-                    <p className="text-slate-400 text-sm">{item.jurusan} '{item.angkatan}</p>
+                    <p className="text-slate-400 text-sm">{item.jurusan} &apos;{item.angkatan}</p>
                   </div>
                 </div>
                 
@@ -298,7 +299,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
                 <div className="relative">
                   <Quote className="absolute -top-2 -left-2 text-white/5 transform -scale-x-100" size={40} />
                   <p className="text-slate-300 italic relative z-10 leading-relaxed text-sm">
-                    "{item.deskripsi}"
+                    &quot;{item.deskripsi}&quot;
                   </p>
                 </div>
               </div>

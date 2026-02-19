@@ -3,7 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import withAdmin from '../../utils/withAdmin';
 import { getMitra, createMitra, updateMitra, deleteMitra } from '../../services/api';
 import { showToast } from '../../utils/toast';
-import { Plus, Trash, X, Save, Edit, GripVertical, Check, Ban } from 'lucide-react';
+import { Plus, Trash, X, Save, Edit, GripVertical, Check, Ban, Building2 } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
 import ImageUploader from '../../components/ImageUploader';
 import { Reorder } from 'framer-motion';

@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/wzVk-WVpQYw_805AXeHNX/_buildManifest.js",
-    "static/wzVk-WVpQYw_805AXeHNX/_ssgManifest.js"
+    "static/v0GFmtxaqllo8GosQ9DA8/_buildManifest.js",
+    "static/v0GFmtxaqllo8GosQ9DA8/_ssgManifest.js"
   ],
   "rootMainFiles": [
     "static/chunks/webpack-c3432eb3bc98d0f5.js",
@@ -22,7 +22,7 @@
       "static/chunks/689-254846b12fc87645.js",
       "static/chunks/949-54c60275f5f529b7.js",
       "static/chunks/786-9e8220b4de171283.js",
-      "static/chunks/pages/index-64fd002aea9d31fa.js"
+      "static/chunks/pages/index-56f07f069045aba3.js"
     ],
     "/_app": [
       "static/chunks/webpack-c3432eb3bc98d0f5.js",
@@ -53,7 +53,7 @@
       "static/chunks/953-2971562bb3bcfae8.js",
       "static/chunks/40-cf533bdec2c4d4ac.js",
       "static/css/7e83ca6efc823727.css",
-      "static/chunks/pages/admin/alumni-c29aa5afde34bfca.js"
+      "static/chunks/pages/admin/alumni-3879259a564199db.js"
     ],
     "/admin/carousel": [
       "static/chunks/webpack-c3432eb3bc98d0f5.js",
@@ -137,7 +137,7 @@
       "static/chunks/953-2971562bb3bcfae8.js",
       "static/chunks/40-cf533bdec2c4d4ac.js",
       "static/css/7e83ca6efc823727.css",
-      "static/chunks/pages/admin/mitra-5ed462e826044db9.js"
+      "static/chunks/pages/admin/mitra-efbda8e150171e48.js"
     ],
     "/admin/testimonial": [
       "static/chunks/webpack-c3432eb3bc98d0f5.js",

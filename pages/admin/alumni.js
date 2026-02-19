@@ -3,7 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import withAdmin from '../../utils/withAdmin';
 import { getAlumni, createAlumni, updateAlumni, deleteAlumni } from '../../services/api';
 import { showToast } from '../../utils/toast';
-import { Plus, Trash, X, Save, Edit, Search } from 'lucide-react';
+import { Plus, Trash, X, Save, Edit, Search, Users } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
 import ImageUploader from '../../components/ImageUploader';
 
