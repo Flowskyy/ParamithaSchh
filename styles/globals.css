@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --surface: #f8fafc;
+  --primary: #4F8EF7;
+  --secondary: #64748b;
+  --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+::selection { background: rgba(79,142,247,0.2); color: var(--primary); }
+
+/* Glass utility */
+.glass {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #2563EB 0%, #4F8EF7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl font-bold text-sm transition-all hover:bg-primary-700 hover:-translate-y-0.5 shadow-lg shadow-primary-600/20;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold text-sm transition-all hover:bg-slate-50 hover:text-slate-900 hover:-translate-y-0.5;
+}
+
+/* Input */
+.input-field {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.2s;
+  outline: none;
+}
+.input-field::placeholder { color: #94a3b8; }
+.input-field:focus { 
+  border-color: var(--primary); 
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.1); 
+}
+
+/* Utilities */
+.text-balance { text-wrap: balance; }
+
+/* NProgress Customization */
+#nprogress .bar {
+  background: #3b82f6 !important; /* Tailwind blue-500 */
+  height: 3px !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #3b82f6, 0 0 5px #3b82f6 !important;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 20s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
