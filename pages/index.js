@@ -100,6 +100,9 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
           </motion.div>
         </div>
 
+        {/* Gradient Fade to Next Section */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
+
         {/* Scroll Indicator */}
         <motion.div 
           animate={{ y: [0, 10, 0] }}
@@ -234,10 +237,10 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
       </Section>
 
       {/* Mitra Perusahaan Section */}
-      <section className="py-16 bg-white border-y border-slate-100 overflow-hidden">
-        <div className="container mx-auto px-6 mb-10 text-center">
-          <h2 className="text-2xl font-bold text-slate-900">Dipercaya oleh Perusahaan Terkemuka</h2>
-          <p className="text-slate-500 mt-2">Partner industri untuk praktek kerja dan penyaluran lulusan</p>
+      <section className="py-20 bg-white border-t border-slate-100 overflow-hidden">
+        <div className="container mx-auto px-6 mb-12 text-center">
+          <h2 className="text-3xl font-bold text-slate-900">Partner Industri</h2>
+          <p className="text-slate-500 mt-2">Dipercaya oleh perusahaan terkemuka di Indonesia</p>
         </div>
         
         <div className="relative w-full">
@@ -268,16 +271,15 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
       </section>
 
       {/* Alumni Section */}
-      <Section className="bg-[#080810]" title={<span className="text-white">Alumni Kami</span>} subtitle="Kisah sukses para lulusan SMK Paramitha 2">
+      <Section className="bg-slate-900" title={<span className="text-white">Alumni Kami</span>} subtitle={<span className="text-slate-400">Kisah sukses para lulusan SMK Paramitha 2</span>}>
         <div className="overflow-x-auto pb-8 -mx-6 px-6 md:overflow-visible md:pb-0">
           <div className="flex md:grid md:grid-cols-3 gap-6 w-max md:w-full">
             {alumniList.map((item) => (
-              <div key={item.id} className="w-[300px] md:w-full bg-[#0f0f1a] border border-white/5 rounded-3xl p-6 relative group hover:-translate-y-2 transition-transform duration-300">
+              <div key={item.id} className="w-[300px] md:w-full bg-slate-800/50 border border-slate-700 rounded-3xl p-6 relative group hover:-translate-y-2 transition-transform duration-300">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-br from-primary-500 to-orange-500">
-                    <div className="w-full h-full rounded-full overflow-hidden relative border-2 border-[#0f0f1a]">
-                      <SmartImage src={item.foto_url} fill style={{ objectFit: 'cover' }} />
-                    </div>
+                  {/* Updated Image Style: No bullet/circle, transparent blending */}
+                  <div className="w-16 h-16 relative shrink-0">
+                      <SmartImage src={item.foto_url} fill style={{ objectFit: 'contain' }} className="drop-shadow-md" />
                   </div>
                   <div>
                     <h4 className="text-white font-bold text-lg">{item.nama}</h4>
@@ -295,7 +297,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
                 
                 <div className="relative">
                   <Quote className="absolute -top-2 -left-2 text-white/5 transform -scale-x-100" size={40} />
-                  <p className="text-slate-400 italic relative z-10 leading-relaxed text-sm">
+                  <p className="text-slate-300 italic relative z-10 leading-relaxed text-sm">
                     "{item.deskripsi}"
                   </p>
                 </div>
