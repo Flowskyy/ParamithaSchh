@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Upload, X, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../services/supabase';
 import { showToast } from '../utils/toast';
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../../utils/supabaseClient';
+import { supabase } from '../../services/supabase';
 import { showToast } from '../../utils/toast';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
