@@ -68,7 +68,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
             style={{ objectFit: 'cover' }}
           />
           {/* Subtle overlay for text readability only */}
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
 
         {/* Content */}
@@ -82,7 +82,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
             <span className="inline-block py-1 px-3 rounded-full bg-white/10 text-white border border-white/20 text-sm font-bold mb-6 backdrop-blur-md">
               SEKOLAH PUSAT KEUNGGULAN
             </span>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
+            <h1 className="text-5xl md:text-7xl font-bold font-sans text-white mb-4 leading-tight drop-shadow-lg">
               Selamat Datang di <br/>
               <span className="text-primary-400">SMK Paramitha 2 Jakarta</span>
             </h1>
@@ -90,7 +90,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
               {heroData.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/pendaftaran" className="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1 shadow-lg shadow-primary-600/30 flex items-center justify-center gap-2">
+              <Link href="/pendaftaran" className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1 shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2">
                 Daftar Sekarang <ArrowRight size={20} />
               </Link>
               <Link href="#jurusan" className="px-8 py-4 bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-xl font-bold text-lg transition-all backdrop-blur-sm flex items-center justify-center">
@@ -113,39 +113,58 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
       </div>
 
       {/* Project PKK Section */}
-      <Section className="bg-slate-50" title="Project PKK & P5" subtitle="Produk Kreatif dan Kewirausahaan Siswa">
-        <div className="bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-200">
-          <div className="bg-slate-100 border-b border-slate-200 p-3 flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
-            </div>
-            <div className="bg-white px-4 py-1 rounded-md text-xs text-slate-500 flex-1 text-center font-mono border border-slate-200 mx-4">
-              paramithatourandtravel.vercel.app
-            </div>
-          </div>
-          <div className="relative w-full h-[600px]">
-            <iframe 
-              src="https://paramithatourandtravel.vercel.app/" 
-              title="Paramitha Tour & Travel"
-              className="w-full h-full border-0"
-              loading="lazy"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-6 pointer-events-none">
-              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl inline-block shadow-lg">
-                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <Building2 className="text-primary-600" />
-                  Paramitha Tour & Travel
-                </h3>
-                <p className="text-slate-600 text-sm mt-1">
-                  Unit usaha travel resmi yang dikelola oleh siswa dan guru jurusan Usaha Layanan Wisata (ULW).
-                </p>
-              </div>
-            </div>
-          </div>
+      <section className="bg-slate-50 py-16 md:py-24 w-full">
+        <div className="container mx-auto px-6 mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Project PKK</h2>
+            <p className="text-lg text-slate-500">Produk Kreatif dan Kewirausahaan Siswa</p>
         </div>
-      </Section>
+        
+        <div className="w-full bg-slate-900 py-12">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-slate-700 max-w-6xl mx-auto transform hover:scale-[1.01] transition-transform duration-500">
+                  {/* Browser Header */}
+                  <div className="bg-slate-800 border-b border-slate-700 p-3 flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="bg-slate-900 px-4 py-1 rounded-md text-xs text-slate-400 flex-1 text-center font-mono border border-slate-700 mx-4 truncate">
+                      paramithatourandtravel.vercel.app
+                    </div>
+                  </div>
+                  {/* Iframe */}
+                  <div className="relative w-full h-[500px] md:h-[700px]">
+                    <iframe 
+                      src="https://paramithatourandtravel.vercel.app/" 
+                      title="Paramitha Tour & Travel"
+                      className="w-full h-full border-0"
+                      loading="lazy"
+                    />
+                    {/* Overlay info */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pointer-events-none flex flex-col md:flex-row justify-between items-end gap-4">
+                      <div className="bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg pointer-events-auto max-w-lg border-l-4 border-primary-600">
+                        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 mb-1">
+                          <Building2 className="text-primary-600" />
+                          Paramitha Tour & Travel
+                        </h3>
+                        <p className="text-slate-600 text-sm leading-relaxed">
+                          Unit usaha travel resmi yang dikelola oleh siswa dan guru jurusan Usaha Layanan Wisata (ULW).
+                        </p>
+                      </div>
+                      <Link 
+                        href="https://paramithatourandtravel.vercel.app/" 
+                        target="_blank"
+                        className="pointer-events-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-2 mb-2 whitespace-nowrap"
+                      >
+                        Lihat Website Full <ArrowRight size={18} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+      </section>
 
       {/* Jurusan Section */}
       <Section id="jurusan" title="Kompetensi Keahlian" subtitle="Pilihan jurusan unggulan untuk masa depan gemilang">

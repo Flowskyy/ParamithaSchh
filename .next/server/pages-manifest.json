@@ -3,6 +3,6 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/jurusan/[slug]": "pages/jurusan/[slug].js",
-  "/": "pages/index.js",
-  "/ppdb": "pages/ppdb.js"
+  "/ppdb": "pages/ppdb.js",
+  "/": "pages/index.js"
 }
