@@ -97,7 +97,7 @@ export default function VisiMisiPage({ sekolahInfo }) {
             >
               <h2 className="text-3xl font-bold text-[#F5C400] mb-8 tracking-widest">VISI</h2>
               <p className="text-3xl md:text-5xl font-bold leading-tight">
-                "Menjadi SMK Pusat Keunggulan yang Menghasilkan Tamatan Berkarakter Profil Pelajar Pancasila, Kompeten, Wirausaha, dan Berdaya Saing Global."
+                &quot;Menjadi SMK Pusat Keunggulan yang Menghasilkan Tamatan Berkarakter Profil Pelajar Pancasila, Kompeten, Wirausaha, dan Berdaya Saing Global.&quot;
               </p>
             </motion.div>
           </div>

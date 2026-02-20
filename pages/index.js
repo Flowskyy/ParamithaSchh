@@ -161,7 +161,7 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
               <div className="relative pl-8 border-l-4 border-[#F5C400] mb-8">
                 <Quote className="absolute -top-2 -left-3 bg-white text-[#F5C400] p-1" size={24} />
                 <p className="text-slate-600 text-lg italic leading-relaxed">
-                  "SMK Paramitha 2 berkomitmen untuk tidak hanya mencetak lulusan yang ahli dalam bidangnya, tetapi juga memiliki integritas moral yang tinggi. Kami percaya bahwa pendidikan adalah kunci untuk membuka pintu masa depan."
+                  &quot;SMK Paramitha 2 berkomitmen untuk tidak hanya mencetak lulusan yang ahli dalam bidangnya, tetapi juga memiliki integritas moral yang tinggi. Kami percaya bahwa pendidikan adalah kunci untuk membuka pintu masa depan.&quot;
                 </p>
               </div>
 
@@ -176,54 +176,6 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
             </motion.div>
           </div>
         </div>
-        <WaveSeparator position="bottom" color="#F8F8FF" height="100px" />
-      </Section>
-
-      {/* 3. VISI & MISI SEKILAS */}
-      <Section className="bg-[#F8F8FF] pb-32">
-        <div className="container mx-auto px-6">
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-8 lg:gap-12"
-          >
-            {/* Visi Card */}
-            <motion.div variants={fadeInUp} className="bg-gradient-to-br from-[#1E1E8F] to-[#141460] rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-1/4 -translate-y-1/4 group-hover:scale-110 transition-transform duration-700">
-                <CheckCircle size={200} />
-              </div>
-              <h3 className="text-3xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-2 h-12 bg-[#F5C400] rounded-full" />
-                Visi Kami
-              </h3>
-              <p className="text-lg leading-relaxed text-blue-100 mb-8">
-                "{info.visi || 'Menjadi Sekolah Menengah Kejuruan yang Unggul dalam Imtaq dan Iptek, serta Menghasilkan Tamatan yang Kompeten.'}"
-              </p>
-            </motion.div>
-
-            {/* Misi Card */}
-            <motion.div variants={fadeInUp} className="bg-white rounded-3xl p-8 md:p-12 border-2 border-[#C0161C]/10 shadow-lg hover:shadow-xl transition-shadow relative overflow-hidden group">
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#C0161C]/5 rounded-full blur-3xl -z-0" />
-              <h3 className="text-3xl font-bold mb-6 flex items-center gap-3 text-slate-900">
-                <span className="w-2 h-12 bg-[#C0161C] rounded-full" />
-                Misi Kami
-              </h3>
-              <ul className="space-y-4 mb-8 relative z-10">
-                {(info.misi || []).slice(0, 3).map((m, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle className="text-[#C0161C] flex-shrink-0 mt-1" size={18} />
-                    <span>{m}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/tentang/visi-misi" className="inline-flex items-center gap-2 text-[#C0161C] font-bold hover:underline relative z-10">
-                Lihat Visi & Misi Lengkap <ArrowRight size={16} />
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
         <WaveSeparator position="bottom" color="#FFF8F8" height="100px" />
       </Section>
 
@@ -231,8 +183,8 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
       <Section className="bg-[#FFF8F8] pb-32">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-[#1E1E8F] font-bold tracking-widest uppercase mb-2">Teaching Factory</h2>
-            <h3 className="text-3xl md:text-4xl font-bold text-slate-900" style={{ fontFamily: '"Belleza", sans-serif' }}>
+            <h2 className="text-[#1E1E8F] font-bold tracking-widest uppercase mb-2">Proyek PKK Paramitha 2</h2>
+            <h3 className="text-3xl md:text-4xl font-normal text-slate-900" style={{ fontFamily: '"Belleza", sans-serif' }}>
               Paramitha <span className="text-[#F5C400]">Tour & Travel</span>
             </h3>
           </div>
@@ -408,6 +360,7 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
             </div>
           </motion.div>
         </div>
+        <WaveSeparator position="bottom" color="#F8F8FF" height="100px" />
       </section>
 
     </Layout>

@@ -89,7 +89,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                   <div className="relative mb-8 pl-8 md:pl-12 border-l-4 border-[#F5C400]">
                     <Quote className="absolute top-0 left-2 text-[#F5C400]/20 -ml-8 -mt-4 w-16 h-16" />
                     <p className="text-2xl font-serif text-[#1E1E8F] italic leading-relaxed m-0">
-                      "Assalamu'alaikum Warahmatullahi Wabarakatuh. Salam sejahtera bagi kita semua."
+                      &quot;Assalamu&apos;alaikum Warahmatullahi Wabarakatuh. Salam sejahtera bagi kita semua.&quot;
                     </p>
                   </div>
 
@@ -117,7 +117,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                           Mari bergabung bersama kami untuk mewujudkan generasi masa depan yang unggul, kreatif, dan inovatif. Bersama SMK Paramitha 2, kita raih masa depan gemilang.
                         </p>
                         <p className="font-bold text-[#1E1E8F]">
-                          Wassalamu'alaikum Warahmatullahi Wabarakatuh.
+                          Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh.
                         </p>
                       </>
                     )}

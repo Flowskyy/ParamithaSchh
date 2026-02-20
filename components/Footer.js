@@ -43,45 +43,46 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#F8F8FF] text-slate-600 relative overflow-hidden">
-      {/* Top Border Gradient */}
-      <div className="h-1 w-full bg-gradient-to-r from-[#1E1E8F] to-[#C0161C]" />
-
-      <div className="container mx-auto px-6 py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+      
+      <div className="container mx-auto px-6 pt-20 pb-8 lg:pt-32 lg:pb-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 xl:gap-24 mb-12">
           
           {/* Brand Info */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
-                 <Image src="/images/logo.jpg" alt="Logo" fill className="object-cover" sizes="48px" />
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="relative w-16 h-16">
+                 <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain" sizes="64px" />
               </div>
-              <span className="font-bold text-xl tracking-tight text-slate-900 leading-tight">
+              <span className="font-bold text-2xl tracking-tight text-slate-900 leading-tight">
                 SMK Paramitha 2
               </span>
             </div>
-            <p className="text-slate-500 leading-relaxed text-sm">
+            <p className="text-slate-600 leading-relaxed text-base">
               Mewujudkan lulusan yang kompeten, berkarakter, dan siap bersaing di dunia industri global.
             </p>
-            <div className="flex gap-3">
-              <a href={info.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-sm">
-                <Instagram size={18} />
+            <div className="flex gap-4">
+              <a href={info.instagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 min-w-[3rem] min-h-[3rem] shrink-0 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-md">
+                <Instagram size={20} />
               </a>
-              <a href={info.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-sm">
-                <Youtube size={18} />
+              <a href={info.youtube} target="_blank" rel="noopener noreferrer" className="w-12 h-12 min-w-[3rem] min-h-[3rem] shrink-0 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-md">
+                <Youtube size={20} />
               </a>
-              <a href={info.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-sm">
-                <Facebook size={18} />
+              <a href={info.facebook} target="_blank" rel="noopener noreferrer" className="w-12 h-12 min-w-[3rem] min-h-[3rem] shrink-0 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-md">
+                <Facebook size={20} />
               </a>
-              <a href={info.tiktok} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-sm">
-                <TikTokIcon size={18} />
+              <a href={info.tiktok} target="_blank" rel="noopener noreferrer" className="w-12 h-12 min-w-[3rem] min-h-[3rem] shrink-0 rounded-full bg-[#C0161C] flex items-center justify-center text-white hover:bg-[#F5C400] hover:-translate-y-1 transition-all duration-300 shadow-md">
+                <TikTokIcon size={20} />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 text-slate-900">Tautan Cepat</h3>
-            <ul className="space-y-3">
+          <div className="lg:pl-8">
+            <h3 className="font-bold text-xl mb-8 text-slate-900 relative inline-block">
+              Tautan Cepat
+              <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#F5C400] rounded-full"></span>
+            </h3>
+            <ul className="space-y-4">
               {[
                 { name: 'Profil Sekolah', url: '/tentang/sejarah' },
                 { name: 'Visi & Misi', url: '/tentang/visi-misi' },
@@ -89,8 +90,8 @@ export default function Footer() {
                 { name: 'Hubungi Kami', url: '/contact' }
               ].map((item, idx) => (
                 <li key={idx}>
-                  <Link href={item.url} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-2 group text-sm">
-                    <ChevronRight size={14} className="text-slate-400 group-hover:text-[#C0161C] transition-colors" />
+                  <Link href={item.url} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-3 group text-base font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#C0161C] transition-colors"></span>
                     {item.name}
                   </Link>
                 </li>
@@ -100,8 +101,11 @@ export default function Footer() {
 
           {/* Jurusan */}
           <div>
-            <h3 className="font-bold text-lg mb-6 text-slate-900">Program Keahlian</h3>
-            <ul className="space-y-3">
+            <h3 className="font-bold text-xl mb-8 text-slate-900 relative inline-block">
+              Program Keahlian
+              <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#1E1E8F] rounded-full"></span>
+            </h3>
+            <ul className="space-y-4">
               {[
                 { name: 'Rekayasa Perangkat Lunak', url: '/jurusan/rpl' },
                 { name: 'Desain Komunikasi Visual', url: '/jurusan/dkv' },
@@ -111,8 +115,8 @@ export default function Footer() {
                 { name: 'Manajemen Logistik', url: '/jurusan/manajemen-logistik' }
               ].map((item, idx) => (
                 <li key={idx}>
-                  <Link href={item.url} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-2 group text-sm">
-                    <ChevronRight size={14} className="text-slate-400 group-hover:text-[#C0161C] transition-colors" />
+                  <Link href={item.url} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-3 group text-base font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#C0161C] transition-colors"></span>
                     {item.name}
                   </Link>
                 </li>
@@ -122,31 +126,41 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-bold text-lg mb-6 text-slate-900">Hubungi Kami</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-sm">
-                <MapPin className="text-[#C0161C] shrink-0 mt-1" size={18} />
-                <span className="leading-relaxed">{info.address}</span>
+            <h3 className="font-bold text-xl mb-8 text-slate-900 relative inline-block">
+              Hubungi Kami
+              <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#C0161C] rounded-full"></span>
+            </h3>
+            <ul className="space-y-6">
+              <li className="flex items-start gap-4 text-base group">
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#C0161C] group-hover:bg-[#C0161C] group-hover:text-white transition-colors border border-slate-100 shrink-0">
+                  <MapPin size={20} />
+                </div>
+                <span className="leading-relaxed text-slate-600">{info.address}</span>
               </li>
-              <li className="flex items-center gap-3 text-sm">
-                <Phone className="text-[#C0161C] shrink-0" size={18} />
-                <span>{info.phone}</span>
+              <li className="flex items-center gap-4 text-base group">
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#C0161C] group-hover:bg-[#C0161C] group-hover:text-white transition-colors border border-slate-100 shrink-0">
+                  <Phone size={20} />
+                </div>
+                <span className="text-slate-600 font-medium">{info.phone}</span>
               </li>
-              <li className="flex items-center gap-3 text-sm">
-                <Mail className="text-[#C0161C] shrink-0" size={18} />
-                <span>{info.email}</span>
+              <li className="flex items-center gap-4 text-base group">
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#C0161C] group-hover:bg-[#C0161C] group-hover:text-white transition-colors border border-slate-100 shrink-0">
+                  <Mail size={20} />
+                </div>
+                <span className="text-slate-600 font-medium">{info.email}</span>
               </li>
             </ul>
           </div>
         </div>
 
-      </div>
-
-      {/* Copyright */}
-      <div className="w-full bg-[#1E1E8F] py-4 px-8">
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-white font-medium text-sm">
-          <p>© {new Date().getFullYear()} SMK Paramitha 2 Jakarta. All rights reserved.</p>
-          <p>Developed by RPL Students SMK Paramitha 2</p>
+        {/* Merged Copyright Section */}
+        <div className="pt-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-slate-500 text-base font-medium">
+            <p>© {new Date().getFullYear()} SMK Paramitha 2 Jakarta. All rights reserved.</p>
+            <p className="flex items-center gap-3">
+              Developed by <span className="text-[#1E1E8F] font-bold text-lg">RPL Students</span>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

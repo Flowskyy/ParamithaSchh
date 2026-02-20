@@ -37,10 +37,20 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedImage) return
+      
       if (e.key === 'Escape') setSelectedImage(null)
-      if (e.key === 'ArrowRight') handleNext(e)
-      if (e.key === 'ArrowLeft') handlePrev(e)
+      if (e.key === 'ArrowRight') {
+        const currentIndex = filteredGaleri.findIndex(item => item.id === selectedImage.id)
+        const nextIndex = (currentIndex + 1) % filteredGaleri.length
+        setSelectedImage(filteredGaleri[nextIndex])
+      }
+      if (e.key === 'ArrowLeft') {
+        const currentIndex = filteredGaleri.findIndex(item => item.id === selectedImage.id)
+        const prevIndex = (currentIndex - 1 + filteredGaleri.length) % filteredGaleri.length
+        setSelectedImage(filteredGaleri[prevIndex])
+      }
     }
+    
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedImage, filteredGaleri])
