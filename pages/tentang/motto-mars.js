@@ -153,7 +153,7 @@ export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
                 <p>Maju terus pantang mundur</p>
                 <p>Raih prestasi yang luhur</p>
                 <p>SMK Paramitha 2</p>
-                <p>Jayalah s'lama-lamanya</p>
+                <p>Jayalah s&apos;lama-lamanya</p>
               </div>
               <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
             </motion.div>

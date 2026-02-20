@@ -170,8 +170,8 @@ function SambutanAdmin() {
                </div>
             </div>
             <div className="mt-4 text-sm text-slate-600 line-clamp-6 italic">
-                <span className="block font-semibold mb-2">"{info.kepsek_greeting}"</span>
-                "{info.kepsek_message_body || 'Message...'}"
+                <span className="block font-semibold mb-2">&quot;{info.kepsek_greeting}&quot;</span>
+                &quot;{info.kepsek_message_body || 'Message...'}&quot;
             </div>
           </div>
         </div>

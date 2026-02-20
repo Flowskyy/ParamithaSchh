@@ -473,7 +473,7 @@ export default function AdminPendaftarPPDB() {
                   <div>
                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Pesan Tambahan</label>
                     <div className="bg-slate-50 p-3 rounded-lg text-sm text-slate-600 italic border border-slate-100">
-                      "{selectedPendaftar.pesan}"
+                      &quot;{selectedPendaftar.pesan}&quot;
                     </div>
                   </div>
                 )}

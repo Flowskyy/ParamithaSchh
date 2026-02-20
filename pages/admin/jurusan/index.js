@@ -48,7 +48,7 @@ function JurusanAdmin() {
         }
       }
     }
-  }, [loading, items, router.query]);
+  }, [loading, items, router.query, editing]);
 
   async function loadData() {
     setLoading(true);
