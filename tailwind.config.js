@@ -8,31 +8,52 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'sans-serif'], // Added for "wow" factor headings if font available, fallback sans
+        heading: ['"Space Grotesk"', 'sans-serif'],
       },
       colors: {
-        dark: '#0f172a', // Slate 900
+        dark: '#0A0A1A',
         light: '#ffffff',
-        surface: '#f8fafc', // Slate 50
+        surface: '#F8F8FF',
         card: '#ffffff',
+        muted: '#6B7280',
+        border: 'rgba(0,0,0,0.08)',
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb', // Standard vibrant blue
-          700: '#1d4ed8', // High contrast for buttons
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554', // Very dark for text
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#C0161C', // Main Red
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+          950: '#450a0a',
+        },
+        secondary: {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#1E1E8F', // Main Navy
+          950: '#172554',
         },
         accent: {
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c', // Vibrant orange
-          700: '#c2410c',
+          50: '#fefce8',
+          100: '#fef9c3',
+          200: '#fef08a',
+          300: '#fde047',
+          400: '#facc15',
+          500: '#F5C400', // Main Gold
+          600: '#ca8a04',
+          700: '#a16207',
+          800: '#854d0e',
+          900: '#713f12',
         },
       },
       animation: {

@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import withAdmin from '../../utils/withAdmin';
-import { getFasilitas, saveFasilitas, deleteFasilitas } from '../../services/api';
+import { getFasilitas, saveFasilitas, deleteFasilitas, uploadImage } from '../../services/api';
 import { showToast } from '../../utils/toast';
-import { Plus, Trash, X, Save, Edit } from 'lucide-react';
+import { Plus, Trash, X, Save, Edit, Upload, Loader2 } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
 import ImageUploader from '../../components/ImageUploader';
+import toast from 'react-hot-toast';
 
 function FasilitasAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -44,7 +46,7 @@ function FasilitasAdmin() {
       loadData();
     } catch (error) {
       console.error(error);
-      showToast.error('Failed to save');
+      showToast.error(error.message || 'Failed to save');
     }
   };
 
@@ -104,12 +106,13 @@ function FasilitasAdmin() {
             </div>
             <div className="space-y-2">
               <label className="text-slate-600 text-sm font-medium mb-2 block">Image</label>
+              
               <ImageUploader 
                 currentImage={formData.image_url} 
                 onUploadComplete={(url) => setFormData({...formData, image_url: url})} 
                 aspectRatio={4/3} 
-                bucket="media" 
-                folder="fasilitas" 
+                bucket="fasilitas" 
+                folder="uploads" 
               />
             </div>
             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">

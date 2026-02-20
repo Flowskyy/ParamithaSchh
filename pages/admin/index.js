@@ -74,36 +74,36 @@ export default function AdminLogin() {
         <title>Admin Login - SMK Paramitha 2</title>
       </Head>
       
-      <div className="min-h-screen bg-[#080810] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background Mesh */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#4F8EF7]/20 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#F97316]/10 rounded-full blur-[120px]" />
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-100 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-100 rounded-full blur-[120px]" />
         </div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-[#0f0f1a]/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative z-10"
+          className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-2xl relative z-10"
         >
           <div className="flex flex-col items-center mb-8">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl shadow-[#4F8EF7]/20 mb-4 bg-white">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 shadow-2xl shadow-primary-200 mb-4 bg-white">
               <Image src="/images/logo.jpg" alt="Logo" fill className="object-cover" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-1">Admin Portal</h1>
-            <p className="text-slate-400 text-sm">Sign in to manage your school website</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-1">Admin Portal</h1>
+            <p className="text-slate-500 text-sm">Sign in to manage your school website</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-slate-300 text-sm font-medium ml-1">Email Address</label>
+              <label className="text-slate-700 text-sm font-medium ml-1">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#080810]/50 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-slate-600 focus:border-[#4F8EF7] focus:ring-1 focus:ring-[#4F8EF7] focus:outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all"
                   placeholder="admin@paramitha.sch.id"
                   required
                 />
@@ -111,14 +111,14 @@ export default function AdminLogin() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-slate-300 text-sm font-medium ml-1">Password</label>
+              <label className="text-slate-700 text-sm font-medium ml-1">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#080810]/50 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-slate-600 focus:border-[#4F8EF7] focus:ring-1 focus:ring-[#4F8EF7] focus:outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -129,7 +129,7 @@ export default function AdminLogin() {
               <button
                 type="button"
                 onClick={handleResetPassword}
-                className="text-sm text-[#4F8EF7] hover:text-[#4F8EF7]/80 font-medium transition-colors"
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
               >
                 Forgot Password?
               </button>
@@ -138,7 +138,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#4F8EF7] hover:bg-[#3b7acf] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-[#4F8EF7]/25 flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
               {!loading && <ArrowRight size={20} />}
@@ -146,7 +146,7 @@ export default function AdminLogin() {
           </form>
         </motion.div>
         
-        <div className="absolute bottom-6 text-slate-600 text-xs text-center w-full">
+        <div className="absolute bottom-6 text-slate-500 text-xs text-center w-full">
           &copy; {new Date().getFullYear()} SMK Paramitha 2 Jakarta. All rights reserved.
         </div>
       </div>

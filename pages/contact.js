@@ -19,7 +19,7 @@ export default function Contact({ sekolahInfo }) {
   return (
     <Layout title="Hubungi Kami - SMK Paramitha Jakarta">
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-secondary-900">
         <div className="absolute inset-0 z-0">
           <SmartImage
             src="https://placehold.co/1920x1080/png?text=Contact+Us"
@@ -28,7 +28,7 @@ export default function Contact({ sekolahInfo }) {
             className="opacity-30 w-full h-full object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary-900 via-secondary-900/60 to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -37,7 +37,7 @@ export default function Contact({ sekolahInfo }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-primary-400 font-bold tracking-widest uppercase mb-4 block">Get In Touch</span>
+            <span className="text-accent-400 font-bold tracking-widest uppercase mb-4 block">Get In Touch</span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Hubungi Kami
             </h1>

@@ -5,7 +5,7 @@ import { getTestimonial, saveTestimonial, deleteTestimonial } from '../../servic
 import { showToast } from '../../utils/toast';
 import { Plus, Trash, X, Save, Edit, User } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
-import ImageUpload from '../../components/ImageUpload';
+import ImageUploader from '../../components/ImageUploader';
 
 function TestimonialAdmin() {
   const [items, setItems] = useState([]);
@@ -44,7 +44,7 @@ function TestimonialAdmin() {
       loadData();
     } catch (error) {
       console.error(error);
-      showToast.error('Failed to save');
+      showToast.error(error.message || 'Failed to save');
     }
   };
 
@@ -119,11 +119,13 @@ function TestimonialAdmin() {
               </div>
 
               <div className="space-y-2">
-                <ImageUpload 
-                  label="Photo (Optional)"
-                  value={formData.image_url}
-                  onChange={(url) => setFormData({...formData, image_url: url})}
-                  folder="testimonials"
+                <label className="text-slate-700 text-sm font-bold block mb-2">Photo (Optional)</label>
+                <ImageUploader 
+                  currentImage={formData.image_url} 
+                  onUploadComplete={(url) => setFormData({...formData, image_url: url})} 
+                  aspectRatio={1} 
+                  bucket="testimonial" 
+                  folder="" 
                 />
               </div>
 

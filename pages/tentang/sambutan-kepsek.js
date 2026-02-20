@@ -1,96 +1,145 @@
-import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import Layout from '../../components/Layout';
-import Section from '../../components/Section';
 import SmartImage from '../../components/SmartImage';
 import { getSekolahInfo } from '../../services/api';
+import { motion } from 'framer-motion';
+import { Quote } from 'lucide-react';
 
-export default function SambutanKepsek() {
-  const [info, setInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getSekolahInfo();
-        if (data) setInfo(data);
-      } catch (error) {
-        console.error("Failed to fetch info:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+export default function SambutanKepsek({ sekolahInfo }) {
+  const info = sekolahInfo || {};
 
   return (
-    <Layout title="Sambutan Kepala Sekolah - SMK Paramitha 2">
-      <Section className="pt-32 pb-20 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-12 items-start">
+    <Layout>
+      <Head>
+        <title>Sambutan Kepala Sekolah - SMK Paramitha 2</title>
+        <meta name="description" content={`Sambutan Kepala Sekolah SMK Paramitha 2 Jakarta, ${info.kepsek_name || 'Kepala Sekolah'}`} />
+      </Head>
+
+      {/* Hero Header */}
+      <section className="relative py-20 bg-[#1E1E8F] text-white overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C0161C] rounded-full blur-3xl opacity-30 -translate-y-1/2 translate-x-1/3" />
+        
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-5xl font-bold mb-4"
+          >
+            Sambutan Kepala Sekolah
+          </motion.h1>
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: 100 }}
+            className="h-1 bg-[#F5C400] mx-auto rounded-full"
+          />
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="py-16 md:py-24 bg-white relative">
+        <div className="container mx-auto px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
               
-              {/* Photo Column */}
-              <div className="w-full md:w-1/3 flex-shrink-0">
-                <div className="bg-white p-4 rounded-2xl shadow-xl shadow-slate-200 rotate-2 hover:rotate-0 transition-transform duration-300">
-                  <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-slate-100">
+              {/* Left Column: Photo Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="w-full lg:w-1/3 flex-shrink-0 sticky top-28"
+              >
+                <div className="bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 relative">
+                  <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-slate-100">
                     <SmartImage
-                      src={info?.kepsek_photo || '/images/Kepsek.JPG'}
-                      alt={info?.kepsek_name || 'Kepala Sekolah'}
+                      src={info.kepsek_photo || '/images/Kepsek.JPG'}
+                      alt={info.kepsek_name || 'Kepala Sekolah'}
                       fill
                       priority
                       style={{ objectFit: 'cover' }}
-                      className="hover:scale-105 transition-transform duration-500"
+                      className="hover:scale-105 transition-transform duration-700"
                     />
                   </div>
-                  <div className="mt-4 text-center">
-                    <h3 className="text-xl font-bold text-slate-900">
-                      {info?.kepsek_name || 'Dr. H. Ahmad Fauzi, M.Pd'}
+                  
+                  <div className="mt-6 text-center pb-2">
+                    <h3 className="text-2xl font-bold text-[#1E1E8F] mb-1 font-serif">
+                      {info.kepsek_name || 'Dr. H. Ahmad Fauzi, M.Pd'}
                     </h3>
-                    <p className="text-primary-600 font-medium text-sm">Kepala Sekolah</p>
+                    <p className="text-[#C0161C] font-bold uppercase tracking-wider text-sm">
+                      Kepala Sekolah
+                    </p>
+                  </div>
+
+                  {/* Decorative corner */}
+                  <div className="absolute -top-3 -left-3 w-12 h-12 border-t-4 border-l-4 border-[#F5C400] rounded-tl-xl" />
+                  <div className="absolute -bottom-3 -right-3 w-12 h-12 border-b-4 border-r-4 border-[#1E1E8F] rounded-br-xl" />
+                </div>
+              </motion.div>
+
+              {/* Right Column: Text Content */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="w-full lg:w-2/3"
+              >
+                <div className="prose prose-lg prose-slate max-w-none">
+                  <div className="relative mb-8 pl-8 md:pl-12 border-l-4 border-[#F5C400]">
+                    <Quote className="absolute top-0 left-2 text-[#F5C400]/20 -ml-8 -mt-4 w-16 h-16" />
+                    <p className="text-2xl font-serif text-[#1E1E8F] italic leading-relaxed m-0">
+                      "Assalamu'alaikum Warahmatullahi Wabarakatuh. Salam sejahtera bagi kita semua."
+                    </p>
+                  </div>
+
+                  <div className="space-y-6 text-slate-600 leading-relaxed text-justify">
+                    {info.kepsek_message ? (
+                      <div className="whitespace-pre-wrap">{info.kepsek_message}</div>
+                    ) : (
+                      <>
+                        <p>
+                          Puji syukur kita panjatkan ke hadirat Allah SWT atas segala limpahan rahmat dan karunia-Nya, sehingga kita masih diberi kesempatan untuk terus berkarya dan mengabdi di dunia pendidikan.
+                        </p>
+                        <p>
+                          Selamat datang di website resmi SMK Paramitha 2 Jakarta. Website ini kami hadirkan sebagai media informasi dan komunikasi antara sekolah dengan masyarakat luas, khususnya orang tua siswa, alumni, dan dunia usaha/dunia industri.
+                        </p>
+                        <p>
+                          SMK Paramitha 2 berkomitmen untuk mencetak lulusan yang tidak hanya kompeten dalam bidang keahliannya, tetapi juga memiliki karakter yang kuat, berakhlak mulia, dan siap bersaing di era global. Kami terus berupaya meningkatkan kualitas pembelajaran, fasilitas, dan kerjasama dengan industri untuk memastikan lulusan kami siap kerja.
+                        </p>
+                        <p>
+                          Di era digital yang berkembang pesat ini, penguasaan teknologi menjadi kunci. Oleh karena itu, kurikulum kami dirancang adaptif terhadap perubahan zaman, mengintegrasikan teknologi terkini dalam setiap proses pembelajaran.
+                        </p>
+                        <p>
+                          Kami juga menanamkan nilai-nilai kewirausahaan agar siswa memiliki mindset mandiri dan inovatif. Teaching Factory (TEFA) yang kami kembangkan menjadi wadah nyata bagi siswa untuk mengasah skill profesional layaknya di industri.
+                        </p>
+                        <p>
+                          Mari bergabung bersama kami untuk mewujudkan generasi masa depan yang unggul, kreatif, dan inovatif. Bersama SMK Paramitha 2, kita raih masa depan gemilang.
+                        </p>
+                        <p className="font-bold text-[#1E1E8F]">
+                          Wassalamu'alaikum Warahmatullahi Wabarakatuh.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  
+                  <div className="mt-12 pt-8 border-t border-slate-100 flex justify-end">
+                    <div className="text-center">
+                      <div className="text-3xl font-serif text-[#1E1E8F] italic mb-2 opacity-80 sign-font">
+                        {info.kepsek_name || 'Ahmad Fauzi'}
+                      </div>
+                      <div className="text-sm text-slate-400 uppercase tracking-widest">
+                        Kepala Sekolah
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Content Column */}
-              <div className="w-full md:w-2/3">
-                <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 relative inline-block">
-                  Sambutan Kepala Sekolah
-                  <span className="absolute bottom-0 left-0 w-1/3 h-2 bg-primary-500 rounded-full"></span>
-                </h1>
-                
-                <div className="prose prose-lg text-slate-600 leading-relaxed">
-                  <p className="text-xl font-medium text-slate-800 mb-6 italic border-l-4 border-primary-500 pl-4 bg-primary-50 py-2 rounded-r-lg">
-                    &quot;Assalamu&apos;alaikum Warahmatullahi Wabarakatuh.&quot;
-                  </p>
-                  
-                  {info?.kepsek_message ? (
-                    <div className="whitespace-pre-wrap">{info.kepsek_message}</div>
-                  ) : (
-                    <>
-                      <p className="mb-4">
-                        Puji syukur kita panjatkan ke hadirat Allah SWT atas segala limpahan rahmat dan karunia-Nya, sehingga kita masih diberi kesempatan untuk terus berkarya dan mengabdi di dunia pendidikan.
-                      </p>
-                      <p className="mb-4">
-                        Selamat datang di website resmi SMK Paramitha 2 Jakarta. Website ini kami hadirkan sebagai media informasi dan komunikasi antara sekolah dengan masyarakat luas, khususnya orang tua siswa, alumni, dan dunia usaha/dunia industri.
-                      </p>
-                      <p className="mb-4">
-                        SMK Paramitha 2 berkomitmen untuk mencetak lulusan yang tidak hanya kompeten dalam bidang keahliannya, tetapi juga memiliki karakter yang kuat, berakhlak mulia, dan siap bersaing di era global. Kami terus berupaya meningkatkan kualitas pembelajaran, fasilitas, dan kerjasama dengan industri untuk memastikan lulusan kami siap kerja.
-                      </p>
-                      <p className="mb-4">
-                        Mari bergabung bersama kami untuk mewujudkan generasi masa depan yang unggul, kreatif, dan inovatif.
-                      </p>
-                      <p>
-                        Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh.
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+              </motion.div>
 
             </div>
           </div>
         </div>
-      </Section>
+      </section>
     </Layout>
   );
 }
@@ -98,23 +147,17 @@ export default function SambutanKepsek() {
 export async function getServerSideProps() {
   try {
     const sekolahInfo = await getSekolahInfo();
-    
-    if (!sekolahInfo) {
-      console.log('DEBUG: Sekolah Info is empty from Supabase');
-    }
-
-    return { 
-      props: { 
-        sekolahInfo: sekolahInfo || null 
-      } 
+    return {
+      props: {
+        sekolahInfo: sekolahInfo || null
+      }
     };
   } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-    console.log('DEBUG: Error fetching sekolah info');
-    return { 
-      props: { 
-        sekolahInfo: null 
-      } 
+    console.error("Error fetching sekolah info:", error);
+    return {
+      props: {
+        sekolahInfo: null
+      }
     };
   }
 }

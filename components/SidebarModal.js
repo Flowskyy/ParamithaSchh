@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Phone, Mail, ChevronRight, Facebook, Instagram, Youtube } from 'lucide-react';
+import { X, ChevronRight, Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function SidebarModal({ isOpen, onClose, links }) {
   const [openSubmenu, setOpenSubmenu] = React.useState(null);
@@ -24,9 +24,9 @@ export default function SidebarModal({ isOpen, onClose, links }) {
   };
 
   const socialLinks = [
-    { icon: <Facebook size={18} />, href: '#', color: 'hover:text-blue-600' },
-    { icon: <Instagram size={18} />, href: 'https://www.instagram.com/smkparamithajakartaofficial/', color: 'hover:text-pink-600' },
-    { icon: <Youtube size={18} />, href: '#', color: 'hover:text-red-600' },
+    { icon: <Facebook size={16} />, href: 'https://facebook.com/smkparamitha2', color: 'hover:text-[#1E1E8F]' },
+    { icon: <Instagram size={16} />, href: 'https://instagram.com/smkparamitha2', color: 'hover:text-[#C0161C]' },
+    { icon: <Youtube size={16} />, href: 'https://youtube.com/@smkparamitha2', color: 'hover:text-[#C0161C]' },
   ];
 
   return (
@@ -39,165 +39,165 @@ export default function SidebarModal({ isOpen, onClose, links }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]"
           />
 
           {/* Modal Container */}
           <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
-            {/* Modal Card */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-              className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-xl overflow-hidden pointer-events-auto flex flex-col md:flex-row"
+              className="bg-white w-full max-h-[85vh] md:h-auto md:max-w-2xl rounded-3xl shadow-2xl overflow-y-auto md:overflow-hidden pointer-events-auto flex flex-col min-[480px]:flex-row relative"
             >
-              {/* Left Column: Navigation */}
-              <div className="w-full md:w-5/12 bg-slate-50 p-8 flex flex-col border-r border-slate-100 overflow-y-auto">
-                <div className="flex items-center justify-between mb-8 md:hidden">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10">
-                       <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain" sizes="40px" />
+              {/* Close Button - Positioned inside the card */}
+              <button 
+                onClick={onClose} 
+                className="absolute top-4 right-4 z-50 p-1.5 bg-black/10 hover:bg-black/20 md:bg-white/10 md:hover:bg-white/20 backdrop-blur-md rounded-full text-slate-800 md:text-white transition-colors shadow-sm border border-transparent md:border-white/20"
+                aria-label="Close menu"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Left Column: Navigation Menu */}
+              <div className="w-full min-[480px]:w-1/2 md:w-2/5 md:h-full md:overflow-y-auto bg-white flex flex-col">
+                <div className="p-4 md:p-6 flex-1">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="relative w-8 h-8">
+                       <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain" sizes="32px" />
                     </div>
-                    <span className="font-bold text-slate-900">Paramitha 2</span>
-                  </div>
-                  <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                    <X size={24} />
-                  </button>
-                </div>
-
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 hidden md:block">Menu Navigasi</h3>
-                
-                <nav className="space-y-2 flex-1">
-                  {links.map((link, idx) => (
-                    <div key={idx} className="group">
-                      <div 
-                        onClick={() => {
-                          if (link.dropdown) {
-                            toggleSubmenu(idx);
-                          } else {
-                            // If it's a direct link, we rely on the Link component inside, but here we can handle the click for the container
-                          }
-                        }}
-                        className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer select-none ${openSubmenu === idx ? 'bg-white shadow-sm' : 'hover:bg-white/50'}`}
-                      >
-                        {link.dropdown ? (
-                          <span className={`font-bold transition-colors flex-1 ${openSubmenu === idx ? 'text-primary-600' : 'text-slate-700'}`}>
-                            {link.name}
-                          </span>
-                        ) : (
-                          <Link href={link.href} className="flex-1 font-bold text-slate-700" onClick={onClose}>
-                            {link.name}
-                          </Link>
-                        )}
-                        
-                        {link.dropdown && (
-                           <ChevronRight 
-                             size={16} 
-                             className={`text-slate-300 transition-transform duration-300 ${openSubmenu === idx ? 'rotate-90 text-primary-400' : ''}`} 
-                           />
-                        )}
-                      </div>
-                      
-                      {/* Submenu for Modal */}
-                      <AnimatePresence>
-                        {link.dropdown && openSubmenu === idx && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="pl-4 mt-1 space-y-1 border-l-2 border-slate-200 ml-4 py-2">
-                              {link.dropdown.map((subItem, subIdx) => (
-                                <Link
-                                  key={subIdx}
-                                  href={subItem.href}
-                                  onClick={onClose}
-                                  className="block py-2 px-3 text-sm text-slate-500 hover:text-primary-600 hover:bg-slate-100/50 rounded-lg transition-colors"
-                                >
-                                  {subItem.name}
-                                </Link>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Right Column: Info & Details */}
-              <div className="w-full md:w-7/12 p-8 bg-white relative overflow-hidden flex flex-col">
-                {/* Decorative Background */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-                
-                <div className="hidden md:flex justify-end mb-8">
-                  <button 
-                    onClick={onClose}
-                    className="w-10 h-10 rounded-full bg-slate-50 hover:bg-red-50 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-
-                <div className="relative z-10 flex-1 flex flex-col justify-center">
-                  <div className="mb-8">
-                    <div className="relative w-16 h-16 mb-6 rounded-2xl overflow-hidden shadow-lg border border-slate-100 hidden md:block">
-                      <Image src="/images/logo.jpg" alt="Logo" fill className="object-cover" />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2">SMK Paramitha 2 Jakarta</h2>
-                    <p className="text-slate-500">Mencetak Generasi PINK JITU (Profesional, Inovatif, Nasionalis, Kompeten, Jujur, Iman, Tangguh, Unggul)</p>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                      <MapPin className="text-primary-600 shrink-0 mt-1" size={20} />
-                      <div>
-                        <h4 className="font-bold text-slate-900 mb-1">Lokasi Kampus</h4>
-                        <p className="text-sm text-slate-600 leading-relaxed">
-                          Jl. Komp. DDN Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Kec. Duren Sawit, Kota Jakarta Timur, 13450
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <Phone className="text-primary-600" size={20} />
-                        <div>
-                          <h4 className="font-bold text-slate-900 text-sm">Telepon</h4>
-                          <p className="text-sm text-slate-600">021-8650377</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                        <Mail className="text-primary-600" size={20} />
-                        <div>
-                          <h4 className="font-bold text-slate-900 text-sm">Email</h4>
-                          <p className="text-sm text-slate-600">info@paramitha2.sch.id</p>
-                        </div>
-                      </div>
+                    <div>
+                      <h2 className="font-bold text-slate-900 text-sm leading-tight">SMK Paramitha 2</h2>
+                      <p className="text-[10px] text-slate-500 font-medium tracking-wide">JAKARTA</p>
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-400">Ikuti Kami</span>
-                    <div className="flex gap-4">
-                      {socialLinks.map((social, idx) => (
-                        <a 
-                          key={idx}
-                          href={social.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`text-slate-400 transition-colors ${social.color}`}
+                  {/* Navigation Links */}
+                  <nav className="space-y-0.5">
+                    {links.map((link, idx) => (
+                      <div key={idx} className="group">
+                        <div 
+                          onClick={() => {
+                            if (link.dropdown) {
+                              toggleSubmenu(idx);
+                            } else {
+                              // If it's a direct link, assume Link component handles navigation
+                            }
+                          }}
+                          className={`flex items-center justify-between p-2 rounded-lg transition-all cursor-pointer select-none ${openSubmenu === idx ? 'bg-slate-50' : 'hover:bg-slate-50'}`}
                         >
-                          {social.icon}
-                        </a>
-                      ))}
+                          {link.dropdown ? (
+                            <span className={`font-bold text-sm md:text-base transition-colors flex-1 ${openSubmenu === idx ? 'text-[#C0161C]' : 'text-slate-800'}`}>
+                              {link.name}
+                            </span>
+                          ) : (
+                            <Link href={link.href} className="flex-1 font-bold text-sm md:text-base text-slate-800 hover:text-[#C0161C] transition-colors" onClick={onClose}>
+                              {link.name}
+                            </Link>
+                          )}
+                          
+                          {link.dropdown && (
+                            <ChevronRight 
+                              size={16} 
+                              className={`text-slate-400 transition-transform duration-300 ${openSubmenu === idx ? 'rotate-90 text-[#C0161C]' : ''}`} 
+                            />
+                          )}
+                        </div>
+
+                        {/* Submenu */}
+                        <AnimatePresence>
+                          {link.dropdown && openSubmenu === idx && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-3 pr-2 pb-1 space-y-0.5 ml-2 border-l-2 border-slate-100">
+                                {link.dropdown.map((item, subIdx) => (
+                                  <Link 
+                                    key={subIdx} 
+                                    href={item.href}
+                                    onClick={onClose}
+                                    className={`block px-3 py-1.5 rounded-md text-xs hover:bg-slate-50 transition-colors ${item.isHighlight ? 'text-[#C0161C] font-semibold' : 'text-slate-600 hover:text-[#C0161C]'}`}
+                                  >
+                                    {item.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+
+              {/* Right Column: CTA & Contact Info */}
+              <div className="w-full min-[480px]:w-1/2 md:w-3/5 bg-gradient-to-br from-[#C0161C] to-[#1E1E8F] text-white p-5 md:p-8 flex flex-col justify-between relative overflow-hidden shrink-0">
+                {/* Decorative Elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+                {/* Badge */}
+                <div className="relative z-10 mb-4">
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#F5C400] text-[#1E1E8F] text-[10px] font-bold tracking-wider mb-3 shadow-lg shadow-yellow-900/20">
+                    PENERIMAAN SISWA BARU
+                  </span>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">Bergabung Bersama Kami</h3>
+                  <p className="text-white/90 text-xs md:text-sm mb-6 leading-relaxed max-w-xs">
+                    Siapkan masa depan gemilang dengan pendidikan vokasi berkualitas dan berkarakter.
+                  </p>
+                  
+                  <Link 
+                    href="/ppdb"
+                    onClick={onClose}
+                    className="inline-flex items-center justify-center px-6 py-2.5 bg-[#C0161C] hover:bg-[#a01217] text-white font-bold rounded-xl transition-all shadow-lg shadow-red-900/30 group text-sm border border-white/10 w-full sm:w-auto"
+                  >
+                    <span>Daftar PPDB Online</span>
+                    <ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+
+                {/* Contact Info */}
+                <div className="relative z-10 space-y-4 mt-auto">
+                  <div className="space-y-3 border-t border-white/10 pt-4">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="shrink-0 mt-0.5 text-[#F5C400]" size={16} />
+                      <p className="text-xs text-white/90 leading-snug">
+                        Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Jakarta Timur
+                      </p>
                     </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="shrink-0 text-[#F5C400]" size={16} />
+                      <p className="text-xs text-white/90">021-8650377</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Mail className="shrink-0 text-[#F5C400]" size={16} />
+                      <p className="text-xs text-white/90">info@smkparamitha2.sch.id</p>
+                    </div>
+                  </div>
+
+                  {/* Social Icons */}
+                  <div className="flex gap-2">
+                    {socialLinks.map((social, idx) => (
+                      <a 
+                        key={idx} 
+                        href={social.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/90 transition-all hover:bg-white hover:text-[#1E1E8F] hover:scale-110"
+                      >
+                        {social.icon}
+                      </a>
+                    ))}
                   </div>
                 </div>
               </div>
+
             </motion.div>
           </div>
         </>

@@ -33,7 +33,8 @@ function CarouselAdmin() {
     e.preventDefault();
     const { error } = await saveCarousel(formData);
     if (error) {
-      showToast.error('Failed to save');
+      console.error(error);
+      showToast.error(error.message || 'Failed to save');
       return;
     }
     showToast.success('Saved successfully');
@@ -89,8 +90,8 @@ function CarouselAdmin() {
                   currentImage={formData.image_url} 
                   onUploadComplete={(url) => setFormData({...formData, image_url: url})} 
                   aspectRatio={16/9} 
-                  bucket="media" 
-                  folder="carousel" 
+                  bucket="carousel" 
+                  folder="" 
                 />
               </div>
               <div className="pt-4 flex justify-end gap-3">

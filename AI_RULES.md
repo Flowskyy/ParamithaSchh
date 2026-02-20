@@ -154,4 +154,3 @@ SituasiYang HARUS dilakukanTambah state baruTaruh useState di level atas kompone
 ❌ DILARANG tanya hal sepele yang bisa diputuskan sendiri
 
 
-Aturan ini berlaku sampai room chat diganti.

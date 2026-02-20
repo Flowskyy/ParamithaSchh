@@ -50,7 +50,7 @@ Mohon informasi lebih lanjut. Terima kasih.`;
   return (
     <Layout title="PPDB Online - SMK Paramitha 2 Jakarta">
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-slate-900">
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-secondary-900">
         <div className="absolute inset-0">
           <SmartImage
             src="https://placehold.co/1920x1080/png?text=PPDB"
@@ -59,7 +59,7 @@ Mohon informasi lebih lanjut. Terima kasih.`;
             className="opacity-30 w-full h-full object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary-900 via-transparent to-secondary-900/50"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -68,7 +68,7 @@ Mohon informasi lebih lanjut. Terima kasih.`;
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-primary-400 font-bold tracking-widest uppercase mb-4 block">Penerimaan Peserta Didik Baru</span>
+            <span className="text-accent-400 font-bold tracking-widest uppercase mb-4 block">Penerimaan Peserta Didik Baru</span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Bergabunglah Bersama Kami</h1>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto">
               Siapkan masa depan gemilang dengan pendidikan vokasi berkualitas di SMK Paramitha 2 Jakarta.
@@ -82,13 +82,13 @@ Mohon informasi lebih lanjut. Terima kasih.`;
         </div>
       </section>
 
-      <Section className="bg-slate-50">
+      <Section className="bg-surface">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Info Pendaftaran */}
           <div className="space-y-8">
             <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <Calendar className="text-primary-500" /> Jadwal Pendaftaran
+                <Calendar className="text-secondary-600" /> Jadwal Pendaftaran
               </h3>
               <div className="space-y-6 relative">
                 <div className="absolute left-3.5 top-3 bottom-3 w-0.5 bg-slate-200"></div>
@@ -100,12 +100,12 @@ Mohon informasi lebih lanjut. Terima kasih.`;
                 ].map((item, idx) => (
                   <div key={idx} className="relative pl-12">
                     <div className={`absolute left-0 top-1.5 w-7 h-7 rounded-full border-4 border-white shadow-sm ${
-                      item.status === 'Sedang Berlangsung' ? 'bg-primary-500 animate-pulse' : 'bg-slate-200'
+                      item.status === 'Sedang Berlangsung' ? 'bg-primary-600 animate-pulse' : 'bg-slate-200'
                     }`}></div>
                     <h4 className="text-slate-900 font-bold">{item.title}</h4>
                     <p className="text-slate-500 text-sm">{item.date}</p>
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full mt-1 inline-block ${
-                      item.status === 'Sedang Berlangsung' ? 'bg-primary-500/10 text-primary-600' : 'bg-slate-100 text-slate-500'
+                      item.status === 'Sedang Berlangsung' ? 'bg-primary-600/10 text-primary-600' : 'bg-slate-100 text-slate-500'
                     }`}>
                       {item.status}
                     </span>
@@ -116,7 +116,7 @@ Mohon informasi lebih lanjut. Terima kasih.`;
 
             <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                <FileText className="text-primary-500" /> Persyaratan Berkas
+                <FileText className="text-secondary-600" /> Persyaratan Berkas
               </h3>
               <ul className="space-y-3">
                 {[
@@ -127,7 +127,7 @@ Mohon informasi lebih lanjut. Terima kasih.`;
                   "Fotocopy KTP Orang Tua"
                 ].map((req, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle size={18} className="text-green-500 shrink-0 mt-1" />
+                    <CheckCircle size={18} className="text-primary-600 shrink-0 mt-1" />
                     <span>{req}</span>
                   </li>
                 ))}

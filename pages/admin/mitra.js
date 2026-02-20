@@ -11,20 +11,20 @@ import { Reorder } from 'framer-motion';
 function MitraItem({ item, handleEdit, handleDelete }) {
   return (
     <Reorder.Item value={item} id={item.id} className="relative">
-      <div className="bg-[#0f0f1a] border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-[#4F8EF7]/50 transition-all group mb-4 cursor-grab active:cursor-grabbing">
-        <div className="text-slate-600 hover:text-white cursor-grab active:cursor-grabbing p-2">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-primary-200 hover:shadow-md transition-all group mb-4 cursor-grab active:cursor-grabbing">
+        <div className="text-slate-400 hover:text-primary-600 cursor-grab active:cursor-grabbing p-2">
           <GripVertical size={20} />
         </div>
         
-        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 relative bg-white p-2">
+        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 relative bg-slate-50 p-2 border border-slate-100">
           <div className="relative w-full h-full">
             <SmartImage src={item.logo_url} fill style={{ objectFit: 'contain' }} />
           </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h4 className="text-white font-bold truncate">{item.nama}</h4>
-          <a href={item.website} target="_blank" rel="noreferrer" className="text-[#4F8EF7] text-sm hover:underline truncate block">
+          <h4 className="text-slate-900 font-bold truncate">{item.nama}</h4>
+          <a href={item.website} target="_blank" rel="noreferrer" className="text-primary-600 text-sm hover:underline truncate block">
             {item.website || '-'}
           </a>
         </div>
@@ -99,7 +99,7 @@ function MitraAdmin() {
       loadData();
     } catch (error) {
       console.error(error);
-      showToast.error('Failed to save');
+      showToast.error(error.message || 'Failed to save');
     }
   };
 
@@ -153,75 +153,75 @@ function MitraAdmin() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Manage Mitra</h1>
-          <p className="text-slate-400 text-sm">Partner industri dan perusahaan</p>
+          <h1 className="text-2xl font-bold text-slate-900">Manage Mitra</h1>
+          <p className="text-slate-500 text-sm">Partner industri dan perusahaan</p>
         </div>
         <button 
           onClick={handleCreate}
-          className="px-4 py-2 bg-[#4F8EF7] hover:bg-[#3b7acf] text-white rounded-xl font-bold flex items-center gap-2 text-sm shadow-lg shadow-[#4F8EF7]/20 transition-all hover:-translate-y-0.5"
+          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold flex items-center gap-2 text-sm shadow-lg shadow-primary-600/20 transition-all hover:-translate-y-0.5"
         >
           <Plus size={18} /> Add Mitra
         </button>
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-[#0f0f1a] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
-              <h3 className="text-xl font-bold text-white">{editing === 'new' ? 'Add New Mitra' : 'Edit Mitra'}</h3>
-              <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-white transition-colors"><X size={24} /></button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl">
+            <div className="flex justify-between items-center p-6 border-b border-slate-100">
+              <h3 className="text-xl font-bold text-slate-900">{editing === 'new' ? 'Add New Mitra' : 'Edit Mitra'}</h3>
+              <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button>
             </div>
             
             <form onSubmit={handleSave} className="p-6 space-y-6">
               <div className="space-y-2">
-                <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Nama Perusahaan</label>
+                <label className="text-slate-600 text-xs uppercase font-bold tracking-wider">Nama Perusahaan</label>
                 <input 
                   type="text" 
                   value={formData.nama || ''} 
                   onChange={e => setFormData({...formData, nama: e.target.value})}
-                  className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-primary-600 focus:outline-none transition-all"
                   required
                 />
               </div>
               
               <div className="space-y-2">
-                <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Website URL</label>
+                <label className="text-slate-600 text-xs uppercase font-bold tracking-wider">Website URL</label>
                 <input 
                   type="text" 
                   value={formData.website || ''} 
                   onChange={e => setFormData({...formData, website: e.target.value})}
-                  className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-primary-600 focus:outline-none transition-all"
                   placeholder="https://..."
                 />
               </div>
 
-              <div className="flex items-center gap-3 bg-[#080810] border border-white/10 p-3 rounded-xl">
+              <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-3 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, aktif: !prev.aktif }))}
-                  className={`w-12 h-6 rounded-full relative transition-colors ${formData.aktif ? 'bg-[#4F8EF7]' : 'bg-slate-700'}`}
+                  className={`w-12 h-6 rounded-full relative transition-colors ${formData.aktif ? 'bg-primary-600' : 'bg-slate-300'}`}
                 >
                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${formData.aktif ? 'left-7' : 'left-1'}`} />
                 </button>
-                <span className="text-white font-medium">Status Aktif</span>
+                <span className="text-slate-900 font-medium">Status Aktif</span>
               </div>
 
               <div className="space-y-2">
-                <label className="text-slate-400 text-xs uppercase font-bold tracking-wider block mb-2">Logo Perusahaan</label>
+                <label className="text-slate-600 text-xs uppercase font-bold tracking-wider block mb-2">Logo Perusahaan</label>
                 <ImageUploader 
                   currentImage={formData.logo_url} 
                   onUploadComplete={(url) => setFormData({...formData, logo_url: url})} 
                   aspectRatio={16/9} 
-                  bucket="media" 
-                  folder="mitra" 
+                  bucket="mitra" 
+                  folder="" 
                 />
               </div>
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-white/10">
-                <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-400 font-medium hover:bg-white/5 rounded-xl transition-colors">
+              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-colors">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-[#4F8EF7] hover:bg-[#3b7acf] text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-[#4F8EF7]/20 transition-all hover:-translate-y-0.5">
+                <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary-600/20 transition-all hover:-translate-y-0.5">
                   <Save size={18} /> Save Mitra
                 </button>
               </div>
@@ -243,8 +243,8 @@ function MitraAdmin() {
         </Reorder.Group>
         
         {items.length === 0 && !loading && (
-          <div className="py-12 text-center text-slate-500 bg-[#0f0f1a]/50 rounded-2xl border border-white/5 border-dashed">
-            <Building2 size={48} className="mx-auto mb-4 opacity-20" />
+          <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+            <Building2 size={48} className="mx-auto mb-4 opacity-20 text-slate-400" />
             <p>No partners found.</p>
           </div>
         )}

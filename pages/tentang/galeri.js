@@ -1,135 +1,227 @@
-import Layout from '../../components/Layout';
-import Section from '../../components/Section';
-import SmartImage from '../../components/SmartImage';
-import { getGaleri, getSekolahInfo } from '../../services/api';
-import { fallbackGaleri } from '../../utils/fallbackData';
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react'
+import Head from 'next/head'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
+import Layout from '../../components/Layout'
+import SmartImage from '../../components/SmartImage'
+import { getGaleri, getSekolahInfo } from '../../services/api'
+import { fallbackGaleri, fallbackSekolahInfo } from '../../utils/fallbackData'
 
-export default function Galeri({ sekolahInfo, galeriData }) {
-  const [items, setItems] = useState(galeriData || fallbackGaleri);
-  const [activeTab, setActiveTab] = useState('Semua');
+export default function GaleriPage({ galeri, sekolahInfo }) {
+  const [activeCategory, setActiveCategory] = useState('Semua')
+  const [selectedImage, setSelectedImage] = useState(null)
+  
+  // Extract unique categories
+  const categories = ['Semua', ...new Set(galeri.map(item => item.category).filter(Boolean))]
 
+  const filteredGaleri = activeCategory === 'Semua' 
+    ? galeri 
+    : galeri.filter(item => item.category === activeCategory)
+
+  // Lightbox navigation
+  const handleNext = (e) => {
+    e.stopPropagation()
+    const currentIndex = filteredGaleri.findIndex(item => item.id === selectedImage.id)
+    const nextIndex = (currentIndex + 1) % filteredGaleri.length
+    setSelectedImage(filteredGaleri[nextIndex])
+  }
+
+  const handlePrev = (e) => {
+    e.stopPropagation()
+    const currentIndex = filteredGaleri.findIndex(item => item.id === selectedImage.id)
+    const prevIndex = (currentIndex - 1 + filteredGaleri.length) % filteredGaleri.length
+    setSelectedImage(filteredGaleri[prevIndex])
+  }
+
+  // Keyboard navigation
   useEffect(() => {
-    if (galeriData && galeriData.length > 0) setItems(galeriData);
-  }, [galeriData]);
-
-  const categories = ['Semua', ...new Set(items.map(i => i.category))];
-  const filteredItems = activeTab === 'Semua' ? items : items.filter(i => i.category === activeTab);
+    const handleKeyDown = (e) => {
+      if (!selectedImage) return
+      if (e.key === 'Escape') setSelectedImage(null)
+      if (e.key === 'ArrowRight') handleNext(e)
+      if (e.key === 'ArrowLeft') handlePrev(e)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedImage, filteredGaleri])
 
   return (
-    <Layout title="Galeri - SMK Paramitha 2 Jakarta">
+    <Layout>
+      <Head>
+        <title>Galeri — SMK Paramitha 2</title>
+        <meta name="description" content="Dokumentasi kegiatan dan prestasi siswa SMK Paramitha 2 Jakarta." />
+      </Head>
+
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-slate-900">
-        <SmartImage
-          src="https://placehold.co/1920x1080/png?text=Galeri+Kegiatan"
-          alt="Galeri Kegiatan"
-          fill
-          className="opacity-30 w-full h-full object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50"></div>
+      <section className="relative py-20 md:py-32 bg-[#080810] text-white">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E8F]/90 to-[#080810]/50 z-0" />
+        <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-20 mix-blend-overlay z-0" />
         
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl font-bold mb-6"
           >
-            <span className="text-primary-400 font-bold tracking-widest uppercase mb-4 block">Dokumentasi</span>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Galeri Kegiatan</h1>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Momen-momen berharga dan prestasi siswa-siswi SMK Paramitha 2 Jakarta.
-            </p>
+            Galeri Kegiatan
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto"
+          >
+            Momen-momen berharga dalam perjalanan pendidikan dan pengembangan diri siswa.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Filter Section */}
+      <section className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm">
+        <div className="container mx-auto px-6">
+          <div className="flex overflow-x-auto pb-2 md:pb-0 hide-scrollbar gap-2 justify-center md:justify-start">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                  activeCategory === cat 
+                    ? 'bg-[#1E1E8F] text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Grid (Masonry-ish) */}
+      <section className="py-12 bg-[#F8F8FF] min-h-screen">
+        <div className="container mx-auto px-6">
+          <motion.div 
+            layout
+            className="columns-1 md:columns-3 lg:columns-4 gap-4 space-y-4"
+          >
+            <AnimatePresence>
+              {filteredGaleri.map((item) => (
+                <motion.div
+                  layout
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="break-inside-avoid relative group rounded-xl overflow-hidden cursor-pointer bg-gray-200"
+                  onClick={() => setSelectedImage(item)}
+                >
+                  <SmartImage 
+                    src={item.image_url} 
+                    alt={item.title}
+                    width={800}
+                    height={600}
+                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <ZoomIn className="text-white" size={32} />
+                  </div>
+                  
+                  {/* Caption */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p className="text-white font-medium text-sm truncate">{item.title}</p>
+                    <p className="text-white/70 text-xs">{item.category}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </motion.div>
         </div>
       </section>
 
-      <Section className="bg-slate-50 min-h-screen">
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
-              className={`px-8 py-3 rounded-full text-sm font-bold transition-all border duration-300 ${
-                activeTab === cat 
-                  ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-600/30 scale-105' 
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:scale-105'
-              }`}
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 md:p-10 backdrop-blur-sm"
+            onClick={() => setSelectedImage(null)}
+          >
+            {/* Close Button */}
+            <button 
+              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-50 p-2 bg-white/10 rounded-full"
+              onClick={() => setSelectedImage(null)}
             >
-              {cat}
+              <X size={24} />
             </button>
-          ))}
-        </div>
 
-        {/* Masonry Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 px-4">
-          {filteredItems.map((item, idx) => (
-            <motion.div 
-              key={item.id} 
-              layout
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.4 }}
-              className="break-inside-avoid rounded-3xl overflow-hidden relative group shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-slate-900"
+            {/* Navigation Buttons */}
+            <button 
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors p-3 bg-white/10 rounded-full hidden md:block"
+              onClick={handlePrev}
             >
-              <div className="relative overflow-hidden">
+              <ChevronLeft size={32} />
+            </button>
+            <button 
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors p-3 bg-white/10 rounded-full hidden md:block"
+              onClick={handleNext}
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Image Container */}
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-5xl w-full max-h-[80vh] flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full h-auto max-h-[70vh] rounded-lg overflow-hidden shadow-2xl">
                 <SmartImage 
-                  src={item.image_url} 
-                  alt={item.title} 
-                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110 group-hover:opacity-60" 
-                  width={600} 
-                  height={400} 
+                  src={selectedImage.image_url} 
+                  alt={selectedImage.title}
+                  width={1200}
+                  height={800}
+                  className="w-full h-full object-contain bg-black"
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 transform scale-0 group-hover:scale-100 transition-transform duration-500 delay-100">
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                     </svg>
-                   </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-all duration-300 flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0">
-                  <span className="text-primary-400 text-xs font-bold uppercase tracking-widest mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-200">{item.category}</span>
-                  <h3 className="text-white font-bold text-xl mb-1 leading-tight transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-100">{item.title}</h3>
-                  <div className="w-12 h-1 bg-primary-500 rounded-full mt-4 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left delay-300"></div>
-                </div>
+              </div>
+              
+              <div className="mt-4 text-center">
+                <h3 className="text-white text-xl font-bold">{selectedImage.title}</h3>
+                <p className="text-gray-400">{selectedImage.category}</p>
               </div>
             </motion.div>
-          ))}
-        </div>
-      </Section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
-  );
+  )
 }
 
 export async function getServerSideProps() {
   try {
-    const [sekolahInfo, galeriData] = await Promise.all([
-      getSekolahInfo(),
-      getGaleri()
-    ]);
+    const [galeri, sekolahInfo] = await Promise.all([
+      getGaleri(),
+      getSekolahInfo()
+    ])
 
-    // Debugging
-    if (!galeriData || galeriData.length === 0) {
-      console.log('DEBUG: Galeri data is empty from Supabase, using fallback');
+    return { 
+      props: { 
+        galeri: galeri?.length ? galeri : fallbackGaleri,
+        sekolahInfo: sekolahInfo || fallbackSekolahInfo
+      } 
     }
-
+  } catch {
     return { 
       props: { 
-        sekolahInfo: sekolahInfo || null,
-        galeriData: galeriData && galeriData.length > 0 ? galeriData : fallbackGaleri
+        galeri: fallbackGaleri,
+        sekolahInfo: fallbackSekolahInfo 
       } 
-    };
-  } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-    console.log('DEBUG: Error fetching galeri, using fallback');
-    return { 
-      props: { 
-        sekolahInfo: null,
-        galeriData: fallbackGaleri
-      } 
-    };
+    }
   }
 }

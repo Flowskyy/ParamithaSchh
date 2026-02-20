@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { X, ChevronDown, ArrowRight, Phone, MapPin, LayoutGrid, Mail } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Menu, LayoutGrid } from 'lucide-react';
 import SidebarModal from './SidebarModal';
 
 export default function Navbar() {
@@ -14,7 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -26,8 +25,10 @@ export default function Navbar() {
       name: 'Tentang Kami', 
       href: '#', 
       dropdown: [
+        { name: 'Lihat Semua', href: '/tentang', desc: 'Tentang Sekolah', isHighlight: true },
         { name: 'Sejarah Sekolah', href: '/tentang/sejarah', desc: 'Perjalanan & Milestone' },
         { name: 'Visi & Misi', href: '/tentang/visi-misi', desc: 'Tujuan & Nilai Utama' },
+        { name: 'Motto & Mars', href: '/tentang/motto-mars', desc: 'Semangat & Identitas' },
         { name: 'Sambutan Kepsek', href: '/tentang/sambutan-kepsek', desc: 'Pesan Kepala Sekolah' },
         { name: 'Fasilitas', href: '/tentang/fasilitas', desc: 'Sarana Prasarana' },
         { name: 'Galeri', href: '/tentang/galeri', desc: 'Dokumentasi Kegiatan' },
@@ -37,6 +38,7 @@ export default function Navbar() {
       name: 'Jurusan', 
       href: '#',
       dropdown: [
+        { name: 'Semua Jurusan', href: '/jurusan', desc: 'Daftar Program Keahlian', isHighlight: true },
         { name: 'Rekayasa Perangkat Lunak', href: '/jurusan/rpl', desc: 'Software Engineering' },
         { name: 'Desain Komunikasi Visual', href: '/jurusan/dkv', desc: 'Creative Design' },
         { name: 'Perhotelan', href: '/jurusan/perhotelan', desc: 'Hospitality' },
@@ -50,9 +52,13 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-3 border-b border-black/5' : 'bg-transparent py-5'
-      }`}>
+      <nav 
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          scrolled 
+            ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' 
+            : 'bg-gradient-to-b from-black/30 to-transparent py-5'
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -61,10 +67,14 @@ export default function Navbar() {
                  <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain" sizes="48px" />
               </div>
               <div className="flex flex-col">
-                <span className={`font-bold text-lg leading-tight transition-colors text-slate-900`}>
+                <span className={`font-bold text-lg leading-tight transition-colors ${
+                  scrolled ? 'text-slate-900' : 'text-white'
+                }`}>
                   SMK Paramitha 2
                 </span>
-                <span className={`text-[10px] uppercase tracking-widest font-medium text-primary-600`}>
+                <span className={`text-[10px] uppercase tracking-widest font-medium ${
+                  scrolled ? 'text-[#C0161C]' : 'text-white/80'
+                }`}>
                   Jakarta
                 </span>
               </div>
@@ -83,8 +93,8 @@ export default function Navbar() {
                     href={link.href}
                     className={`flex items-center gap-1 font-medium text-sm transition-colors py-2 ${
                       scrolled 
-                        ? 'text-slate-600 hover:text-primary-600' 
-                        : 'text-slate-700 hover:text-primary-600'
+                        ? 'text-slate-700 hover:text-[#C0161C]' 
+                        : 'text-white hover:text-white/80'
                     }`}
                   >
                     {link.name}
@@ -93,16 +103,20 @@ export default function Navbar() {
 
                   {/* Dropdown */}
                   {link.dropdown && (
-                    <div className={`absolute top-full left-0 w-64 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0`}>
-                      <div className="bg-white rounded-xl shadow-xl border border-slate-100 p-2 overflow-hidden">
+                    <div className={`absolute top-full left-0 w-72 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0`}>
+                      <div className="bg-white rounded-xl shadow-xl border border-[#F5C400]/30 p-2 overflow-hidden">
                         {link.dropdown.map((item, subIdx) => (
                           <Link 
                             key={subIdx} 
                             href={item.href}
-                            className="block p-3 rounded-lg hover:bg-slate-50 transition-colors group/item"
+                            className="block px-4 py-3 hover:bg-slate-50 rounded-lg transition-colors group/item"
                           >
-                            <span className="block font-bold text-slate-800 text-sm group-hover/item:text-primary-600 transition-colors">{item.name}</span>
-                            <span className="block text-xs text-slate-400 mt-0.5">{item.desc}</span>
+                            <div className={`font-medium text-sm group-hover/item:text-[#C0161C] ${item.isHighlight ? 'text-[#C0161C] font-bold' : 'text-slate-700'}`}>
+                              {item.name}
+                            </div>
+                            <div className="text-[10px] text-slate-400 group-hover/item:text-slate-500 mt-0.5">
+                              {item.desc}
+                            </div>
                           </Link>
                         ))}
                       </div>
@@ -110,42 +124,42 @@ export default function Navbar() {
                   )}
                 </div>
               ))}
-            </div>
 
-            {/* CTA Button */}
-            <div className="hidden lg:block">
-              <Link 
-                href="/ppdb" 
-                className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
+              {/* Info Button (Desktop) */}
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className={`hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl transition-all border ${
                   scrolled 
-                    ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/20' 
-                    : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/10'
+                    ? 'border-[#1E1E8F] text-[#1E1E8F] hover:bg-[#1E1E8F] hover:text-white' 
+                    : 'border-white text-white hover:bg-white/20'
                 }`}
               >
-                PPDB Online <ArrowRight size={16} />
-              </Link>
+                <LayoutGrid size={18} />
+                <span className="text-xs font-bold uppercase tracking-wider">Info</span>
+              </button>
             </div>
 
-            {/* Sidebar Toggle */}
+            {/* Mobile Menu Toggle */}
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all ml-2 lg:ml-4 ${
+              className={`lg:hidden flex items-center gap-2 px-3 py-2 rounded-full transition-all ml-2 ${
                 scrolled 
-                  ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' 
-                  : 'bg-white/80 text-slate-700 hover:bg-white shadow-sm'
+                  ? 'bg-slate-100 text-[#C0161C] hover:bg-slate-200' 
+                  : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
               }`}
             >
-              <LayoutGrid size={18} />
-              <span className="text-xs font-bold uppercase tracking-wider">Info</span>
+              <Menu size={20} />
+              <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
             </button>
           </div>
         </div>
       </nav>
 
+      {/* Sidebar Modal */}
       <SidebarModal 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
-        links={links} 
+        links={links}
       />
     </>
   );

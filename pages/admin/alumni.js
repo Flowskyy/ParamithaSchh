@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import withAdmin from '../../utils/withAdmin';
-import { getAlumni, createAlumni, updateAlumni, deleteAlumni } from '../../services/api';
+import { getAlumni, saveAlumni, deleteAlumni } from '../../services/api';
 import { showToast } from '../../utils/toast';
-import { Plus, Trash, X, Save, Edit, Search, Users } from 'lucide-react';
+import { Plus, Edit, Trash, X, Save, Briefcase, GraduationCap } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
 import ImageUploader from '../../components/ImageUploader';
 
@@ -11,7 +11,6 @@ function AlumniAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
@@ -25,48 +24,40 @@ function AlumniAdmin() {
     setLoading(false);
   }
 
-  const handleCreate = () => {
-    setEditing('new');
-    setFormData({ 
-      nama: '', 
-      jurusan: 'Rekayasa Perangkat Lunak', 
-      angkatan: new Date().getFullYear().toString(),
-      foto_url: '',
-      perusahaan: '',
-      posisi: '',
-      deskripsi: '',
-      order_index: items.length + 1
-    });
-  };
-
   const handleEdit = (item) => {
     setEditing(item.id);
     setFormData(item);
   };
 
+  const handleCreate = () => {
+    const newItem = {
+      nama: '',
+      jurusan: '',
+      angkatan: '', // or tahun_lulus
+      perusahaan: '',
+      jabatan: '', // or posisi
+      foto_url: '',
+      deskripsi: ''
+    };
+    setEditing('new');
+    setFormData(newItem);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
-    try {
-      let result;
-      if (editing === 'new') {
-        result = await createAlumni(formData);
-      } else {
-        result = await updateAlumni(editing, formData);
-      }
-      
-      if (result.error) throw result.error;
-      
-      showToast.success('Saved successfully');
-      setEditing(null);
-      loadData();
-    } catch (error) {
-      console.error(error);
-      showToast.error('Failed to save');
+    const { error } = await saveAlumni(formData);
+    if (error) {
+      console.error("Save Error:", error);
+      showToast.error(`Failed to save: ${error.message || error.details || 'Unknown error'}`);
+      return;
     }
+    showToast.success('Saved successfully');
+    setEditing(null);
+    loadData();
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Delete this alumni?')) {
+    if (confirm('Are you sure you want to delete this alumni?')) {
       const { error } = await deleteAlumni(id);
       if (error) {
         showToast.error('Failed to delete');
@@ -77,186 +68,182 @@ function AlumniAdmin() {
     }
   };
 
-  const filteredItems = items.filter(item => 
-    item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.perusahaan.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <AdminLayout>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Manage Alumni</h1>
-          <p className="text-slate-400 text-sm">Kelola data alumni dan cerita sukses</p>
+          <h1 className="text-2xl font-bold text-slate-900">Manage Alumni</h1>
+          <p className="text-slate-500 text-sm">Kelola data alumni berprestasi</p>
         </div>
-        <div className="flex gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search alumni..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-[#0f0f1a] border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white text-sm focus:border-[#4F8EF7] focus:outline-none w-full md:w-64"
-            />
-          </div>
-          <button 
-            onClick={handleCreate}
-            className="px-4 py-2 bg-[#4F8EF7] hover:bg-[#3b7acf] text-white rounded-xl font-bold flex items-center gap-2 text-sm shadow-lg shadow-[#4F8EF7]/20 transition-all hover:-translate-y-0.5"
-          >
-            <Plus size={18} /> Add Alumni
-          </button>
-        </div>
+        <button 
+          onClick={handleCreate}
+          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold flex items-center gap-2 text-sm shadow-sm transition-all hover:-translate-y-0.5"
+        >
+          <Plus size={16} /> Add Alumni
+        </button>
       </div>
 
-      {editing && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-[#0f0f1a] border border-white/10 rounded-2xl w-full max-w-2xl shadow-2xl my-8">
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
-              <h3 className="text-xl font-bold text-white">{editing === 'new' ? 'Add New Alumni' : 'Edit Alumni'}</h3>
-              <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-white transition-colors"><X size={24} /></button>
-            </div>
-            
-            <form onSubmit={handleSave} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Nama Lengkap</label>
+      {editing ? (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
+          <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+            <h3 className="text-xl font-bold text-slate-900">{editing === 'new' ? 'New Alumni' : 'Edit Alumni'}</h3>
+            <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 bg-slate-100 p-1 rounded-full"><X size={20} /></button>
+          </div>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                 <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Nama Lengkap</label>
                   <input 
                     type="text" 
                     value={formData.nama || ''} 
                     onChange={e => setFormData({...formData, nama: e.target.value})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
                     required
+                    placeholder="Nama Alumni"
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Angkatan</label>
-                  <input 
-                    type="text" 
-                    value={formData.angkatan || ''} 
-                    onChange={e => setFormData({...formData, angkatan: e.target.value})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-slate-600 text-sm font-medium">Jurusan</label>
+                    <input 
+                      type="text" 
+                      value={formData.jurusan || ''} 
+                      onChange={e => setFormData({...formData, jurusan: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                      placeholder="Contoh: RPL"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-slate-600 text-sm font-medium">Angkatan / Tahun Lulus</label>
+                    <input 
+                      type="text" 
+                      value={formData.angkatan || ''} 
+                      onChange={e => setFormData({...formData, angkatan: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                      placeholder="2020"
+                    />
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Jurusan</label>
-                  <select 
-                    value={formData.jurusan || 'Rekayasa Perangkat Lunak'} 
-                    onChange={e => setFormData({...formData, jurusan: e.target.value})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                  >
-                    <option>Rekayasa Perangkat Lunak</option>
-                    <option>Desain Komunikasi Visual</option>
-                    <option>Perhotelan</option>
-                    <option>Kuliner</option>
-                    <option>Usaha Layanan Wisata</option>
-                    <option>Manajemen Logistik</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Urutan</label>
-                  <input 
-                    type="number" 
-                    value={formData.order_index || 0} 
-                    onChange={e => setFormData({...formData, order_index: parseInt(e.target.value)})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Perusahaan</label>
-                  <input 
-                    type="text" 
-                    value={formData.perusahaan || ''} 
-                    onChange={e => setFormData({...formData, perusahaan: e.target.value})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Posisi / Jabatan</label>
-                  <input 
-                    type="text" 
-                    value={formData.posisi || ''} 
-                    onChange={e => setFormData({...formData, posisi: e.target.value})}
-                    className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-slate-600 text-sm font-medium">Perusahaan</label>
+                    <input 
+                      type="text" 
+                      value={formData.perusahaan || ''} 
+                      onChange={e => setFormData({...formData, perusahaan: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                      placeholder="Nama Perusahaan"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-slate-600 text-sm font-medium">Jabatan / Posisi</label>
+                    <input 
+                      type="text" 
+                      value={formData.posisi || formData.jabatan || ''} 
+                      onChange={e => setFormData({...formData, posisi: e.target.value, jabatan: e.target.value})}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                      placeholder="Posisi Pekerjaan"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-slate-400 text-xs uppercase font-bold tracking-wider">Deskripsi / Testimoni</label>
-                <textarea 
-                  rows="3"
-                  value={formData.deskripsi || ''} 
-                  onChange={e => setFormData({...formData, deskripsi: e.target.value})}
-                  className="w-full bg-[#080810] border border-white/10 rounded-xl p-3 text-white focus:border-[#4F8EF7] focus:outline-none transition-all"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium mb-2 block">Foto Alumni</label>
+                  <ImageUploader 
+                    currentImage={formData.foto_url} 
+                    onUploadComplete={(url) => setFormData({...formData, foto_url: url})} 
+                    aspectRatio={1} 
+                    bucket="alumni" 
+                    folder="" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Testimoni / Deskripsi</label>
+                  <textarea 
+                    value={formData.deskripsi || ''} 
+                    onChange={e => setFormData({...formData, deskripsi: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-32"
+                    placeholder="Kesan pesan alumni..."
+                  />
+                </div>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-400 text-xs uppercase font-bold tracking-wider block mb-2">Foto Alumni</label>
-                <ImageUploader 
-                  currentImage={formData.foto_url} 
-                  onUploadComplete={(url) => setFormData({...formData, foto_url: url})} 
-                  aspectRatio={1/1} 
-                  bucket="media" 
-                  folder="alumni" 
-                />
-              </div>
-
-              <div className="pt-4 flex justify-end gap-3 border-t border-white/10">
-                <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-400 font-medium hover:bg-white/5 rounded-xl transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" className="px-6 py-2 bg-[#4F8EF7] hover:bg-[#3b7acf] text-white rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-[#4F8EF7]/20 transition-all hover:-translate-y-0.5">
-                  <Save size={18} /> Save Alumni
-                </button>
-              </div>
-            </form>
+            </div>
+            
+            <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
+              <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">
+                Cancel
+              </button>
+              <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary-600/20 transition-all hover:-translate-y-0.5">
+                <Save size={16} /> Save Alumni
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                  <th className="p-4 font-bold">Foto</th>
+                  <th className="p-4 font-bold">Nama / Angkatan</th>
+                  <th className="p-4 font-bold">Jurusan</th>
+                  <th className="p-4 font-bold">Karir</th>
+                  <th className="p-4 font-bold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {items.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="p-4 w-20">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 border border-slate-200">
+                        <SmartImage src={item.foto_url} fill className="object-cover" />
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="font-bold text-slate-900">{item.nama}</div>
+                      <div className="text-xs text-slate-500 flex items-center gap-1">
+                        <GraduationCap size={12} /> {item.angkatan || item.tahun_lulus}
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-md">
+                        {item.jurusan}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="text-sm font-medium text-slate-900">{item.perusahaan}</div>
+                      <div className="text-xs text-slate-500 flex items-center gap-1">
+                        <Briefcase size={12} /> {item.posisi || item.jabatan}
+                      </div>
+                    </td>
+                    <td className="p-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEdit(item)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit">
+                          <Edit size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                          <Trash size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && !loading && (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-slate-400">
+                      Belum ada data alumni. Silakan tambah data baru.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredItems.map((item) => (
-          <div key={item.id} className="bg-[#0f0f1a] border border-white/5 rounded-2xl p-5 flex gap-5 hover:border-[#4F8EF7]/50 transition-all group">
-            <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 relative border-2 border-white/10">
-              <SmartImage src={item.foto_url} fill style={{ objectFit: 'cover' }} className="group-hover:scale-110 transition-transform duration-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start mb-1">
-                <h4 className="text-white font-bold truncate pr-2">{item.nama}</h4>
-                <div className="flex gap-1 shrink-0">
-                  <button onClick={() => handleEdit(item)} className="p-1.5 text-[#4F8EF7] hover:bg-[#4F8EF7]/10 rounded-lg transition-colors">
-                    <Edit size={16} />
-                  </button>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                    <Trash size={16} />
-                  </button>
-                </div>
-              </div>
-              <p className="text-slate-400 text-sm truncate">{item.posisi} at {item.perusahaan}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 bg-white/5 rounded-md text-slate-300">{item.jurusan}</span>
-                <span className="text-[10px] text-slate-500">{item.angkatan}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-        {filteredItems.length === 0 && !loading && (
-          <div className="col-span-full py-12 text-center text-slate-500 bg-[#0f0f1a]/50 rounded-2xl border border-white/5 border-dashed">
-            <Users size={48} className="mx-auto mb-4 opacity-20" />
-            <p>No alumni found matching your search.</p>
-          </div>
-        )}
-      </div>
     </AdminLayout>
   );
 }

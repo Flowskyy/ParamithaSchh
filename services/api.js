@@ -194,6 +194,73 @@ export function getPublicUrl(bucket, path) {
     return null;
   }
 }
+
+// NEW: Universal Upload Function
+export const uploadImage = async (file, bucket, folder = '') => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder ? folder + '/' : ''}${Date.now()}-${Math.random()
+      .toString(36).substring(2)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file, { upsert: true });
+    
+    if (uploadError) throw uploadError;
+    
+    const { data } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(fileName);
+    
+    return { url: data.publicUrl, error: null };
+  } catch (error) {
+    console.error('Upload failed:', error.message);
+    return { url: null, error: error.message };
+  }
+};
+
+// NEW: Init Buckets
+export const initStorageBuckets = async () => {
+  const buckets = ['hero', 'jurusan', 'fasilitas', 'galeri', 'alumni', 'carousel', 'media', 'mitra', 'testimonial', 'images'];
+  
+  try {
+    // List all existing buckets first
+    const { data: existingBuckets, error } = await supabase.storage.listBuckets();
+    
+    if (error) {
+      console.error('Error listing buckets:', error);
+      return;
+    }
+    
+    const existingIds = existingBuckets.map(b => b.id);
+    
+    for (const bucket of buckets) {
+      if (!existingIds.includes(bucket)) {
+        console.log(`Creating bucket: ${bucket}`);
+        const { data, error: createError } = await supabase.storage.createBucket(bucket, { 
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'] 
+        });
+        
+        if (createError) {
+          console.error(`Error creating bucket ${bucket}:`, createError);
+        } else {
+          console.log(`Bucket ${bucket} created successfully.`);
+        }
+      } else {
+         // Optional: Update public status if needed, but usually not required if already exists
+         // console.log(`Bucket ${bucket} already exists.`);
+      }
+    }
+    
+    return { success: true, message: 'Buckets initialized' };
+  } catch (err) {
+    console.error('Unexpected error in initStorageBuckets:', err);
+    return { success: false, message: err.message };
+  }
+};
+
 export async function uploadFile(bucket, path, file) {
   try {
     const result = await supabase.storage.from(bucket).upload(path, file, { cacheControl: '3600', upsert: true });

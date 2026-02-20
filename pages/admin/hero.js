@@ -4,8 +4,9 @@ import withAdmin from '../../utils/withAdmin';
 import { getHero, saveHero, getSekolahInfo, upsertSekolahInfo } from '../../services/api';
 import { showToast } from '../../utils/toast';
 import { Save, Upload, Info, User } from 'lucide-react';
-import ImageUploader from '../../components/ImageUploader';
 import SmartImage from '../../components/SmartImage';
+import ImageUploader from '../../components/ImageUploader';
+import toast from 'react-hot-toast';
 
 function HeroAdmin() {
   const [data, setData] = useState({
@@ -55,7 +56,8 @@ function HeroAdmin() {
 
     if (resHero.error || resInfo.error) {
       console.error(resHero.error || resInfo.error);
-      showToast.error('Failed to update settings');
+      const msg = resHero.error?.message || resInfo.error?.message || 'Failed to update settings';
+      showToast.error(msg);
     } else {
       showToast.success('All settings updated!');
       // Refresh data
@@ -72,6 +74,12 @@ function HeroAdmin() {
   const useDefaultKepsekPhoto = () => {
     setInfo(prev => ({ ...prev, kepsek_photo: '/images/Kepsek.JPG' }));
   };
+
+  // Pattern WAJIB: Upload Hero Image
+  // Replaced with ImageUploader component
+
+  // Pattern WAJIB: Upload Kepsek Photo
+  // Replaced with ImageUploader component
 
   return (
     <AdminLayout>
@@ -125,8 +133,8 @@ function HeroAdmin() {
                   currentImage={data.image_url} 
                   onUploadComplete={(url) => setData({...data, image_url: url})} 
                   aspectRatio={16/9} 
-                  bucket="media" 
-                  folder="hero" 
+                  bucket="hero" 
+                  folder="backgrounds" 
                 />
               </div>
             </div>
@@ -245,11 +253,12 @@ function HeroAdmin() {
                 <ImageUploader 
                   currentImage={info.kepsek_photo} 
                   onUploadComplete={(url) => setInfo({...info, kepsek_photo: url})} 
-                  aspectRatio={1/1} 
-                  bucket="media" 
+                  aspectRatio={3/4} 
+                  bucket="hero" 
                   folder="kepsek" 
                 />
-                <div className="flex justify-end mt-2">
+                
+                <div className="flex justify-center mt-2">
                   <button 
                     type="button"
                     onClick={useDefaultKepsekPhoto}

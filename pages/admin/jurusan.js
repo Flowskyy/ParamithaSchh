@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import withAdmin from '../../utils/withAdmin';
-import { getJurusan, saveJurusan, deleteJurusan } from '../../services/api';
+import { getJurusan, saveJurusan, deleteJurusan, uploadImage } from '../../services/api';
 import { showToast } from '../../utils/toast';
-import { Plus, Edit, Trash, X, Save } from 'lucide-react';
+import { Plus, Edit, Trash, X, Save, CheckCircle, ArrowRight, Upload, Loader2 } from 'lucide-react';
 import SmartImage from '../../components/SmartImage';
 import ImageUploader from '../../components/ImageUploader';
+import toast from 'react-hot-toast';
 
 function JurusanAdmin() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -26,7 +28,11 @@ function JurusanAdmin() {
 
   const handleEdit = (item) => {
     setEditing(item.id);
-    setFormData(item);
+    setFormData({
+      ...item,
+      kompetensi: item.kompetensi || [],
+      prospek: item.prospek || []
+    });
   };
 
   const handleCreate = () => {
@@ -35,7 +41,9 @@ function JurusanAdmin() {
       short_desc: '',
       description: '',
       image_url: '',
-      slug: ''
+      slug: '',
+      kompetensi: [],
+      prospek: []
     };
     setEditing('new');
     setFormData(newItem);
@@ -45,7 +53,8 @@ function JurusanAdmin() {
     e.preventDefault();
     const { error } = await saveJurusan(formData);
     if (error) {
-      showToast.error('Failed to save');
+      console.error(error);
+      showToast.error(error.message || 'Failed to save');
       return;
     }
     showToast.success('Saved successfully');
@@ -63,6 +72,32 @@ function JurusanAdmin() {
       showToast.success('Deleted successfully');
       loadData();
     }
+  };
+
+  // Helper for array inputs
+  const addArrayItem = (field) => {
+    setFormData({
+      ...formData,
+      [field]: [...(formData[field] || []), '']
+    });
+  };
+
+  const removeArrayItem = (field, index) => {
+    const newArray = [...(formData[field] || [])];
+    newArray.splice(index, 1);
+    setFormData({
+      ...formData,
+      [field]: newArray
+    });
+  };
+
+  const updateArrayItem = (field, index, value) => {
+    const newArray = [...(formData[field] || [])];
+    newArray[index] = value;
+    setFormData({
+      ...formData,
+      [field]: newArray
+    });
   };
 
   return (
@@ -86,59 +121,124 @@ function JurusanAdmin() {
             <h3 className="text-xl font-bold text-slate-900">{editing === 'new' ? 'New Jurusan' : 'Edit Jurusan'}</h3>
             <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 bg-slate-100 p-1 rounded-full"><X size={20} /></button>
           </div>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-slate-600 text-sm font-medium">Name</label>
-                <input 
-                  type="text" 
-                  value={formData.name || ''} 
-                  onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                  required
-                  placeholder="Nama Jurusan"
-                />
+          <form onSubmit={handleSave} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Name</label>
+                  <input 
+                    type="text" 
+                    value={formData.name || ''} 
+                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                    required
+                    placeholder="Nama Jurusan"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Slug (URL)</label>
+                  <input 
+                    type="text" 
+                    value={formData.slug || ''} 
+                    onChange={e => setFormData({...formData, slug: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
+                    required
+                    placeholder="nama-jurusan"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Short Description</label>
+                  <textarea 
+                    value={formData.short_desc || ''} 
+                    onChange={e => setFormData({...formData, short_desc: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-20"
+                    placeholder="Deskripsi singkat untuk kartu..."
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-slate-600 text-sm font-medium">Slug (URL)</label>
-                <input 
-                  type="text" 
-                  value={formData.slug || ''} 
-                  onChange={e => setFormData({...formData, slug: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                  required
-                  placeholder="nama-jurusan"
-                />
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium mb-2 block">Cover Image</label>
+                  
+                  <ImageUploader 
+                    currentImage={formData.image_url} 
+                    onUploadComplete={(url) => setFormData({...formData, image_url: url})} 
+                    aspectRatio={16/9} 
+                    bucket="jurusan" 
+                    folder="covers" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-slate-600 text-sm font-medium">Full Description</label>
+                  <textarea 
+                    value={formData.description || ''} 
+                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-32"
+                    placeholder="Deskripsi lengkap..."
+                  />
+                </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-slate-600 text-sm font-medium">Short Description</label>
-              <textarea 
-                value={formData.short_desc || ''} 
-                onChange={e => setFormData({...formData, short_desc: e.target.value})}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-20"
-                placeholder="Deskripsi singkat..."
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+              {/* Kompetensi Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-600 text-sm font-medium">Kompetensi / Kurikulum</label>
+                  <button type="button" onClick={() => addArrayItem('kompetensi')} className="text-primary-600 text-xs font-bold hover:underline">+ Add Item</button>
+                </div>
+                <div className="space-y-2">
+                  {(formData.kompetensi || []).map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="bg-slate-100 p-2 rounded text-slate-500"><CheckCircle size={14} /></div>
+                      <input 
+                        type="text" 
+                        value={item} 
+                        onChange={e => updateArrayItem('kompetensi', idx, e.target.value)}
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-primary-500"
+                        placeholder="Materi pembelajaran..."
+                      />
+                      <button type="button" onClick={() => removeArrayItem('kompetensi', idx)} className="text-red-400 hover:text-red-600 p-1">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!formData.kompetensi || formData.kompetensi.length === 0) && (
+                    <p className="text-slate-400 text-xs italic">Belum ada data kompetensi.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Prospek Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-600 text-sm font-medium">Prospek Karir</label>
+                  <button type="button" onClick={() => addArrayItem('prospek')} className="text-primary-600 text-xs font-bold hover:underline">+ Add Item</button>
+                </div>
+                <div className="space-y-2">
+                  {(formData.prospek || []).map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="bg-slate-100 p-2 rounded text-slate-500"><ArrowRight size={14} /></div>
+                      <input 
+                        type="text" 
+                        value={item} 
+                        onChange={e => updateArrayItem('prospek', idx, e.target.value)}
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-primary-500"
+                        placeholder="Peluang karir..."
+                      />
+                      <button type="button" onClick={() => removeArrayItem('prospek', idx)} className="text-red-400 hover:text-red-600 p-1">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!formData.prospek || formData.prospek.length === 0) && (
+                    <p className="text-slate-400 text-xs italic">Belum ada data prospek karir.</p>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-slate-600 text-sm font-medium">Full Description</label>
-              <textarea 
-                value={formData.description || ''} 
-                onChange={e => setFormData({...formData, description: e.target.value})}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-32"
-                placeholder="Deskripsi lengkap..."
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-slate-600 text-sm font-medium mb-2 block">Cover Image</label>
-              <ImageUploader 
-                currentImage={formData.image_url} 
-                onUploadComplete={(url) => setFormData({...formData, image_url: url})} 
-                aspectRatio={16/9} 
-                bucket="media" 
-                folder="jurusan" 
-              />
-            </div>
+
             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
               <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">
                 Cancel
@@ -150,33 +250,54 @@ function JurusanAdmin() {
           </form>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {items.map((item) => (
-            <div key={item.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row h-full md:h-48 group">
-              <div className="w-full md:w-48 h-48 md:h-full relative shrink-0">
-                <SmartImage src={item.image_url} fill style={{ objectFit: 'cover' }} className="group-hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">{item.name}</h3>
-                  </div>
-                  <p className="text-slate-500 text-sm line-clamp-2 mb-4">{item.short_desc}</p>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <button onClick={() => handleEdit(item)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit">
-                    <Edit size={18} />
-                  </button>
-                  <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
-                    <Trash size={18} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-          {items.length === 0 && !loading && (
-            <p className="text-slate-400 text-center py-8 col-span-full">No data found.</p>
-          )}
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                  <th className="p-4 font-bold">Image</th>
+                  <th className="p-4 font-bold">Jurusan Info</th>
+                  <th className="p-4 font-bold">Deskripsi Singkat</th>
+                  <th className="p-4 font-bold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {items.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="p-4 w-32">
+                      <div className="w-24 h-16 rounded-lg overflow-hidden bg-slate-200 border border-slate-200 relative">
+                        <SmartImage src={item.image_url} fill className="object-cover" />
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="font-bold text-slate-900 text-lg">{item.name}</div>
+                      <div className="text-xs text-slate-500 font-mono bg-slate-100 inline-block px-1 rounded">/{item.slug}</div>
+                    </td>
+                    <td className="p-4 max-w-md">
+                      <p className="text-sm text-slate-600 line-clamp-2">{item.short_desc}</p>
+                    </td>
+                    <td className="p-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEdit(item)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit">
+                          <Edit size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                          <Trash size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && !loading && (
+                  <tr>
+                    <td colSpan="4" className="p-8 text-center text-slate-400">
+                      No data found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </AdminLayout>

@@ -1,177 +1,139 @@
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, ChevronRight, BookOpen, Users, Trophy } from 'lucide-react';
+import React from 'react';
 import Layout from '../../components/Layout';
-import Section from '../../components/Section';
-import SmartImage from '../../components/SmartImage';
-import { getJurusan, getSekolahInfo } from '../../services/api';
+import { motion } from 'framer-motion';
+import { getJurusan } from '../../services/api';
 import { fallbackJurusan } from '../../utils/fallbackData';
+import Link from 'next/link';
+import SmartImage from '../../components/SmartImage';
+import { Palette, Hotel, ChefHat, Plane, Code, Package, ArrowRight, BookOpen } from 'lucide-react';
 
-export default function JurusanList({ sekolahInfo, jurusanList }) {
-  // Use props data initially, but can be updated if needed (though SSR provides fresh data)
-  // No need for client-side fetch if SSR is doing it
-  
+const iconMap = {
+  Palette,
+  Hotel,
+  ChefHat,
+  Plane,
+  Code,
+  Package
+};
+
+export async function getServerSideProps() {
+  const data = await getJurusan();
+  // Use fallback if data is empty or error
+  const jurusanList = data && data.length > 0 ? data : fallbackJurusan;
+
+  return {
+    props: {
+      jurusanList,
+    },
+  };
+}
+
+export default function JurusanIndex({ jurusanList }) {
   return (
-    <Layout title="Program Keahlian - SMK Paramitha 2 Jakarta">
+    <Layout title="Kompetensi Keahlian | SMK Paramitha 2 Jakarta">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-slate-900 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <SmartImage 
-            src="https://placehold.co/1920x1080/png?text=Jurusan"
+      <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-[#1E1E8F]">
+        <div className="absolute inset-0 opacity-20">
+          <SmartImage
+            src="/images/Carousel.png"
             alt="Jurusan Hero"
             fill
-            style={{ objectFit: 'cover' }}
-            className="opacity-40"
+            className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/50" />
         </div>
-
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1E1E8F]/80 to-[#1E1E8F]/90" />
+        
+        <div className="container mx-auto px-4 relative z-10 text-center text-white">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="inline-block py-1 px-4 rounded-full bg-primary-500/20 text-primary-300 text-sm font-bold mb-6 border border-primary-500/30 backdrop-blur-sm">
-              Program Keahlian Unggulan
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-              Pilih Masa Depanmu Disini
-            </h1>
-            <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-              SMK Paramitha 2 Jakarta menyediakan berbagai kompetensi keahlian yang relevan dengan kebutuhan industri masa kini dan masa depan.
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Kompetensi Keahlian</h1>
+            <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+              Pilihan jurusan unggulan yang siap mengantarkanmu menuju masa depan gemilang dengan keterampilan sesuai kebutuhan industri.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Intro Statistics/Features */}
-      <Section className="bg-white relative z-20 -mt-10 pt-0">
+      {/* Jurusan Grid */}
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: BookOpen, title: "Kurikulum Industri", desc: "Materi pembelajaran disesuaikan dengan standar industri terkini." },
-              { icon: Users, title: "Pengajar Profesional", desc: "Didimbing oleh guru dan praktisi yang berpengalaman di bidangnya." },
-              { icon: Trophy, title: "Sertifikasi Kompetensi", desc: "Lulusan dibekali sertifikat kompetensi yang diakui secara nasional." },
-            ].map((item, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-center hover:-translate-y-2 transition-transform duration-300"
-              >
-                <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <item.icon size={32} />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                <p className="text-slate-600">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* List Jurusan */}
-      <Section className="bg-slate-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 gap-12">
-            {jurusanList.map((jurusan, idx) => (
-              <motion.div 
-                key={jurusan.slug || idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2">
-                  <div className="relative h-64 lg:h-auto overflow-hidden">
-                    <SmartImage 
-                      src={jurusan.image_url} 
-                      alt={jurusan.title} 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {jurusanList.map((jurusan, index) => {
+              const Icon = iconMap[jurusan.icon] || BookOpen;
+              
+              return (
+                <motion.div
+                  key={jurusan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <SmartImage
+                      src={jurusan.image_url}
+                      alt={jurusan.title}
                       fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent lg:bg-gradient-to-r" />
-                  </div>
-                  
-                  <div className="p-8 lg:p-12 flex flex-col justify-center relative">
-                    <div className="mb-4">
-                      <span className="text-primary-600 font-bold tracking-wider text-sm uppercase">Kompetensi Keahlian</span>
-                      <h2 className="text-3xl font-bold text-slate-900 mt-2 mb-4 group-hover:text-primary-600 transition-colors">
-                        {jurusan.title}
-                      </h2>
-                      <p className="text-slate-600 leading-relaxed mb-8">
-                        {jurusan.description}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
-                        Materi Unggulan:
-                      </h4>
-                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
-                        {jurusan.kurikulum && jurusan.kurikulum.slice(0, 4).map((item, i) => (
-                          <li key={i} className="flex items-center text-sm text-slate-600 gap-2">
-                            <ChevronRight size={14} className="text-primary-500" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-
-                      <Link 
-                        href={`/jurusan/${jurusan.slug}`} 
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-primary-600 transition-all group-hover:translate-x-2"
-                      >
-                        Selengkapnya <ArrowRight size={18} />
-                      </Link>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                    <div className="absolute bottom-4 left-4 text-white flex items-center gap-2">
+                      <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                        <Icon size={24} />
+                      </div>
+                      <span className="font-semibold text-lg">{jurusan.singkatan || jurusan.slug.toUpperCase()}</span>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h3 className="text-2xl font-bold text-[#1E1E8F] mb-3 group-hover:text-[#C0161C] transition-colors">
+                      {jurusan.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 line-clamp-3 flex-grow">
+                      {jurusan.short_desc}
+                    </p>
+                    
+                    <Link 
+                      href={`/jurusan/${jurusan.slug}`}
+                      className="inline-flex items-center gap-2 text-[#C0161C] font-semibold hover:gap-3 transition-all"
+                    >
+                      Selengkapnya <ArrowRight size={18} />
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
-      </Section>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-[#1E1E8F] text-white">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold mb-6">Masih Bingung Memilih Jurusan?</h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Konsultasikan minat dan bakatmu dengan tim kami. Kami siap membantu menemukan jurusan yang paling tepat untuk masa depanmu.
+            </p>
+            <Link 
+              href="/kontak"
+              className="inline-block px-8 py-4 bg-[#C0161C] hover:bg-[#a01217] text-white rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              Hubungi Kami
+            </Link>
+          </motion.div>
+        </div>
+      </section>
     </Layout>
   );
-}
-
-export async function getServerSideProps() {
-  try {
-    const [sekolahInfo, jurusanData] = await Promise.all([
-      getSekolahInfo(),
-      getJurusan()
-    ]);
-
-    let jurusanList = jurusanData;
-
-    // Debugging and Fallback logic
-    if (!jurusanList || jurusanList.length === 0) {
-      console.log('DEBUG: Jurusan list is empty from Supabase, using fallback');
-      jurusanList = fallbackJurusan;
-    }
-
-    return { 
-      props: { 
-        sekolahInfo: sekolahInfo || null,
-        jurusanList
-      } 
-    };
-  } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-    console.log('DEBUG: Error fetching data, using fallback for Jurusan list');
-    return { 
-      props: { 
-        sekolahInfo: null,
-        jurusanList: fallbackJurusan 
-      } 
-    };
-  }
 }

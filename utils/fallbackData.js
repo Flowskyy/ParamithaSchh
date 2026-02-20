@@ -327,5 +327,13 @@ export const fallbackSekolahInfo = {
   description: "Sekolah Menengah Kejuruan Pusat Keunggulan",
   kepsek_name: "Drs. H. Ahmad Fauzi, M.Pd",
   kepsek_message: "Selamat datang di website resmi SMK Paramitha 2 Jakarta.",
-  map_url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.388836567295!2d106.92095907499035!3d-6.212344693775533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698ca1002220d9%3A0xc39247c870295841!2sSMK%20Paramitha%202!5e0!3m2!1sid!2sid!4v1709605342133!5m2!1sid!2sid"
+  map_url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.388836567295!2d106.92095907499035!3d-6.212344693775533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e698ca1002220d9%3A0xc39247c870295841!2sSMK%20Paramitha%202!5e0!3m2!1sid!2sid!4v1709605342133!5m2!1sid!2sid",
+  visi: "Menjadi Sekolah Menengah Kejuruan yang Unggul dalam Imtaq dan Iptek, serta Menghasilkan Tamatan yang Kompeten, Berkarakter, dan Berwawasan Lingkungan.",
+  misi: [
+    "Menanamkan keimanan dan ketaqwaan kepada Tuhan Yang Maha Esa.",
+    "Mengembangkan kurikulum yang selaras dengan kebutuhan dunia kerja dan industri.",
+    "Meningkatkan kompetensi pendidik dan tenaga kependidikan secara berkelanjutan.",
+    "Menyediakan sarana dan prasarana pembelajaran yang modern dan memadai.",
+    "Membangun kerjasama yang sinergis dengan dunia usaha dan dunia industri."
+  ]
 };
