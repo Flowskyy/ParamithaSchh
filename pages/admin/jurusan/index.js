@@ -48,6 +48,7 @@ function JurusanAdmin() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, items, router.query, editing]);
 
   async function loadData() {

@@ -79,7 +79,7 @@ function SambutanAdmin() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Sambutan Kepala Sekolah</h1>
-          <p className="text-slate-500">Manage principal's welcome message and profile</p>
+          <p className="text-slate-500">Manage principal&apos;s welcome message and profile</p>
         </div>
         <button 
           onClick={handleSubmit}
