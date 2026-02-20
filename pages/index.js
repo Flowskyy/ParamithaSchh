@@ -1,64 +1,79 @@
 import Head from 'next/head';
+import { useRef, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import SmartImage from '../components/SmartImage';
-import { motion } from 'framer-motion';
-import { ArrowRight, Star, Quote, Building2, MapPin, Phone, Mail } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring, useInView, animate } from 'framer-motion';
+import { ArrowRight, Play, Award, CheckCircle, Music, Star, ChevronDown, MapPin, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
+
+// Counter Component
+function Counter({ from = 0, to, duration = 2, suffix = '' }) {
+  const nodeRef = useRef();
+  const inView = useInView(nodeRef, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (inView) {
+      const controls = animate(from, to, {
+        duration,
+        onUpdate(value) {
+          node.textContent = Math.floor(value) + suffix;
+        },
+      });
+      return () => controls.stop();
+    }
+  }, [inView, from, to, duration, suffix]);
+
+  return <span ref={nodeRef} className="tabular-nums">{from}</span>;
+}
+
 import { 
   getHero, 
   getJurusan, 
   getFasilitas, 
   getAlumni, 
   getMitra,
-  getCarousel 
+  getSekolahInfo 
 } from '../services/api';
 import { 
   fallbackHero, 
   fallbackJurusan, 
   fallbackFasilitas, 
   fallbackAlumni, 
-  fallbackMitra 
+  fallbackMitra,
+  fallbackSekolahInfo
 } from '../utils/fallbackData';
-import { useState } from 'react';
 
-export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel }) {
-  // Use hero data or fallback
+export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahInfo }) {
   const heroData = hero || fallbackHero;
   const jurusanList = jurusan && jurusan.length > 0 ? jurusan : fallbackJurusan;
   const fasilitasList = fasilitas && fasilitas.length > 0 ? fasilitas : fallbackFasilitas;
-  const alumniList = alumni && alumni.length > 0 ? alumni : fallbackAlumni;
-  const mitraList = mitra && mitra.length > 0 ? mitra : fallbackMitra;
+  const info = sekolahInfo || fallbackSekolahInfo;
   
-  // Only active mitra
-  const activeMitra = mitraList.filter(m => m.aktif !== false).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5
-      }
-    }
-  };
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <div className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image/Slider */}
+      <Head>
+        <title>SMK Paramitha 2 Jakarta — Sekolah Pusat Keunggulan</title>
+        <meta name="description" content="SMK Paramitha 2 Jakarta - Mencetak Generasi PINK JITU (Profesional, Inovatif, Nasionalis, Kompeten, Jujur, Iman, Tangguh, Unggul)" />
+      </Head>
+
+      {/* Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-primary-500 origin-left z-[100]"
+        style={{ scaleX }}
+      />
+
+      {/* HERO SECTION - FUTURISTIC */}
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
+        {/* Animated Background */}
         <div className="absolute inset-0 z-0">
           <SmartImage 
             src="/images/Carousel.png" 
@@ -66,303 +81,455 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, carousel
             fill 
             priority
             style={{ objectFit: 'cover' }}
+            className="opacity-40"
           />
-          {/* Subtle overlay for text readability only */}
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900" />
+          
+          {/* Animated Particles/Orbs */}
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3], 
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[100px]"
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.5, 1],
+              opacity: [0.2, 0.4, 0.2], 
+            }}
+            transition={{ duration: 10, repeat: Infinity, delay: 1 }}
+            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px]"
+          />
         </div>
 
         {/* Content */}
         <div className="container mx-auto px-6 relative z-10 pt-20">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl"
-          >
-            <span className="inline-block py-1 px-3 rounded-full bg-white/10 text-white border border-white/20 text-sm font-bold mb-6 backdrop-blur-md">
-              SEKOLAH PUSAT KEUNGGULAN
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold font-sans text-white mb-4 leading-tight drop-shadow-lg">
-              Selamat Datang di <br/>
-              <span className="text-primary-400">SMK Paramitha 2 Jakarta</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-white mb-10 leading-relaxed max-w-2xl drop-shadow-md font-medium">
-              {heroData.subtitle}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/pendaftaran" className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-lg transition-all transform hover:-translate-y-1 shadow-lg shadow-blue-900/30 flex items-center justify-center gap-2">
-                Daftar Sekarang <ArrowRight size={20} />
-              </Link>
-              <Link href="#jurusan" className="px-8 py-4 bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-xl font-bold text-lg transition-all backdrop-blur-sm flex items-center justify-center">
-                Lihat Jurusan
-              </Link>
-            </div>
-          </motion.div>
+          <div className="max-w-5xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-primary-300 text-sm font-bold mb-8 backdrop-blur-md uppercase tracking-wider">
+                <Star size={14} className="fill-current" /> Sekolah Pusat Keunggulan
+              </span>
+              
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight">
+                Masa Depan <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 animate-gradient bg-300%">
+                  Dimulai Di Sini
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-3xl mx-auto font-light">
+                {heroData.subtitle || "Mencetak generasi unggul dengan kompetensi standar industri dan karakter berakhlak mulia."}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link href="/ppdb" className="group relative px-8 py-4 bg-primary-600 text-white rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(79,142,247,0.5)]">
+                  <span className="relative z-10 flex items-center gap-2">
+                    Daftar Sekarang <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Link>
+                
+                <Link href="#jurusan" className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm">
+                  Jelajahi Jurusan
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
-
-        {/* Gradient Fade to Next Section */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
 
         {/* Scroll Indicator */}
         <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/70"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ delay: 1, duration: 2, repeat: Infinity }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-400 flex flex-col items-center gap-2"
         >
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center p-1">
-            <div className="w-1 h-2 bg-white rounded-full" />
-          </div>
+          <span className="text-xs uppercase tracking-widest">Scroll</span>
+          <ChevronDown size={20} />
         </motion.div>
       </div>
 
-      {/* Project PKK Section */}
-      <section className="bg-slate-50 py-16 md:py-24 w-full">
-        <div className="container mx-auto px-6 mb-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Project PKK</h2>
-            <p className="text-lg text-slate-500">Produk Kreatif dan Kewirausahaan Siswa</p>
-        </div>
-        
-        <div className="w-full bg-slate-900 py-12">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-slate-700 max-w-6xl mx-auto transform hover:scale-[1.01] transition-transform duration-500">
-                  {/* Browser Header */}
-                  <div className="bg-slate-800 border-b border-slate-700 p-3 flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <div className="bg-slate-900 px-4 py-1 rounded-md text-xs text-slate-400 flex-1 text-center font-mono border border-slate-700 mx-4 truncate">
-                      paramithatourandtravel.vercel.app
-                    </div>
-                  </div>
-                  {/* Iframe */}
-                  <div className="relative w-full h-[500px] md:h-[700px]">
-                    <iframe 
-                      src="https://paramithatourandtravel.vercel.app/" 
-                      title="Paramitha Tour & Travel"
-                      className="w-full h-full border-0"
-                      loading="lazy"
-                    />
-                    {/* Overlay info */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pointer-events-none flex flex-col md:flex-row justify-between items-end gap-4">
-                      <div className="bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg pointer-events-auto max-w-lg border-l-4 border-primary-600">
-                        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 mb-1">
-                          <Building2 className="text-primary-600" />
-                          Paramitha Tour & Travel
-                        </h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Unit usaha travel resmi yang dikelola oleh siswa dan guru jurusan Usaha Layanan Wisata (ULW).
-                        </p>
-                      </div>
-                      <Link 
-                        href="https://paramithatourandtravel.vercel.app/" 
-                        target="_blank"
-                        className="pointer-events-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-2 mb-2 whitespace-nowrap"
-                      >
-                        Lihat Website Full <ArrowRight size={18} />
-                      </Link>
-                    </div>
-                  </div>
+      {/* MOTTO SECTION - PINK JITU */}
+      <section className="relative py-24 bg-slate-950 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-5" />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-sm font-bold text-primary-500 uppercase tracking-[0.2em] mb-4">Nilai-Nilai Utama</h2>
+            <h3 className="text-4xl md:text-5xl font-bold text-white">Motto <span className="text-primary-500">PINK JITU</span></h3>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            {/* PINK */}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="space-y-8"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-2xl">
+                  <h4 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-6">PINK</h4>
+                  <ul className="space-y-4">
+                    {[
+                      { l: 'P', t: 'rofesional', d: 'Bekerja dengan keahlian tinggi' },
+                      { l: 'I', t: 'novatif', d: 'Selalu menciptakan kebaruan' },
+                      { l: 'N', t: 'asionalis', d: 'Cinta tanah air dan bangsa' },
+                      { l: 'K', t: 'ompeten', d: 'Menguasai bidang keahlian' }
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-4">
+                        <span className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-500 flex items-center justify-center font-bold">{item.l}</span>
+                        <div>
+                          <strong className="text-white block">{item.t}</strong>
+                          <span className="text-slate-400 text-sm">{item.d}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-            </div>
+              </div>
+            </motion.div>
+
+            {/* JITU */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="space-y-8"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-2xl">
+                  <h4 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500 mb-6">JITU</h4>
+                  <ul className="space-y-4">
+                    {[
+                      { l: 'J', t: 'ujur', d: 'Integritas dalam tindakan' },
+                      { l: 'I', t: 'man', d: 'Berlandaskan ketuhanan' },
+                      { l: 'T', t: 'angguh', d: 'Kuat menghadapi tantangan' },
+                      { l: 'U', t: 'nggul', d: 'Terbaik dalam prestasi' }
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-4">
+                        <span className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">{item.l}</span>
+                        <div>
+                          <strong className="text-white block">{item.t}</strong>
+                          <span className="text-slate-400 text-sm">{item.d}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Jurusan Section */}
-      <Section id="jurusan" title="Kompetensi Keahlian" subtitle="Pilihan jurusan unggulan untuk masa depan gemilang">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {jurusanList.map((item) => (
-            <Link href={`/jurusan/${item.slug}`} key={item.id} className="group relative block h-[320px] rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500">
-              {/* Image Background */}
-              <div className="absolute inset-0">
+      {/* MARS SECTION */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-24">
+            <div className="w-full md:w-1/2">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative aspect-square rounded-full bg-slate-100 flex items-center justify-center border-[20px] border-slate-50 shadow-inner"
+              >
+                <div className="absolute inset-0 rounded-full border border-slate-200 animate-[spin_10s_linear_infinite]" />
+                <div className="text-center z-10">
+                  <div className="w-24 h-24 bg-primary-600 rounded-full flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-primary-600/30">
+                    <Music size={40} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900">Mars SMK Paramitha</h3>
+                  <p className="text-slate-500 mt-2">Pembangkit Semangat Juang</p>
+                </div>
+                
+                {/* Floating notes */}
+                {[1, 2, 3].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ y: [0, -20, 0], opacity: [0, 1, 0] }}
+                    transition={{ duration: 2, delay: i * 0.5, repeat: Infinity }}
+                    className="absolute text-primary-400"
+                    style={{ 
+                      left: `${20 + i * 20}%`, 
+                      top: `${30 + i * 10}%` 
+                    }}
+                  >
+                    <Music size={20} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+            
+            <div className="w-full md:w-1/2">
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-4xl font-bold text-slate-900 mb-8 border-l-4 border-primary-600 pl-6">
+                  Lirik Mars
+                </h2>
+                <div className="space-y-6 text-lg text-slate-600 leading-relaxed font-medium italic">
+                  <p>
+                    "Kami Para Putra-Putri Siswa Paramitha<br/>
+                    Pewaris Penerus Cita Pembangunan Negara<br/>
+                    Kami Semua Berusaha Tuk Mencapai Cita-Cita<br/>
+                    Giat Belajar Bekerja Berjuang Bersama Gembira"
+                  </p>
+                  <p>
+                    "Sekolah Menengah Industri Pariwisata<br/>
+                    Serta Teknologi Informatika<br/>
+                    Dibina Dididik Jiwa Raganya<br/>
+                    Agar Berguna Tuk Nusa Bangsa"
+                  </p>
+                  <p className="font-bold text-primary-700">
+                    "Dunia Usaha Kita Memanggil Kita Semua<br/>
+                    Marilah Giat Belajar<br/>
+                    Jayalah Paramitha Kita<br/>
+                    Marilah Giat Belajar<br/>
+                    Jayalah Paramitha Kita"
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TENTANG SEKOLAH (SHORT PROFILE) */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6 text-slate-900">Tentang SMK Paramitha 2</h2>
+            <p className="text-lg text-slate-600 leading-relaxed mb-8">
+              SMK Paramitha 2 Jakarta adalah lembaga pendidikan kejuruan yang berkomitmen mencetak lulusan 
+              siap kerja dengan kompetensi unggul di bidang Teknologi dan Pariwisata. 
+              Didukung fasilitas modern dan tenaga pengajar profesional, kami siap mengantarkan siswa 
+              menuju gerbang kesuksesan di dunia industri maupun wirausaha.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                <h4 className="text-3xl font-bold text-primary-600 mb-1">A</h4>
+                <p className="text-sm text-slate-500">Akreditasi</p>
+              </div>
+              <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                <h4 className="text-3xl font-bold text-primary-600 mb-1">SPK</h4>
+                <p className="text-sm text-slate-500">Sekolah Pusat Keunggulan</p>
+              </div>
+              <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                <h4 className="text-3xl font-bold text-primary-600 mb-1">
+                  <Counter to={jurusanList.length} />
+                </h4>
+                <p className="text-sm text-slate-500">Program Keahlian</p>
+              </div>
+              <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-100">
+                <h4 className="text-3xl font-bold text-primary-600 mb-1">
+                  <Counter to={1000} suffix="+" />
+                </h4>
+                <p className="text-sm text-slate-500">Lulusan Kompeten</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* JURUSAN SECTION */}
+      <Section id="jurusan" title="Program Keahlian" subtitle="Pilih jurusan sesuai minat dan bakatmu" className="bg-slate-900 text-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {jurusanList.map((item, idx) => (
+            <Link href={`/jurusan/${item.slug}`} key={item.id} className="group perspective">
+              <motion.div 
+                whileHover={{ rotateX: 5, rotateY: 5, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl bg-slate-800 border border-slate-700"
+              >
+                {/* Image */}
                 <SmartImage 
                   src={item.image_url} 
                   alt={item.title} 
                   fill 
                   style={{ objectFit: 'cover' }}
-                  className="group-hover:scale-110 transition-transform duration-700"
+                  className="group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-40"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500" />
-              </div>
-              
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 w-full p-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="px-3 py-1 bg-primary-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
-                    {item.singkatan || 'Jurusan'}
-                  </span>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/50 to-transparent" />
+                
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 w-full p-8">
+                  <div className="mb-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs font-bold rounded-lg mb-2">
+                      {item.singkatan || 'JURUSAN'}
+                    </span>
+                    <h3 className="text-2xl font-bold text-white leading-tight mb-2">
+                      {item.title}
+                    </h3>
+                  </div>
+                  <p className="text-slate-400 text-sm line-clamp-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
+                    {item.short_desc}
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-slate-700 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 flex items-center text-primary-400 text-sm font-bold gap-2">
+                    Selengkapnya <ArrowRight size={16} />
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 leading-tight group-hover:text-primary-300 transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-slate-300 text-sm line-clamp-2 opacity-0 h-0 group-hover:opacity-100 group-hover:h-auto transition-all duration-500 mb-4">
-                  {item.short_desc}
-                </p>
-                <div className="flex items-center gap-2 text-white/80 text-sm font-medium group-hover:text-white transition-colors">
-                  <span>Lihat Detail</span>
-                  <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
+              </motion.div>
             </Link>
           ))}
         </div>
       </Section>
 
-      {/* Fasilitas Section */}
-      <Section className="bg-slate-50" title="Fasilitas Sekolah" subtitle="Sarana prasarana modern standar industri">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {fasilitasList.map((item, idx) => (
-            <div key={item.id} className={`relative rounded-2xl overflow-hidden group ${idx === 0 ? 'md:col-span-2 md:row-span-2 h-[400px]' : 'h-[190px]'}`}>
-              <SmartImage 
-                src={item.image_url} 
-                alt={item.title} 
-                fill 
-                style={{ objectFit: 'cover' }}
-                className="group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6">
-                <h3 className={`font-bold text-white mb-1 ${idx === 0 ? 'text-2xl' : 'text-lg'}`}>{item.title}</h3>
-                <p className="text-slate-300 text-sm line-clamp-2">{item.description || item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-12">
-          <Link href="/tentang/fasilitas" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 hover:text-primary-600 transition-colors">
-            Lihat Semua Fasilitas
-          </Link>
-        </div>
-      </Section>
-
-      {/* Mitra Perusahaan Section */}
-      <section className="py-20 bg-white border-t border-slate-100 overflow-hidden">
-        <div className="container mx-auto px-6 mb-12 text-center">
-          <h2 className="text-3xl font-bold text-slate-900">Partner Industri</h2>
-          <p className="text-slate-500 mt-2">Dipercaya oleh perusahaan terkemuka di Indonesia</p>
-        </div>
-        
-        <div className="relative w-full">
-          <div className="marquee-track flex gap-12 w-max items-center">
-            {/* Double the list for seamless loop */}
-            {[...activeMitra, ...activeMitra].map((mitra, idx) => (
-              <div 
-                key={`${mitra.id}-${idx}`} 
-                className="group relative flex flex-col items-center justify-center w-40 grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100 hover:scale-110 cursor-pointer"
+      {/* PROJECT PKK SECTION */}
+      <section className="py-24 bg-slate-50 overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="w-full lg:w-1/3">
+              <h2 className="text-4xl font-bold text-slate-900 mb-6">Project Kreatif & Kewirausahaan</h2>
+              <p className="text-lg text-slate-600 mb-8">
+                Siswa kami tidak hanya belajar teori, tetapi juga praktik langsung membuat produk dan layanan nyata. Salah satu karya terbaik siswa jurusan ULW adalah Paramitha Tour & Travel.
+              </p>
+              <Link 
+                href="https://paramithatourandtravel.vercel.app/" 
+                target="_blank"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors"
               >
-                {mitra.logo_url ? (
-                  <div className="w-32 h-20 relative">
-                    <SmartImage 
-                      src={mitra.logo_url} 
-                      alt={mitra.nama} 
-                      fill
-                      className="object-contain"
+                Kunjungi Website <ArrowRight size={18} />
+              </Link>
+            </div>
+            
+            <div className="w-full lg:w-2/3">
+              <motion.div 
+                whileHover={{ y: -10 }}
+                className="rounded-xl overflow-hidden shadow-2xl border border-slate-200 bg-white"
+              >
+                <div className="bg-slate-100 border-b border-slate-200 p-3 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <div className="bg-white px-4 py-1 rounded text-xs text-slate-400 flex-1 text-center font-mono border border-slate-200 mx-4">
+                    paramithatourandtravel.vercel.app
+                  </div>
+                </div>
+                <div className="relative h-[400px] w-full bg-slate-50">
+                   <iframe 
+                      src="https://paramithatourandtravel.vercel.app/" 
+                      title="Paramitha Tour & Travel"
+                      className="w-full h-full border-0"
+                      loading="lazy"
                     />
-                  </div>
-                ) : (
-                  <div className="px-6 py-3 bg-slate-100 rounded-lg text-slate-600 font-bold text-center border border-slate-200">
-                    {mitra.nama}
-                  </div>
-                )}
-              </div>
-            ))}
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Alumni Section */}
-      <Section className="bg-slate-900" title={<span className="text-white">Alumni Kami</span>} subtitle={<span className="text-slate-400">Kisah sukses para lulusan SMK Paramitha 2</span>}>
-        <div className="overflow-x-auto pb-8 -mx-6 px-6 md:overflow-visible md:pb-0">
-          <div className="flex md:grid md:grid-cols-3 gap-6 w-max md:w-full">
-            {alumniList.map((item) => (
-              <div key={item.id} className="w-[300px] md:w-full bg-slate-800/50 border border-slate-700 rounded-3xl p-6 relative group hover:-translate-y-2 transition-transform duration-300">
-                <div className="flex items-center gap-4 mb-6">
-                  {/* Updated Image Style: No bullet/circle, transparent blending */}
-                  <div className="w-16 h-16 relative shrink-0">
-                      <SmartImage src={item.foto_url} fill style={{ objectFit: 'contain' }} className="drop-shadow-md" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-bold text-lg">{item.nama}</h4>
-                    <p className="text-slate-400 text-sm">{item.jurusan} &apos;{item.angkatan}</p>
-                  </div>
+      {/* FASILITAS HIGHLIGHT */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Fasilitas Modern</h2>
+            <p className="text-slate-500">Menunjang kegiatan belajar mengajar dengan teknologi terkini</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {fasilitasList.slice(0, 4).map((item, idx) => (
+              <motion.div 
+                key={item.id || idx}
+                whileHover={{ scale: 1.05 }}
+                className="relative aspect-square rounded-2xl overflow-hidden group"
+              >
+                <SmartImage 
+                  src={item.image_url} 
+                  alt={item.title} 
+                  fill 
+                  style={{ objectFit: 'cover' }}
+                  className="group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+                <div className="absolute bottom-0 left-0 w-full p-4">
+                  <h3 className="text-white font-bold text-lg">{item.title}</h3>
                 </div>
-                
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 text-primary-400 mb-1 font-bold">
-                    <Building2 size={16} />
-                    <span>{item.perusahaan}</span>
-                  </div>
-                  <p className="text-white font-medium">{item.posisi}</p>
-                </div>
-                
-                <div className="relative">
-                  <Quote className="absolute -top-2 -left-2 text-white/5 transform -scale-x-100" size={40} />
-                  <p className="text-slate-300 italic relative z-10 leading-relaxed text-sm">
-                    &quot;{item.deskripsi}&quot;
-                  </p>
-                </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
-      </Section>
-
-      {/* CTA Section */}
-      <Section className="bg-primary-600 text-white text-center py-20">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-6">Siap Menjadi Bagian dari Kami?</h2>
-          <p className="text-xl text-primary-100 mb-10">
-            Bergabunglah dengan SMK Paramitha 2 Jakarta dan raih masa depan gemilang dengan kompetensi siap kerja.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/pendaftaran" className="px-8 py-4 bg-white text-primary-600 rounded-xl font-bold text-lg hover:bg-primary-50 transition-colors shadow-xl">
-              Daftar Online
+          <div className="text-center mt-10">
+            <Link href="/tentang/fasilitas" className="text-primary-600 font-bold hover:underline">
+              Lihat Semua Fasilitas
             </Link>
-            <Link href="/contact" className="px-8 py-4 bg-primary-700 text-white rounded-xl font-bold text-lg hover:bg-primary-800 transition-colors border border-primary-500">
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section className="py-24 bg-primary-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10" />
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Siap Bergabung?</h2>
+          <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
+            Jadilah bagian dari keluarga besar SMK Paramitha 2 Jakarta dan raih masa depan gemilang bersama kami.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/ppdb" className="px-8 py-4 bg-white text-primary-600 rounded-full font-bold text-lg shadow-xl hover:bg-slate-100 transition-colors">
+              Daftar PPDB Online
+            </Link>
+            <Link href="/contact" className="px-8 py-4 bg-primary-700 text-white border border-primary-500 rounded-full font-bold text-lg hover:bg-primary-800 transition-colors">
               Hubungi Kami
             </Link>
           </div>
         </div>
-      </Section>
+      </section>
+
     </Layout>
   );
 }
 
 export async function getServerSideProps() {
   try {
-    const [hero, jurusan, fasilitas, alumni, mitra] = await Promise.all([
+    const [hero, jurusan, fasilitas, alumni, mitra, sekolahInfo] = await Promise.all([
       getHero(),
       getJurusan(),
       getFasilitas(),
       getAlumni(),
-      getMitra()
+      getMitra(),
+      getSekolahInfo()
     ]);
-
-    // Debug logs
-    if (!hero) console.log('DEBUG: Hero data empty');
-    if (!jurusan || jurusan.length === 0) console.log('DEBUG: Jurusan data empty');
-    if (!alumni || alumni.length === 0) console.log('DEBUG: Alumni data empty');
 
     return {
       props: {
         hero: hero || null,
-        jurusan: jurusan || [],
-        fasilitas: fasilitas || [],
-        alumni: alumni || [],
-        mitra: mitra || []
-      },
+        jurusan: jurusan || null,
+        fasilitas: fasilitas || null,
+        alumni: alumni || null,
+        mitra: mitra || null,
+        sekolahInfo: sekolahInfo || null
+      }
     };
   } catch (error) {
-    console.error('Error fetching home data:', error);
+    console.error('Error fetching data:', error);
     return {
       props: {
         hero: null,
-        jurusan: [],
-        fasilitas: [],
-        alumni: [],
-        mitra: []
-      },
+        jurusan: null,
+        fasilitas: null,
+        alumni: null,
+        mitra: null,
+        sekolahInfo: null
+      }
     };
   }
 }

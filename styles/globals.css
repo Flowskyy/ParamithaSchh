@@ -78,6 +78,8 @@ body {
 }
 
 /* Utilities */
+.perspective { perspective: 1000px; }
+.bg-300\% { background-size: 300% 300%; }
 .text-balance { text-wrap: balance; }
 
 /* NProgress Customization */

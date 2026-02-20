@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Menu, X, ChevronDown, ArrowRight, Phone, MapPin } from 'lucide-react';
+import { Menu, X, ChevronDown, ArrowRight, Phone, MapPin, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import SidebarModal from './SidebarModal';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const router = useRouter();
@@ -125,10 +127,21 @@ export default function Navbar() {
               </Link>
             </div>
 
+            {/* Sidebar Toggle */}
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className={`p-2 rounded-lg transition-colors ml-2 ${
+                scrolled ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
+              }`}
+              title="Menu Lengkap"
+            >
+              <LayoutGrid size={24} />
+            </button>
+
             {/* Mobile Toggle */}
             <button 
               onClick={() => setIsOpen(true)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
+              className={`lg:hidden p-2 rounded-lg transition-colors ml-1 ${
                 scrolled ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
               }`}
             >
@@ -138,7 +151,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - CENTERED MODAL STYLE */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -146,24 +159,26 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] lg:hidden"
+              className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] lg:hidden flex items-center justify-center p-4"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 w-[85%] max-w-sm bg-white z-[60] shadow-2xl overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed z-[61] w-full max-w-md bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 lg:hidden max-h-[85vh] flex flex-col"
               onClick={e => e.stopPropagation()}
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-slate-100">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/50 backdrop-blur-sm z-10">
+                 <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-slate-100 shadow-sm">
                       <Image src="/images/logo.jpg" alt="Logo" fill className="object-cover" sizes="40px" />
                     </div>
-                    <span className="font-bold text-lg text-slate-900">Paramitha 2</span>
+                    <div>
+                      <span className="font-bold text-lg text-slate-900 block leading-none">Paramitha 2</span>
+                      <span className="text-xs text-slate-500 font-medium tracking-wide">MENU UTAMA</span>
+                    </div>
                   </div>
                   <button 
                     onClick={() => setIsOpen(false)}
@@ -171,19 +186,23 @@ export default function Navbar() {
                   >
                     <X size={20} />
                   </button>
-                </div>
+              </div>
 
-                <div className="space-y-2">
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                <div className="space-y-1">
                   {links.map((link, idx) => (
-                    <div key={idx} className="border-b border-slate-100 last:border-0 pb-2 last:pb-0">
+                    <div key={idx} className="border-b border-slate-50 last:border-0 pb-1 last:pb-0">
                       <div 
-                        className="flex items-center justify-between py-3"
-                        onClick={() => link.dropdown && setActiveDropdown(activeDropdown === idx ? null : idx)}
+                        className={`flex items-center justify-between py-3 px-2 rounded-xl transition-colors ${activeDropdown === idx ? 'bg-slate-50' : 'hover:bg-slate-50'}`}
+                        onClick={() => link.dropdown ? setActiveDropdown(activeDropdown === idx ? null : idx) : setIsOpen(false)}
                       >
                         <Link 
                           href={link.href}
-                          onClick={() => !link.dropdown && setIsOpen(false)}
-                          className={`font-bold text-lg ${router.pathname === link.href ? 'text-primary-600' : 'text-slate-800'}`}
+                          onClick={(e) => {
+                            if (link.dropdown) e.preventDefault();
+                            else setIsOpen(false);
+                          }}
+                          className={`font-bold text-lg flex-1 ${router.pathname === link.href ? 'text-primary-600' : 'text-slate-800'}`}
                         >
                           {link.name}
                         </Link>
@@ -201,18 +220,18 @@ export default function Navbar() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden bg-slate-50 rounded-xl mb-2"
+                            className="overflow-hidden"
                           >
-                            <div className="p-2 space-y-1">
+                            <div className="pl-4 pr-2 py-2 space-y-1">
                               {link.dropdown.map((item, subIdx) => (
                                 <Link 
                                   key={subIdx} 
                                   href={item.href}
-                                  className="block p-3 rounded-lg hover:bg-white transition-colors"
+                                  className="flex flex-col p-3 rounded-xl bg-slate-50/50 hover:bg-primary-50 transition-colors border border-transparent hover:border-primary-100"
                                   onClick={() => setIsOpen(false)}
                                 >
-                                  <span className="block font-medium text-slate-700 text-sm">{item.name}</span>
-                                  <span className="block text-xs text-slate-400 mt-0.5">{item.desc}</span>
+                                  <span className="font-bold text-slate-700 text-sm">{item.name}</span>
+                                  <span className="text-xs text-slate-400 mt-0.5">{item.desc}</span>
                                 </Link>
                               ))}
                             </div>
@@ -223,20 +242,32 @@ export default function Navbar() {
                   ))}
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="mt-8 pt-4">
                   <Link 
                     href="/ppdb" 
-                    className="w-full bg-slate-900 text-white font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 active:scale-95 transition-transform"
+                    className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold text-lg py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-slate-900/20 active:scale-95 transition-transform"
                     onClick={() => setIsOpen(false)}
                   >
                     Daftar PPDB <ArrowRight size={20} />
                   </Link>
+                  
+                  <div className="mt-6 flex justify-center gap-6 text-slate-400">
+                    <a href="#" className="hover:text-primary-600 transition-colors"><Phone size={20} /></a>
+                    <a href="#" className="hover:text-primary-600 transition-colors"><Mail size={20} /></a>
+                    <a href="#" className="hover:text-primary-600 transition-colors"><MapPin size={20} /></a>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      <SidebarModal 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+        links={links} 
+      />
     </>
   );
 }
