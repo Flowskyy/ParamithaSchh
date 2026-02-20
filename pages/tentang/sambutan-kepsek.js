@@ -7,6 +7,15 @@ import { Quote } from 'lucide-react';
 
 export default function SambutanKepsek({ sekolahInfo }) {
   const info = sekolahInfo || {};
+  
+  // Split kepsek_message into greeting and body
+  // Format: "Greeting|||Body"
+  const [greeting, ...messageParts] = (info.kepsek_message || '').split('|||');
+  const message = messageParts.join('|||'); // Rejoin in case there are multiple delimiters (unlikely)
+  
+  // Fallback if no delimiter found (legacy data)
+  const finalGreeting = message ? greeting : "Assalamu'alaikum Warahmatullahi Wabarakatuh. Salam sejahtera bagi kita semua.";
+  const finalMessage = message ? message : (greeting || '');
 
   return (
     <Layout>
@@ -89,37 +98,15 @@ export default function SambutanKepsek({ sekolahInfo }) {
                   <div className="relative mb-8 pl-8 md:pl-12 border-l-4 border-[#F5C400]">
                     <Quote className="absolute top-0 left-2 text-[#F5C400]/20 -ml-8 -mt-4 w-16 h-16" />
                     <p className="text-2xl font-serif text-[#1E1E8F] italic leading-relaxed m-0">
-                      &quot;Assalamu&apos;alaikum Warahmatullahi Wabarakatuh. Salam sejahtera bagi kita semua.&quot;
+                      &quot;{finalGreeting}&quot;
                     </p>
                   </div>
 
                   <div className="space-y-6 text-slate-600 leading-relaxed text-justify">
-                    {info.kepsek_message ? (
-                      <div className="whitespace-pre-wrap">{info.kepsek_message}</div>
+                    {finalMessage ? (
+                      <div className="whitespace-pre-wrap">{finalMessage}</div>
                     ) : (
-                      <>
-                        <p>
-                          Puji syukur kita panjatkan ke hadirat Allah SWT atas segala limpahan rahmat dan karunia-Nya, sehingga kita masih diberi kesempatan untuk terus berkarya dan mengabdi di dunia pendidikan.
-                        </p>
-                        <p>
-                          Selamat datang di website resmi SMK Paramitha 2 Jakarta. Website ini kami hadirkan sebagai media informasi dan komunikasi antara sekolah dengan masyarakat luas, khususnya orang tua siswa, alumni, dan dunia usaha/dunia industri.
-                        </p>
-                        <p>
-                          SMK Paramitha 2 berkomitmen untuk mencetak lulusan yang tidak hanya kompeten dalam bidang keahliannya, tetapi juga memiliki karakter yang kuat, berakhlak mulia, dan siap bersaing di era global. Kami terus berupaya meningkatkan kualitas pembelajaran, fasilitas, dan kerjasama dengan industri untuk memastikan lulusan kami siap kerja.
-                        </p>
-                        <p>
-                          Di era digital yang berkembang pesat ini, penguasaan teknologi menjadi kunci. Oleh karena itu, kurikulum kami dirancang adaptif terhadap perubahan zaman, mengintegrasikan teknologi terkini dalam setiap proses pembelajaran.
-                        </p>
-                        <p>
-                          Kami juga menanamkan nilai-nilai kewirausahaan agar siswa memiliki mindset mandiri dan inovatif. Teaching Factory (TEFA) yang kami kembangkan menjadi wadah nyata bagi siswa untuk mengasah skill profesional layaknya di industri.
-                        </p>
-                        <p>
-                          Mari bergabung bersama kami untuk mewujudkan generasi masa depan yang unggul, kreatif, dan inovatif. Bersama SMK Paramitha 2, kita raih masa depan gemilang.
-                        </p>
-                        <p className="font-bold text-[#1E1E8F]">
-                          Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh.
-                        </p>
-                      </>
+                      <p className="text-slate-400 italic">Belum ada sambutan kepala sekolah.</p>
                     )}
                   </div>
                   

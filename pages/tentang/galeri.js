@@ -5,7 +5,6 @@ import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 import Layout from '../../components/Layout'
 import SmartImage from '../../components/SmartImage'
 import { getGaleri, getSekolahInfo } from '../../services/api'
-import { fallbackGaleri, fallbackSekolahInfo } from '../../utils/fallbackData'
 
 export default function GaleriPage({ galeri, sekolahInfo }) {
   const [activeCategory, setActiveCategory] = useState('Semua')
@@ -107,12 +106,12 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
         </div>
       </section>
 
-      {/* Gallery Grid (Masonry-ish) */}
+      {/* Gallery Grid (Instagram Style) */}
       <section className="py-12 bg-[#F8F8FF] min-h-screen">
         <div className="container mx-auto px-6">
           <motion.div 
             layout
-            className="columns-1 md:columns-3 lg:columns-4 gap-4 space-y-4"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
           >
             <AnimatePresence>
               {filteredGaleri.map((item) => (
@@ -123,26 +122,31 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="break-inside-avoid relative group rounded-xl overflow-hidden cursor-pointer bg-gray-200"
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-slate-100 flex flex-col"
                   onClick={() => setSelectedImage(item)}
                 >
-                  <SmartImage 
-                    src={item.image_url} 
-                    alt={item.title}
-                    width={800}
-                    height={600}
-                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <ZoomIn className="text-white" size={32} />
+                  {/* Image: Portrait 4:5 */}
+                  <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden group">
+                    <SmartImage 
+                      src={item.image_url} 
+                      alt={item.title}
+                      fill
+                      className="transition-transform duration-500 group-hover:scale-110"
+                      style={{ objectFit: 'cover' }}
+                    />
                   </div>
                   
-                  {/* Caption */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="text-white font-medium text-sm truncate">{item.title}</p>
-                    <p className="text-white/70 text-xs">{item.category}</p>
+                  {/* Content - IG Style Clean */}
+                  <div className="p-3">
+                    <p className="text-sm text-slate-800 line-clamp-3">
+                      <span className="font-bold mr-2">{item.title}</span>
+                      {item.caption || <span className="italic text-slate-400">No caption</span>}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-2 uppercase tracking-wide">
+                      {new Date(item.created_at).toLocaleDateString('id-ID', { 
+                        day: 'numeric', month: 'long', year: 'numeric' 
+                      })}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -222,15 +226,15 @@ export async function getServerSideProps() {
 
     return { 
       props: { 
-        galeri: galeri?.length ? galeri : fallbackGaleri,
-        sekolahInfo: sekolahInfo || fallbackSekolahInfo
+        galeri: galeri?.length ? galeri : [],
+        sekolahInfo: sekolahInfo || {}
       } 
     }
   } catch {
     return { 
       props: { 
-        galeri: fallbackGaleri,
-        sekolahInfo: fallbackSekolahInfo 
+        galeri: [],
+        sekolahInfo: {} 
       } 
     }
   }

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { Upload, X, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Check, Loader2 } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { showToast } from '../utils/toast';
 
@@ -26,7 +26,9 @@ export default function ImageUploader({
   onUploadComplete, 
   aspectRatio = 16 / 9,
   bucket = 'media',
-  folder = 'uploads'
+  folder = 'uploads',
+  variant = 'default', // 'default' | 'compact'
+  showPreview = true
 }) {
   const [imgSrc, setImgSrc] = useState('');
   const [crop, setCrop] = useState();
@@ -156,14 +158,21 @@ export default function ImageUploader({
     <div className="w-full">
       {!imgSrc ? (
         <div className="relative">
-          {currentImage && (
-            <div className="mb-4 relative w-full aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+          {showPreview && currentImage ? (
+            <div className="mb-4 relative w-full aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
                <img src={currentImage} alt="Current" className="w-full h-full object-cover" />
+               <button 
+                 type="button"
+                 onClick={() => onUploadComplete('')}
+                 className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-700"
+                 title="Remove Image"
+               >
+                 <X size={16} />
+               </button>
             </div>
-          )}
-          
+          ) : (
           <div 
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+            className={`border-2 border-dashed rounded-xl ${variant === 'compact' ? 'p-3' : 'p-8'} text-center transition-all ${
               dragActive ? 'border-primary-500 bg-primary-50' : 'border-slate-300 hover:border-primary-400 hover:bg-slate-50'
             }`}
             onDragEnter={handleDrag}
@@ -178,23 +187,24 @@ export default function ImageUploader({
               onChange={onSelectFile}
               className="hidden"
             />
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center">
-                <Upload size={24} />
+            <div className={`flex flex-col items-center ${variant === 'compact' ? 'gap-1' : 'gap-3'}`}>
+              <div className={`${variant === 'compact' ? 'w-8 h-8' : 'w-12 h-12'} bg-primary-100 text-primary-600 rounded-full flex items-center justify-center`}>
+                <Upload size={variant === 'compact' ? 16 : 24} />
               </div>
               <div>
                 <button 
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-primary-600 font-bold hover:underline"
+                  className={`text-primary-600 font-bold hover:underline ${variant === 'compact' ? 'text-xs' : ''}`}
                 >
-                  Click to upload
+                  {variant === 'compact' ? 'Upload' : 'Click to upload'}
                 </button>
-                <span className="text-slate-500"> or drag and drop</span>
+                {variant !== 'compact' && <span className="text-slate-500"> or drag and drop</span>}
               </div>
-              <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5MB)</p>
+              {variant !== 'compact' && <p className="text-xs text-slate-400">SVG, PNG, JPG or GIF (max. 5MB)</p>}
             </div>
           </div>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

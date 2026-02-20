@@ -4,10 +4,9 @@ import { motion } from 'framer-motion'
 import { BookOpen, Target, User, Building, Image, Music, ArrowRight } from 'lucide-react'
 import Layout from '../../components/Layout'
 import { getSekolahInfo } from '../../services/api'
-import { fallbackSekolahInfo } from '../../utils/fallbackData'
 
 export default function TentangPage({ sekolahInfo }) {
-  const info = sekolahInfo || fallbackSekolahInfo
+  const info = sekolahInfo || {}
 
   const menuItems = [
     {
@@ -141,8 +140,8 @@ export default function TentangPage({ sekolahInfo }) {
 export async function getServerSideProps() {
   try {
     const sekolahInfo = await getSekolahInfo()
-    return { props: { sekolahInfo: sekolahInfo || null } }
+    return { props: { sekolahInfo: sekolahInfo || {} } }
   } catch {
-    return { props: { sekolahInfo: null } }
+    return { props: { sekolahInfo: {} } }
   }
 }

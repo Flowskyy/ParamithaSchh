@@ -283,14 +283,15 @@ export async function deleteFile(bucket, path) {
 // ─── REPORT ────────────────────────────────────────────────────────
 export async function getReport() {
   try {
-    const [j, g, t, f, c, a, m] = await Promise.all([
+    const [j, g, t, f, c, a, m, p] = await Promise.all([
       supabase.from('jurusan').select('id', { count: 'exact', head: true }),
       supabase.from('galeri').select('id', { count: 'exact', head: true }),
       supabase.from('testimonial').select('id', { count: 'exact', head: true }),
       supabase.from('fasilitas').select('id', { count: 'exact', head: true }),
       supabase.from('carousel').select('id', { count: 'exact', head: true }),
       supabase.from('alumni').select('id', { count: 'exact', head: true }),
-      supabase.from('mitra_perusahaan').select('id', { count: 'exact', head: true })
+      supabase.from('mitra_perusahaan').select('id', { count: 'exact', head: true }),
+      supabase.from('pendaftar').select('id', { count: 'exact', head: true })
     ]);
     
     return {
@@ -300,7 +301,8 @@ export async function getReport() {
       fasilitas: f.count || 0,
       carousel: c.count || 0,
       alumni: a.count || 0,
-      mitra: m.count || 0
+      mitra: m.count || 0,
+      pendaftar: p.count || 0
     };
   } catch (err) {
     console.error('getReport Error:', err);
@@ -311,7 +313,75 @@ export async function getReport() {
       fasilitas: 0,
       carousel: 0,
       alumni: 0,
-      mitra: 0
+      mitra: 0,
+      pendaftar: 0
     };
   }
 }
+
+// ─── PPDB ────────────────────────────────────────────────────────
+export async function getJadwalPPDB() {
+  return handleResponse(
+    supabase.from('jadwal_ppdb').select('*').order('created_at', { ascending: true }),
+    []
+  );
+}
+export async function createJadwalPPDB(p) { return handleMutation(supabase.from('jadwal_ppdb').insert(p)); }
+export async function updateJadwalPPDB(id, p) { return handleMutation(supabase.from('jadwal_ppdb').update(p).eq('id', id)); }
+export async function deleteJadwalPPDB(id) { return handleMutation(supabase.from('jadwal_ppdb').delete().eq('id', id)); }
+
+export async function getPersyaratanPPDB() {
+  return handleResponse(
+    supabase.from('persyaratan_ppdb').select('*').order('created_at', { ascending: true }),
+    []
+  );
+}
+export async function createPersyaratanPPDB(p) { return handleMutation(supabase.from('persyaratan_ppdb').insert(p)); }
+export async function updatePersyaratanPPDB(id, p) { return handleMutation(supabase.from('persyaratan_ppdb').update(p).eq('id', id)); }
+export async function deletePersyaratanPPDB(id) { return handleMutation(supabase.from('persyaratan_ppdb').delete().eq('id', id)); }
+
+export async function getPendaftar() {
+  return handleResponse(
+    supabase.from('pendaftar').select('*').order('created_at', { ascending: false }),
+    []
+  );
+}
+export async function createPendaftar(p) { return handleMutation(supabase.from('pendaftar').insert(p)); }
+export async function updatePendaftar(id, p) { return handleMutation(supabase.from('pendaftar').update(p).eq('id', id)); }
+export async function deletePendaftar(id) { return handleMutation(supabase.from('pendaftar').delete().eq('id', id)); }
+
+// ─── SEJARAH (Timeline) ──────────────────────────────────────────────
+export async function getSejarah() {
+  return handleResponse(
+    supabase.from('sejarah').select('*').order('year', { ascending: true }),
+    []
+  );
+}
+export async function createSejarah(p) { return handleMutation(supabase.from('sejarah').insert(p)); }
+export async function updateSejarah(id, p) { return handleMutation(supabase.from('sejarah').update(p).eq('id', id)); }
+export async function deleteSejarah(id) { return handleMutation(supabase.from('sejarah').delete().eq('id', id)); }
+
+// ─── VISI MISI ───────────────────────────────────────────────────────
+export async function getVisiMisi() {
+  return handleResponse(
+    supabase.from('visi_misi').select('*').limit(1).single(),
+    null
+  );
+}
+export async function upsertVisiMisi(p) {
+  if (p.id) return handleMutation(supabase.from('visi_misi').update(p).eq('id', p.id));
+  return handleMutation(supabase.from('visi_misi').insert(p));
+}
+
+// ─── MOTTO MARS ──────────────────────────────────────────────────────
+export async function getMottoMars() {
+  return handleResponse(
+    supabase.from('motto_mars').select('*').limit(1).single(),
+    null
+  );
+}
+export async function upsertMottoMars(p) {
+  if (p.id) return handleMutation(supabase.from('motto_mars').update(p).eq('id', p.id));
+  return handleMutation(supabase.from('motto_mars').insert(p));
+}
+

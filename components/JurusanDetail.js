@@ -11,15 +11,12 @@ import Layout from './Layout'
 export default function JurusanDetail({ jurusan }) {
   if (!jurusan) return null
 
-  // Fallback images for gallery since data might not have it
-  const galleryImages = [
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+1`,
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+2`,
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+3`,
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+4`,
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+5`,
-    `https://placehold.co/800x600/png?text=Kegiatan+${jurusan.slug}+6`,
-  ]
+  // Use DB gallery if available
+  const galleryImages = jurusan.gallery && jurusan.gallery.length > 0 
+    ? jurusan.gallery 
+    : []
+
+  const title = jurusan.name || jurusan.title
 
   return (
     <Layout>
@@ -27,7 +24,7 @@ export default function JurusanDetail({ jurusan }) {
       <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
         <SmartImage
           src={jurusan.image_url || '/images/Carousel.png'}
-          alt={jurusan.title}
+          alt={title}
           fill
           className="object-cover"
           priority
@@ -45,7 +42,7 @@ export default function JurusanDetail({ jurusan }) {
               PROGRAM KEAHLIAN
             </span>
             <h1 className="text-4xl md:text-7xl font-bold mb-6">
-              {jurusan.title}
+              {title}
             </h1>
             <p className="text-xl md:text-2xl font-light text-white/90 max-w-3xl mx-auto mb-8">
               {jurusan.short_desc}
@@ -70,7 +67,7 @@ export default function JurusanDetail({ jurusan }) {
             <ChevronRight size={16} className="mx-2" />
             <Link href="/jurusan" className="hover:text-[#C0161C]">Jurusan</Link>
             <ChevronRight size={16} className="mx-2" />
-            <span className="text-[#1E1E8F] font-medium">{jurusan.title}</span>
+            <span className="text-[#1E1E8F] font-medium">{title}</span>
           </div>
         </div>
       </div>
@@ -87,7 +84,7 @@ export default function JurusanDetail({ jurusan }) {
             >
               <h2 className="text-3xl font-bold text-[#1E1E8F] mb-6">Tentang Jurusan</h2>
               <div className="prose prose-lg text-gray-600 mb-8">
-                <p>{jurusan.description}</p>
+                <p>{jurusan.content || jurusan.description}</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -106,7 +103,7 @@ export default function JurusanDetail({ jurusan }) {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
                 <SmartImage 
                   src={jurusan.image_url} 
-                  alt={jurusan.title}
+                  alt={title}
                   width={800} 
                   height={600}
                   className="object-cover"
@@ -181,12 +178,12 @@ export default function JurusanDetail({ jurusan }) {
       <section className="py-20 bg-[#080810] text-white">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row gap-12">
-            <div className="w-full md:w-1/3">
+            <div className="w-full">
               <h2 className="text-3xl font-bold text-[#F5C400] mb-6">Fasilitas Penunjang</h2>
               <p className="text-gray-400 mb-8">
                 Didukung peralatan lengkap standar industri untuk memastikan siswa siap kerja.
               </p>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {jurusan.fasilitas?.map((item, idx) => (
                   <motion.div
                     key={idx}
@@ -200,27 +197,9 @@ export default function JurusanDetail({ jurusan }) {
                     <span className="text-gray-200">{item}</span>
                   </motion.div>
                 ))}
-              </div>
-            </div>
-            
-            <div className="w-full md:w-2/3">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="rounded-2xl overflow-hidden h-48 relative">
-                    <SmartImage src="https://placehold.co/600x400/png?text=Fasilitas+1" alt="Fasilitas" fill className="object-cover" />
-                  </div>
-                  <div className="rounded-2xl overflow-hidden h-64 relative">
-                    <SmartImage src="https://placehold.co/600x400/png?text=Fasilitas+2" alt="Fasilitas" fill className="object-cover" />
-                  </div>
-                </div>
-                <div className="space-y-4 pt-8">
-                  <div className="rounded-2xl overflow-hidden h-64 relative">
-                    <SmartImage src="https://placehold.co/600x400/png?text=Fasilitas+3" alt="Fasilitas" fill className="object-cover" />
-                  </div>
-                  <div className="rounded-2xl overflow-hidden h-48 relative">
-                    <SmartImage src="https://placehold.co/600x400/png?text=Fasilitas+4" alt="Fasilitas" fill className="object-cover" />
-                  </div>
-                </div>
+                {(!jurusan.fasilitas || jurusan.fasilitas.length === 0) && (
+                   <p className="text-gray-500 italic">Data fasilitas belum tersedia.</p>
+                )}
               </div>
             </div>
           </div>
@@ -228,38 +207,40 @@ export default function JurusanDetail({ jurusan }) {
       </section>
 
       {/* Galeri Kegiatan */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-[#1E1E8F] mb-4">Galeri Kegiatan</h2>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryImages.map((src, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="relative aspect-square rounded-xl overflow-hidden group"
-              >
-                <SmartImage 
-                  src={src} 
-                  alt={`Gallery ${idx}`} 
-                  fill 
-                  className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
-                    <ArrowRight size={20} className="-rotate-45" />
+      {galleryImages.length > 0 && (
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-[#1E1E8F] mb-4">Galeri Kegiatan</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {galleryImages.map((src, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="relative aspect-square rounded-xl overflow-hidden group"
+                >
+                  <SmartImage 
+                    src={src} 
+                    alt={`Gallery ${idx}`} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+                      <ArrowRight size={20} className="-rotate-45" />
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-[#C0161C] text-white text-center">

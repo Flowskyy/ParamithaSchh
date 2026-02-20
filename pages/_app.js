@@ -5,6 +5,7 @@ import Head from 'next/head';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import '../styles/globals.css';
+import RealtimeReloader from '../components/RealtimeReloader';
 
 // Configure NProgress
 NProgress.configure({ showSpinner: false, speed: 400, minimum: 0.1 });
@@ -31,9 +32,10 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <title>SMK Paramitha 2 Jakarta</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.jpg" />
         <meta name="description" content="SMK Paramitha 2 Jakarta - Vocational School" />
       </Head>
+      <RealtimeReloader />
       <Component {...pageProps} />
       <Toaster position="top-right" />
     </>

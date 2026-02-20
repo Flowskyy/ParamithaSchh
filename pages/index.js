@@ -5,7 +5,6 @@ import { ArrowRight, ChevronDown, CheckCircle, Quote } from 'lucide-react';
 import Layout from '../components/Layout';
 import SmartImage from '../components/SmartImage';
 import { getSekolahInfo, getAlumni, getMitra } from '../services/api';
-import { fallbackSekolahInfo, fallbackAlumni } from '../utils/fallbackData';
 
 // --- Components ---
 import WaveSeparator from '../components/WaveSeparator';
@@ -19,9 +18,13 @@ const Section = ({ children, className, id }) => (
 // --- Main Page ---
 
 export default function Home({ sekolahInfo, alumniList, mitraList }) {
-  const info = sekolahInfo || fallbackSekolahInfo;
-  const alumni = alumniList && alumniList.length > 0 ? alumniList : fallbackAlumni;
+  const info = sekolahInfo || {};
+  const alumni = alumniList || [];
   const mitra = mitraList || [];
+
+  const shortMessage = info.kepsek_message 
+    ? info.kepsek_message.substring(0, 150) + (info.kepsek_message.length > 150 ? '...' : '')
+    : "Belum ada sambutan.";
 
   // Animation variants
   const fadeInUp = {
@@ -161,13 +164,9 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
               <div className="relative pl-8 border-l-4 border-[#F5C400] mb-8">
                 <Quote className="absolute -top-2 -left-3 bg-white text-[#F5C400] p-1" size={24} />
                 <p className="text-slate-600 text-lg italic leading-relaxed">
-                  &quot;SMK Paramitha 2 berkomitmen untuk tidak hanya mencetak lulusan yang ahli dalam bidangnya, tetapi juga memiliki integritas moral yang tinggi. Kami percaya bahwa pendidikan adalah kunci untuk membuka pintu masa depan.&quot;
+                  &quot;{shortMessage}&quot;
                 </p>
               </div>
-
-              <p className="text-slate-600 mb-8 leading-relaxed">
-                Kami terus berinovasi dalam metode pembelajaran dan fasilitas untuk memastikan setiap siswa mendapatkan pengalaman belajar terbaik yang relevan dengan kebutuhan industri saat ini.
-              </p>
 
               <Link href="/tentang/sambutan-kepsek" className="inline-flex items-center gap-2 text-[#1E1E8F] font-bold hover:text-[#C0161C] transition-colors group">
                 Baca Selengkapnya

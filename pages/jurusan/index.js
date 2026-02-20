@@ -2,7 +2,6 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { motion } from 'framer-motion';
 import { getJurusan } from '../../services/api';
-import { fallbackJurusan } from '../../utils/fallbackData';
 import Link from 'next/link';
 import SmartImage from '../../components/SmartImage';
 import { Palette, Hotel, ChefHat, Plane, Code, Package, ArrowRight, BookOpen } from 'lucide-react';
@@ -18,8 +17,8 @@ const iconMap = {
 
 export async function getServerSideProps() {
   const data = await getJurusan();
-  // Use fallback if data is empty or error
-  const jurusanList = data && data.length > 0 ? data : fallbackJurusan;
+  // Use empty array if data is empty or error
+  const jurusanList = data && data.length > 0 ? data : [];
 
   return {
     props: {

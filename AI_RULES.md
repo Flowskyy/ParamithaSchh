@@ -153,4 +153,3 @@ SituasiYang HARUS dilakukanTambah state baruTaruh useState di level atas kompone
 ❌ DILARANG mengulang task yang sudah selesai
 ❌ DILARANG tanya hal sepele yang bisa diputuskan sendiri
 
-

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, ChevronRight } from 'lucide-react';
-import { getSekolahInfo } from '../services/api';
+import { getSekolahInfo, getJurusan } from '../services/api';
 
 // TikTok Icon Component (Inline SVG)
 const TikTokIcon = ({ size = 18, className = "" }) => (
@@ -32,13 +32,27 @@ export default function Footer() {
     youtube: 'https://youtube.com/@smkparamitha2',
     tiktok: 'https://tiktok.com/@smkparamitha2'
   });
+  const [jurusanList, setJurusanList] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       const data = await getSekolahInfo();
       if (data) setInfo(prev => ({ ...prev, ...data }));
+
+      const jur = await getJurusan();
+      if (jur) setJurusanList(jur);
     }
     fetchData();
+
+    const handleDbChange = () => {
+      console.log('Refreshing Footer data...');
+      fetchData();
+    };
+    window.addEventListener('db-change', handleDbChange);
+
+    return () => {
+      window.removeEventListener('db-change', handleDbChange);
+    };
   }, []);
 
   return (
@@ -106,21 +120,18 @@ export default function Footer() {
               <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#1E1E8F] rounded-full"></span>
             </h3>
             <ul className="space-y-4">
-              {[
-                { name: 'Rekayasa Perangkat Lunak', url: '/jurusan/rpl' },
-                { name: 'Desain Komunikasi Visual', url: '/jurusan/dkv' },
-                { name: 'Perhotelan', url: '/jurusan/perhotelan' },
-                { name: 'Kuliner', url: '/jurusan/kuliner' },
-                { name: 'Usaha Layanan Wisata', url: '/jurusan/ulw' },
-                { name: 'Manajemen Logistik', url: '/jurusan/manajemen-logistik' }
-              ].map((item, idx) => (
-                <li key={idx}>
-                  <Link href={item.url} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-3 group text-base font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#C0161C] transition-colors"></span>
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {jurusanList.length > 0 ? (
+                jurusanList.map((item, idx) => (
+                  <li key={idx}>
+                    <Link href={`/jurusan/${item.slug}`} className="text-slate-600 hover:text-[#C0161C] transition-colors flex items-center gap-3 group text-base font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#C0161C] transition-colors"></span>
+                      {item.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-slate-400">Loading jurusan...</li>
+              )}
             </ul>
           </div>
 

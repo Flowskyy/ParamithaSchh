@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import AdminLayout from '../../components/AdminLayout';
-import withAdmin from '../../utils/withAdmin';
-import { getJurusan, saveJurusan, deleteJurusan, uploadImage } from '../../services/api';
-import { showToast } from '../../utils/toast';
+import { useRouter } from 'next/router';
+import AdminLayout from '../../../components/AdminLayout';
+import withAdmin from '../../../utils/withAdmin';
+import { getJurusan, saveJurusan, deleteJurusan, uploadImage } from '../../../services/api';
+import { showToast } from '../../../utils/toast';
 import { Plus, Edit, Trash, X, Save, CheckCircle, ArrowRight, Upload, Loader2 } from 'lucide-react';
-import SmartImage from '../../components/SmartImage';
-import ImageUploader from '../../components/ImageUploader';
+import SmartImage from '../../../components/SmartImage';
+import ImageUploader from '../../../components/ImageUploader';
 import toast from 'react-hot-toast';
 
 function JurusanAdmin() {
+  const router = useRouter();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
@@ -19,6 +21,35 @@ function JurusanAdmin() {
     loadData();
   }, []);
 
+  // Handle URL query params for deep linking
+  useEffect(() => {
+    if (!loading && items.length > 0) {
+      const { slug, action } = router.query;
+      
+      if (action === 'new') {
+        if (editing !== 'new') handleCreate();
+      } else if (slug) {
+        // If editing specific slug, ensure we find it and open editor immediately
+        const item = items.find(i => i.slug === slug);
+        if (item) {
+           if (editing !== item.id) {
+             setEditing(item.id);
+             setFormData({
+                ...item,
+                kompetensi: item.kompetensi || [],
+                prospek: item.prospek || []
+             });
+           }
+        }
+      } else {
+        if (editing) {
+          setEditing(null);
+          setFormData({});
+        }
+      }
+    }
+  }, [loading, items, router.query]);
+
   async function loadData() {
     setLoading(true);
     const data = await getJurusan();
@@ -26,27 +57,55 @@ function JurusanAdmin() {
     setLoading(false);
   }
 
+  const closeEditor = () => {
+    setEditing(null);
+    setFormData({});
+    router.push('/admin/jurusan', undefined, { shallow: true });
+  };
+
   const handleEdit = (item) => {
-    setEditing(item.id);
-    setFormData({
-      ...item,
-      kompetensi: item.kompetensi || [],
-      prospek: item.prospek || []
-    });
+    if (editing !== item.id) {
+      setEditing(item.id);
+      setFormData({
+        ...item,
+        kompetensi: item.kompetensi || [],
+        prospek: item.prospek || [],
+        fasilitas: item.fasilitas || [],
+        gallery: item.gallery || []
+      });
+    }
+    
+    if (router.query.slug !== item.slug) {
+      router.push({
+        pathname: '/admin/jurusan',
+        query: { slug: item.slug }
+      }, undefined, { shallow: true });
+    }
   };
 
   const handleCreate = () => {
-    const newItem = {
-      name: '',
-      short_desc: '',
-      description: '',
-      image_url: '',
-      slug: '',
-      kompetensi: [],
-      prospek: []
-    };
-    setEditing('new');
-    setFormData(newItem);
+    if (editing !== 'new') {
+      const newItem = {
+        name: '',
+        short_desc: '',
+        content: '',
+        image_url: '',
+        slug: '',
+        kompetensi: [],
+        prospek: [],
+        fasilitas: [],
+        gallery: []
+      };
+      setEditing('new');
+      setFormData(newItem);
+    }
+    
+    if (router.query.action !== 'new') {
+      router.push({
+        pathname: '/admin/jurusan',
+        query: { action: 'new' }
+      }, undefined, { shallow: true });
+    }
   };
 
   const handleSave = async (e) => {
@@ -70,6 +129,10 @@ function JurusanAdmin() {
         return;
       }
       showToast.success('Deleted successfully');
+      if (editing === id) {
+        setEditing(null);
+        setFormData({});
+      }
       loadData();
     }
   };
@@ -170,10 +233,10 @@ function JurusanAdmin() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-slate-600 text-sm font-medium">Full Description</label>
+                  <label className="text-slate-600 text-sm font-medium">Full Content</label>
                   <textarea 
-                    value={formData.description || ''} 
-                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    value={formData.content || ''} 
+                    onChange={e => setFormData({...formData, content: e.target.value})}
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all h-32"
                     placeholder="Deskripsi lengkap..."
                   />
@@ -237,15 +300,109 @@ function JurusanAdmin() {
                   )}
                 </div>
               </div>
+
+              {/* Fasilitas Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-600 text-sm font-medium">Fasilitas</label>
+                  <button type="button" onClick={() => addArrayItem('fasilitas')} className="text-primary-600 text-xs font-bold hover:underline">+ Add Item</button>
+                </div>
+                <div className="space-y-2">
+                  {(formData.fasilitas || []).map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="bg-slate-100 p-2 rounded text-slate-500"><CheckCircle size={14} /></div>
+                      <input 
+                        type="text" 
+                        value={item} 
+                        onChange={e => updateArrayItem('fasilitas', idx, e.target.value)}
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:border-primary-500"
+                        placeholder="Nama fasilitas..."
+                      />
+                      <button type="button" onClick={() => removeArrayItem('fasilitas', idx)} className="text-red-400 hover:text-red-600 p-1">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!formData.fasilitas || formData.fasilitas.length === 0) && (
+                    <p className="text-slate-400 text-xs italic">Belum ada data fasilitas.</p>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
-              <button type="button" onClick={() => setEditing(null)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">
-                Cancel
-              </button>
-              <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary-600/20 transition-all hover:-translate-y-0.5">
-                <Save size={16} /> Save Jurusan
-              </button>
+            {/* Gallery Section */}
+            <div className="pt-4 border-t border-slate-100 mt-4">
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-slate-600 text-sm font-medium">Galeri Kegiatan / Praktek Siswa</label>
+                <button type="button" onClick={() => addArrayItem('gallery')} className="text-primary-600 text-xs font-bold hover:underline">+ Add Image URL</button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {(formData.gallery || []).map((item, idx) => (
+                  <div key={idx} className="relative group border border-slate-200 rounded-lg p-2 bg-slate-50">
+                    <div className="aspect-[4/5] relative mb-2 bg-slate-200 rounded overflow-hidden">
+                       {item ? (
+                         <SmartImage src={item} fill className="object-cover" />
+                       ) : (
+                         <div className="flex items-center justify-center h-full text-slate-400 text-xs">No Image</div>
+                       )}
+                    </div>
+                    <input 
+                      type="text" 
+                      value={item} 
+                      onChange={e => updateArrayItem('gallery', idx, e.target.value)}
+                      className="w-full text-xs border border-slate-200 rounded p-1 mb-2"
+                      placeholder="Image URL"
+                    />
+                    <div className="mb-2">
+                       <ImageUploader 
+                          currentImage={item} 
+                          onUploadComplete={(url) => updateArrayItem('gallery', idx, url)}
+                          aspectRatio={4/5}
+                          bucket="jurusan"
+                          folder="gallery"
+                          variant="compact"
+                          showPreview={false}
+                       />
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => removeArrayItem('gallery', idx)} 
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+                <div 
+                  onClick={() => addArrayItem('gallery')}
+                  className="aspect-[4/5] border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 cursor-pointer hover:border-primary-500 hover:text-primary-500 transition-colors"
+                >
+                  <Plus size={24} />
+                  <span className="text-xs mt-2 font-medium">Add Image</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 flex justify-between items-center border-t border-slate-100 mt-4">
+              <div>
+                {editing !== 'new' && (
+                  <button 
+                    type="button" 
+                    onClick={() => handleDelete(editing)} 
+                    className="px-4 py-2 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Trash size={16} /> Delete
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={closeEditor} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary-600/20 transition-all hover:-translate-y-0.5">
+                  <Save size={16} /> Save Jurusan
+                </button>
+              </div>
             </div>
           </form>
         </div>

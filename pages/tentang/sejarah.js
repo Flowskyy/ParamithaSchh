@@ -1,54 +1,17 @@
+
 import Head from 'next/head'
 import { motion } from 'framer-motion'
-import { Calendar, Award, CheckCircle, TrendingUp, Flag } from 'lucide-react'
+import { Flag, Building, Award, TrendingUp, Star, Globe, CheckCircle, Calendar as CalendarIcon } from 'lucide-react'
 import Layout from '../../components/Layout'
-import { getSekolahInfo } from '../../services/api'
-import { fallbackSekolahInfo } from '../../utils/fallbackData'
+import { getSekolahInfo, getSejarah } from '../../services/api'
 
-export default function SejarahPage({ sekolahInfo }) {
-  const info = sekolahInfo || fallbackSekolahInfo
+const iconMap = {
+  Flag, Building, Award, TrendingUp, Star, Globe, CheckCircle, Calendar: CalendarIcon
+};
 
-  const milestones = [
-    {
-      year: '1985',
-      title: 'Awal Berdiri',
-      desc: 'Yayasan Pendidikan Paramitha didirikan dengan semangat mencerdaskan kehidupan bangsa melalui pendidikan vokasi yang berkualitas.',
-      icon: Flag
-    },
-    {
-      year: '1990',
-      title: 'Gedung Pertama',
-      desc: 'Pembangunan gedung pertama di lokasi strategis Jakarta Timur, memulai penerimaan siswa angkatan pertama.',
-      icon: Building
-    },
-    {
-      year: '2005',
-      title: 'Akreditasi A',
-      desc: 'Meraih predikat Akreditasi A untuk semua program keahlian, membuktikan komitmen terhadap standar mutu pendidikan.',
-      icon: Award
-    },
-    {
-      year: '2018',
-      title: 'Revitalisasi SMK',
-      desc: 'Terpilih sebagai salah satu sekolah rujukan nasional dengan fasilitas modern standar industri.',
-      icon: TrendingUp
-    },
-    {
-      year: '2021',
-      title: 'SMK Pusat Keunggulan',
-      desc: 'Ditetapkan sebagai SMK Pusat Keunggulan (Center of Excellence) oleh Kemendikbudristek.',
-      icon: Star
-    },
-    {
-      year: '2024',
-      title: 'Transformasi Digital',
-      desc: 'Implementasi penuh sistem pembelajaran berbasis digital dan kerjasama internasional.',
-      icon: Globe
-    }
-  ]
-
-  // Icons mapping for dynamic usage if needed, or just import directly
-  // Using direct imports for simplicity in the array above
+export default function SejarahPage({ sekolahInfo, sejarahList }) {
+  const info = sekolahInfo || {}
+  const milestones = sejarahList || []
 
   return (
     <Layout>
@@ -75,9 +38,9 @@ export default function SejarahPage({ sekolahInfo }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto"
+            className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto whitespace-pre-wrap"
           >
-            Dedikasi puluhan tahun dalam membentuk karakter dan kompetensi generasi muda Indonesia.
+            {info.history || "Belum ada sejarah."}
           </motion.p>
         </div>
       </section>
@@ -89,35 +52,15 @@ export default function SejarahPage({ sekolahInfo }) {
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-200 hidden md:block" />
 
           <div className="space-y-12 md:space-y-24">
-            {milestones.map((item, index) => (
-              <TimelineItem key={index} item={item} index={index} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Statistics Section */}
-      <section className="py-20 bg-[#F8F8FF]">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <StatCard 
-              number="35+" 
-              label="Tahun Pengalaman" 
-              desc="Mengabdi di dunia pendidikan vokasi" 
-              delay={0}
-            />
-            <StatCard 
-              number="A" 
-              label="Terakreditasi Unggul" 
-              desc="Standar mutu pendidikan nasional" 
-              delay={0.2}
-            />
-            <StatCard 
-              number="PK" 
-              label="Pusat Keunggulan" 
-              desc="SMK Center of Excellence" 
-              delay={0.4}
-            />
+            {milestones.length > 0 ? (
+              milestones.map((item, index) => (
+                <TimelineItem key={item.id || index} item={item} index={index} />
+              ))
+            ) : (
+              <div className="text-center py-10">
+                <p className="text-gray-500 italic">Belum ada data sejarah.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -127,6 +70,7 @@ export default function SejarahPage({ sekolahInfo }) {
 
 function TimelineItem({ item, index }) {
   const isEven = index % 2 === 0
+  const IconComponent = iconMap[item.icon] || Flag;
   
   return (
     <motion.div 
@@ -139,7 +83,7 @@ function TimelineItem({ item, index }) {
       <div className="w-full md:w-5/12" />
       
       <div className="z-10 flex items-center justify-center w-12 h-12 bg-[#C0161C] rounded-full shadow-lg border-4 border-white mb-6 md:mb-0">
-        <item.icon size={20} className="text-white" />
+        <IconComponent size={20} className="text-white" />
       </div>
       
       <div className={`w-full md:w-5/12 bg-white p-8 rounded-2xl shadow-lg border-l-4 border-[#C0161C] hover:shadow-xl transition-shadow duration-300 ${isEven ? 'text-right' : 'text-left'}`}>
@@ -148,38 +92,29 @@ function TimelineItem({ item, index }) {
         </span>
         <h3 className="text-2xl font-bold text-[#1E1E8F] mb-2">{item.title}</h3>
         <div className="text-[#C0161C] font-bold text-xl mb-4">{item.year}</div>
-        <p className="text-gray-600 leading-relaxed">
-          {item.desc}
+        <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+          {item.description}
         </p>
       </div>
     </motion.div>
   )
 }
 
-function StatCard({ number, label, desc, delay }) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300"
-    >
-      <div className="text-5xl font-bold text-[#C0161C] mb-2">{number}</div>
-      <div className="text-xl font-bold text-[#1E1E8F] mb-2">{label}</div>
-      <p className="text-gray-500">{desc}</p>
-    </motion.div>
-  )
-}
-
-// Helper icons
-import { Building, Star, Globe } from 'lucide-react'
-
 export async function getServerSideProps() {
   try {
-    const sekolahInfo = await getSekolahInfo()
-    return { props: { sekolahInfo: sekolahInfo || null } }
-  } catch {
-    return { props: { sekolahInfo: null } }
+    const [sekolahInfo, sejarahList] = await Promise.all([
+      getSekolahInfo(),
+      getSejarah()
+    ]);
+    
+    return { 
+      props: { 
+        sekolahInfo: sekolahInfo || {},
+        sejarahList: sejarahList || []
+      } 
+    }
+  } catch (err) {
+    console.error(err);
+    return { props: { sekolahInfo: {}, sejarahList: [] } }
   }
 }

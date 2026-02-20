@@ -1,216 +1,187 @@
 import Head from 'next/head'
 import { motion } from 'framer-motion'
-import { Music, Mic2, PlayCircle } from 'lucide-react'
+import { Play, Music } from 'lucide-react'
 import Layout from '../../components/Layout'
-import { getSekolahInfo } from '../../services/api'
-import { fallbackSekolahInfo } from '../../utils/fallbackData'
+import { getMottoMars, getSekolahInfo } from '../../services/api'
+import { fallbackMottoMars } from '../../utils/fallbackData'
+import { useState, useRef } from 'react'
 
-export default function MottoMarsPage({ sekolahInfo }) {
-  const pink = [
-    { char: 'P', title: 'Profesional', desc: 'Memiliki kompetensi dan keahlian tinggi dalam bidangnya.' },
-    { char: 'I', title: 'Inovatif', desc: 'Selalu menciptakan pembaruan dan solusi kreatif.' },
-    { char: 'N', title: 'Nasionalis', desc: 'Menunjung tinggi nilai-nilai kebangsaan dan cinta tanah air.' },
-    { char: 'K', title: 'Kompeten', desc: 'Mampu bersaing dan menyelesaikan tugas dengan sangat baik.' },
-  ]
+export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
+  const dbData = mottoMars || {}
+  const pink = (dbData.pink_values && dbData.pink_values.length > 0) ? dbData.pink_values : fallbackMottoMars.pink_values
+  const jitu = (dbData.jitu_values && dbData.jitu_values.length > 0) ? dbData.jitu_values : fallbackMottoMars.jitu_values
+  
+  // Combine all values for the grid, but we might want to keep them visually distinct rows as per image
+  // Image shows PINK in one row, JITU in another.
+  
+  // Mars Audio Logic
+  const audioRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
 
-  const jitu = [
-    { char: 'J', title: 'Jujur', desc: 'Berintegritas, transparan, dan dapat dipercaya dalam tindakan.' },
-    { char: 'I', title: 'Iman', desc: 'Berlandaskan ketakwaan kepada Tuhan Yang Maha Esa.' },
-    { char: 'T', title: 'Tangguh', desc: 'Kuat mental, pantang menyerah, dan siap menghadapi tantangan.' },
-    { char: 'U', title: 'Unggul', desc: 'Selalu berusaha menjadi yang terbaik dan berprestasi.' },
-  ]
-
-  const marsLyrics = [
-    {
-      verse: 1,
-      text: [
-        "Singsingkan lengan bajumu",
-        "Tataplah masa depanmu",
-        "SMK Paramitha 2",
-        "Wadah insan cendekia"
-      ]
-    },
-    {
-      verse: 2,
-      text: [
-        "Berlandaskan iman dan taqwa",
-        "Berakhlak mulia utama",
-        "Menguasai teknologi",
-        "Siap membangun negeri"
-      ]
-    },
-    {
-      verse: "Reff",
-      text: [
-        "Maju terus pantang mundur",
-        "Raih prestasi yang luhur",
-        "SMK Paramitha 2",
-        "Jayalah s'lama-lamanya"
-      ]
-    }
-  ]
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
     }
   }
 
-  const item = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0 }
-  }
+  // Helper for cards
+  const Card = ({ item, index, delay }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: delay }}
+      className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl transition-shadow border border-slate-100 relative overflow-hidden group min-h-[220px]"
+    >
+      {/* Decorative gradient circle */}
+      <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-orange-100 to-yellow-50 rounded-full blur-xl opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+      
+      <div className="relative z-10">
+        <h3 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-yellow-500 mb-2">
+          {item.char}
+        </h3>
+        <h4 className="text-xl font-bold text-[#1E1E8F] mb-3">
+          {item.title}
+        </h4>
+        <p className="text-slate-500 text-sm leading-relaxed">
+          {item.desc}
+        </p>
+      </div>
+    </motion.div>
+  )
 
   return (
     <Layout>
       <Head>
         <title>Motto & Mars — SMK Paramitha 2</title>
-        <meta name="description" content="Nilai-nilai PINK JITU dan Mars kebanggaan SMK Paramitha 2 Jakarta." />
       </Head>
 
-      {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-[#1E1E8F] to-[#C0161C] text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10 mix-blend-overlay"></div>
-        
-        {/* Animated Background Shapes */}
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-1/2 -left-1/2 w-[100vw] h-[100vw] bg-white/5 rounded-full blur-[100px]"
-        />
+      {/* Hero Banner */}
+      <div className="bg-gradient-to-r from-[#9e1c4c] to-[#C0161C] py-20 text-center px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-10"></div>
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-2xl md:text-3xl lg:text-4xl font-medium text-white max-w-4xl mx-auto leading-relaxed"
+        >
+          Fondasi karakter insan SMK Paramitha 2 dalam menyongsong masa depan gemilang.
+        </motion.h1>
+      </div>
 
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-8xl font-bold mb-6 tracking-tight"
-          >
-            PINK JITU
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl md:text-2xl font-light text-white/80 max-w-3xl mx-auto"
-          >
-            Fondasi karakter insan SMK Paramitha 2 dalam menyongsong masa depan gemilang.
-          </motion.p>
-        </div>
-      </section>
-
-      {/* PINK JITU Section */}
-      <section className="py-20 bg-[#F8F8FF]">
-        <div className="container mx-auto px-6">
-          
-          {/* PINK ROW */}
-          <motion.div 
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"
-          >
-            {pink.map((val, idx) => (
-              <motion.div key={idx} variants={item}>
-                <ValueCard val={val} />
-              </motion.div>
+      {/* Cards Section */}
+      <div className="bg-slate-50 py-20 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* PINK Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pink.map((item, idx) => (
+              <Card key={`pink-${idx}`} item={item} index={idx} delay={idx * 0.1} />
             ))}
-          </motion.div>
+          </div>
 
-          {/* JITU ROW */}
-          <motion.div 
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {jitu.map((val, idx) => (
-              <motion.div key={idx} variants={item}>
-                <ValueCard val={val} />
-              </motion.div>
+          {/* JITU Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {jitu.map((item, idx) => (
+              <Card key={`jitu-${idx}`} item={item} index={idx} delay={0.4 + (idx * 0.1)} />
             ))}
-          </motion.div>
-
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* Mars Section */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-[#F8F8FF] to-white"></div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C0161C] text-white rounded-full mb-6 shadow-lg">
+      <div className="bg-white py-20 px-4 relative">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-[#C0161C] rounded-full flex items-center justify-center text-white shadow-lg shadow-red-200">
               <Music size={32} />
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-[#1E1E8F] mb-4">Mars SMK Paramitha 2</h2>
-            <p className="text-gray-500 italic">Cipt. Yayasan Pendidikan Paramitha</p>
+          </div>
+          
+          <h2 className="text-4xl font-bold text-[#1E1E8F] mb-2">Mars SMK Paramitha 2</h2>
+          <p className="text-slate-500 mb-12">Cipt. Yayasan Pendidikan Paramitha</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
+            {/* Verse 1 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
+            >
+              <div className="absolute top-4 left-4 text-6xl font-serif text-slate-100 font-bold select-none -z-10">1</div>
+              <div className="space-y-2 text-slate-700 font-medium">
+                <p>Singsingkan lengan bajumu</p>
+                <p>Tataplah masa depanmu</p>
+                <p>SMK Paramitha 2</p>
+                <p>Wadah insan cendekia</p>
+              </div>
+              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
+            </motion.div>
+
+            {/* Verse 2 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
+            >
+              <div className="absolute top-4 left-4 text-6xl font-serif text-slate-100 font-bold select-none -z-10">2</div>
+              <div className="space-y-2 text-slate-700 font-medium">
+                <p>Berlandaskan iman dan taqwa</p>
+                <p>Berakhlak mulia utama</p>
+                <p>Menguasai teknologi</p>
+                <p>Siap membangun negeri</p>
+              </div>
+              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
+            </motion.div>
+
+            {/* Reff */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
+            >
+              <div className="absolute top-4 left-4 text-5xl font-serif text-slate-100 font-bold select-none -z-10 italic">Reff</div>
+              <div className="space-y-2 text-slate-700 font-medium">
+                <p>Maju terus pantang mundur</p>
+                <p>Raih prestasi yang luhur</p>
+                <p>SMK Paramitha 2</p>
+                <p>Jayalah s'lama-lamanya</p>
+              </div>
+              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
+            </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {marsLyrics.map((block, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className="bg-white p-8 rounded-none border border-[#F5C400]/30 shadow-sm hover:shadow-xl transition-shadow duration-500 relative"
-              >
-                <div className="absolute -top-4 -left-4 text-6xl font-serif text-[#F5C400]/20 pointer-events-none">
-                  {block.verse}
-                </div>
-                <div className="space-y-2 text-center">
-                  {block.text.map((line, i) => (
-                    <p key={i} className="text-gray-700 font-medium text-lg leading-relaxed font-serif">
-                      {line}
-                    </p>
-                  ))}
-                </div>
-                <div className="w-8 h-1 bg-[#C0161C] mx-auto mt-6 rounded-full opacity-50"></div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-16 text-center">
-            <button className="inline-flex items-center gap-2 px-8 py-3 bg-[#1E1E8F] text-white rounded-full hover:bg-[#151570] transition-colors shadow-lg group">
-              <PlayCircle size={20} className="group-hover:scale-110 transition-transform" />
-              Putar Mars
-            </button>
-          </div>
+          <button 
+            onClick={togglePlay}
+            className="inline-flex items-center gap-2 bg-[#1E1E8F] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-colors shadow-lg shadow-blue-900/20"
+          >
+            {isPlaying ? <span className="w-3 h-3 bg-white block animate-pulse"></span> : <Play size={20} fill="currentColor" />}
+            {isPlaying ? 'Pause Mars' : 'Putar Mars'}
+          </button>
+          
+          <audio ref={audioRef} src="/mars-paramitha.mp3" onEnded={() => setIsPlaying(false)} />
         </div>
-      </section>
-    </Layout>
-  )
-}
-
-function ValueCard({ val }) {
-  return (
-    <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 h-full border-t-4 border-[#F5C400] group relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#F5C400]/10 to-transparent rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-150 duration-500"></div>
-      
-      <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-[#F5C400] to-[#C0161C] mb-4">
-        {val.char}
       </div>
-      <h3 className="text-2xl font-bold text-[#1E1E8F] mb-3 group-hover:text-[#C0161C] transition-colors">
-        {val.title}
-      </h3>
-      <p className="text-gray-600 leading-relaxed">
-        {val.desc}
-      </p>
-    </div>
+    </Layout>
   )
 }
 
 export async function getServerSideProps() {
   try {
-    const sekolahInfo = await getSekolahInfo()
-    return { props: { sekolahInfo: sekolahInfo || null } }
+    const [mottoMars, sekolahInfo] = await Promise.all([
+      getMottoMars(),
+      getSekolahInfo()
+    ])
+    return { props: { mottoMars: mottoMars || {}, sekolahInfo: sekolahInfo || null } }
   } catch {
-    return { props: { sekolahInfo: null } }
+    return { props: { mottoMars: {}, sekolahInfo: null } }
   }
 }

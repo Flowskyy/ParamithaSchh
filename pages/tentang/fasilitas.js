@@ -5,7 +5,6 @@ import { Search, Filter } from 'lucide-react'
 import Layout from '../../components/Layout'
 import SmartImage from '../../components/SmartImage'
 import { getFasilitas, getSekolahInfo } from '../../services/api'
-import { fallbackFasilitas, fallbackSekolahInfo } from '../../utils/fallbackData'
 
 export default function FasilitasPage({ fasilitas, sekolahInfo }) {
   const [activeCategory, setActiveCategory] = useState('Semua')
@@ -166,15 +165,15 @@ export async function getServerSideProps() {
 
     return { 
       props: { 
-        fasilitas: fasilitas?.length ? fasilitas : fallbackFasilitas,
-        sekolahInfo: sekolahInfo || fallbackSekolahInfo
+        fasilitas: fasilitas?.length ? fasilitas : [],
+        sekolahInfo: sekolahInfo || {}
       } 
     }
   } catch {
     return { 
       props: { 
-        fasilitas: fallbackFasilitas,
-        sekolahInfo: fallbackSekolahInfo 
+        fasilitas: [],
+        sekolahInfo: {} 
       } 
     }
   }

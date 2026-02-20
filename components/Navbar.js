@@ -4,11 +4,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ChevronDown, Menu, LayoutGrid } from 'lucide-react';
 import SidebarModal from './SidebarModal';
+import { supabase } from '../services/supabase';
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [jurusanItems, setJurusanItems] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +18,31 @@ export default function Navbar() {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Fetch Jurusan dynamically
+    async function loadJurusan() {
+      const { data } = await supabase.from('jurusan').select('slug, name, short_desc').order('order_index');
+      if (data) {
+        setJurusanItems(data.map(j => ({ 
+          name: j.name, 
+          href: `/jurusan/${j.slug}`, 
+          desc: j.short_desc ? j.short_desc.substring(0, 30) + '...' : 'Program Keahlian',
+          isHighlight: false 
+        })));
+      }
+    }
+    loadJurusan();
+
+    const handleDbChange = () => {
+      console.log('Refreshing Navbar data...');
+      loadJurusan();
+    };
+    window.addEventListener('db-change', handleDbChange);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('db-change', handleDbChange);
+    };
   }, []);
 
   const links = [
@@ -39,12 +65,7 @@ export default function Navbar() {
       href: '#',
       dropdown: [
         { name: 'Semua Jurusan', href: '/jurusan', desc: 'Daftar Program Keahlian', isHighlight: true },
-        { name: 'Rekayasa Perangkat Lunak', href: '/jurusan/rpl', desc: 'Software Engineering' },
-        { name: 'Desain Komunikasi Visual', href: '/jurusan/dkv', desc: 'Creative Design' },
-        { name: 'Perhotelan', href: '/jurusan/perhotelan', desc: 'Hospitality' },
-        { name: 'Kuliner', href: '/jurusan/kuliner', desc: 'Culinary Art' },
-        { name: 'Usaha Layanan Wisata', href: '/jurusan/ulw', desc: 'Tourism Services' },
-        { name: 'Manajemen Logistik', href: '/jurusan/manajemen-logistik', desc: 'Logistics & Supply Chain' },
+        ...jurusanItems
       ] 
     },
     { name: 'Hubungi Kami', href: '/contact' },
