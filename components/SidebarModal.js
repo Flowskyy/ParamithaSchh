@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Phone, Mail, ChevronRight, Facebook, Instagram, Youtube } from 'lucide-react';
 
 export default function SidebarModal({ isOpen, onClose, links }) {
+  const [openSubmenu, setOpenSubmenu] = React.useState(null);
+
   // Prevent scrolling when modal is open
   React.useEffect(() => {
     if (isOpen) {
@@ -16,6 +18,10 @@ export default function SidebarModal({ isOpen, onClose, links }) {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  const toggleSubmenu = (idx) => {
+    setOpenSubmenu(openSubmenu === idx ? null : idx);
+  };
 
   const socialLinks = [
     { icon: <Facebook size={18} />, href: '#', color: 'hover:text-blue-600' },
@@ -33,7 +39,7 @@ export default function SidebarModal({ isOpen, onClose, links }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100]"
           />
 
           {/* Modal Container */}
@@ -44,7 +50,7 @@ export default function SidebarModal({ isOpen, onClose, links }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-              className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col md:flex-row"
+              className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-xl overflow-hidden pointer-events-auto flex flex-col md:flex-row"
             >
               {/* Left Column: Navigation */}
               <div className="w-full md:w-5/12 bg-slate-50 p-8 flex flex-col border-r border-slate-100 overflow-y-auto">
@@ -65,34 +71,58 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                 <nav className="space-y-2 flex-1">
                   {links.map((link, idx) => (
                     <div key={idx} className="group">
-                      <Link 
-                        href={link.href}
-                        onClick={onClose}
-                        className="flex items-center justify-between p-3 rounded-xl hover:bg-white hover:shadow-sm transition-all group-hover:translate-x-1"
+                      <div 
+                        onClick={() => {
+                          if (link.dropdown) {
+                            toggleSubmenu(idx);
+                          } else {
+                            // If it's a direct link, we rely on the Link component inside, but here we can handle the click for the container
+                          }
+                        }}
+                        className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer select-none ${openSubmenu === idx ? 'bg-white shadow-sm' : 'hover:bg-white/50'}`}
                       >
-                        <span className="font-bold text-slate-700 group-hover:text-primary-600 transition-colors">
-                          {link.name}
-                        </span>
                         {link.dropdown ? (
-                           <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-400" />
-                        ) : null}
-                      </Link>
+                          <span className={`font-bold transition-colors flex-1 ${openSubmenu === idx ? 'text-primary-600' : 'text-slate-700'}`}>
+                            {link.name}
+                          </span>
+                        ) : (
+                          <Link href={link.href} className="flex-1 font-bold text-slate-700" onClick={onClose}>
+                            {link.name}
+                          </Link>
+                        )}
+                        
+                        {link.dropdown && (
+                           <ChevronRight 
+                             size={16} 
+                             className={`text-slate-300 transition-transform duration-300 ${openSubmenu === idx ? 'rotate-90 text-primary-400' : ''}`} 
+                           />
+                        )}
+                      </div>
                       
                       {/* Submenu for Modal */}
-                      {link.dropdown && (
-                        <div className="pl-4 mt-1 space-y-1 border-l-2 border-slate-200 ml-4 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
-                          {link.dropdown.map((subItem, subIdx) => (
-                            <Link
-                              key={subIdx}
-                              href={subItem.href}
-                              onClick={onClose}
-                              className="block py-2 px-3 text-sm text-slate-500 hover:text-primary-600 hover:bg-slate-100/50 rounded-lg transition-colors"
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {link.dropdown && openSubmenu === idx && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pl-4 mt-1 space-y-1 border-l-2 border-slate-200 ml-4 py-2">
+                              {link.dropdown.map((subItem, subIdx) => (
+                                <Link
+                                  key={subIdx}
+                                  href={subItem.href}
+                                  onClick={onClose}
+                                  className="block py-2 px-3 text-sm text-slate-500 hover:text-primary-600 hover:bg-slate-100/50 rounded-lg transition-colors"
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   ))}
                 </nav>

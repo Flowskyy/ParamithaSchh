@@ -24,7 +24,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-slate-900 pt-20 pb-10 relative overflow-hidden">
+    <footer className="bg-[#0A0A1A] text-slate-300 border-t border-slate-900 pt-20 pb-10 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-600 via-purple-600 to-primary-600"></div>
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-900/20 rounded-full blur-3xl pointer-events-none"></div>

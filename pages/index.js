@@ -71,28 +71,26 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
         style={{ scaleX }}
       />
 
-      {/* HERO SECTION - FUTURISTIC */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
+      {/* HERO SECTION - LIGHT THEME */}
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden mesh-bg">
         {/* Animated Background */}
         <div className="absolute inset-0 z-0">
-          <SmartImage 
-            src="/images/Carousel.png" 
-            alt="Hero Background" 
-            fill 
-            priority
-            style={{ objectFit: 'cover' }}
-            className="opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900" />
+          {/* 
+            Optional: Keep image but make it very subtle or remove it for a cleaner light theme. 
+            User said "Class .mesh-bg -> gradient light/pastel". 
+            Let's keep the image but very faint if it adds texture, otherwise rely on mesh-bg.
+            I will hide the image for now to fully embrace the light pastel theme, or make it extremely subtle.
+          */}
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]" />
           
-          {/* Animated Particles/Orbs */}
+          {/* Animated Particles/Orbs - Adjusted for Light Theme */}
           <motion.div 
             animate={{ 
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.5, 0.3], 
             }}
             transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[100px]"
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-200/40 rounded-full blur-[100px]"
           />
           <motion.div 
             animate={{ 
@@ -100,7 +98,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
               opacity: [0.2, 0.4, 0.2], 
             }}
             transition={{ duration: 10, repeat: Infinity, delay: 1 }}
-            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[120px]"
+            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-[120px]"
           />
         </div>
 
@@ -112,18 +110,18 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/5 border border-white/10 text-primary-300 text-sm font-bold mb-8 backdrop-blur-md uppercase tracking-wider">
+              <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/60 border border-slate-200 text-primary-600 text-sm font-bold mb-8 backdrop-blur-md uppercase tracking-wider shadow-sm">
                 <Star size={14} className="fill-current" /> Sekolah Pusat Keunggulan
               </span>
               
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">
                 Masa Depan <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 animate-gradient bg-300%">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-purple-600 to-primary-600 animate-gradient bg-300%">
                   Dimulai Di Sini
                 </span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-slate-300 mb-10 leading-relaxed max-w-3xl mx-auto font-light">
+              <p className="text-xl md:text-2xl text-slate-600 mb-10 leading-relaxed max-w-3xl mx-auto font-light">
                 {heroData.subtitle || "Mencetak generasi unggul dengan kompetensi standar industri dan karakter berakhlak mulia."}
               </p>
               
@@ -135,7 +133,7 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                   <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Link>
                 
-                <Link href="#jurusan" className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm">
+                <Link href="#jurusan" className="px-8 py-4 bg-white/80 text-slate-700 border border-slate-200 rounded-full font-bold text-lg hover:bg-white transition-all backdrop-blur-sm shadow-sm hover:shadow-md">
                   Jelajahi Jurusan
                 </Link>
               </div>
@@ -156,8 +154,8 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
       </div>
 
       {/* MOTTO SECTION - PINK JITU */}
-      <section className="relative py-24 bg-slate-950 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-5" />
+      <section className="relative py-24 bg-white overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/grid.svg')] opacity-[0.03]" />
         <div className="container mx-auto px-6 relative z-10">
           <motion.div 
             initial={{ opacity: 0 }}
@@ -165,8 +163,8 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-sm font-bold text-primary-500 uppercase tracking-[0.2em] mb-4">Nilai-Nilai Utama</h2>
-            <h3 className="text-4xl md:text-5xl font-bold text-white">Motto <span className="text-primary-500">PINK JITU</span></h3>
+            <h2 className="text-sm font-bold text-primary-600 uppercase tracking-[0.2em] mb-4">Nilai-Nilai Utama</h2>
+            <h3 className="text-4xl md:text-5xl font-bold text-slate-900">Motto <span className="text-primary-600">PINK JITU</span></h3>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
@@ -179,8 +177,8 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
               className="space-y-8"
             >
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-                <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-2xl">
+                <div className="absolute -inset-1 bg-gradient-to-r from-pink-200 to-purple-200 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-1000"></div>
+                <div className="relative bg-white border border-slate-100 shadow-xl p-8 rounded-2xl">
                   <h4 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-6">PINK</h4>
                   <ul className="space-y-4">
                     {[
@@ -190,10 +188,10 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                       { l: 'K', t: 'ompeten', d: 'Menguasai bidang keahlian' }
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-4">
-                        <span className="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-500 flex items-center justify-center font-bold">{item.l}</span>
+                        <span className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center font-bold">{item.l}</span>
                         <div>
-                          <strong className="text-white block">{item.t}</strong>
-                          <span className="text-slate-400 text-sm">{item.d}</span>
+                          <strong className="text-slate-900 block">{item.t}</strong>
+                          <span className="text-slate-500 text-sm">{item.d}</span>
                         </div>
                       </li>
                     ))}
@@ -211,8 +209,8 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
               className="space-y-8"
             >
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-                <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-2xl">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-1000"></div>
+                <div className="relative bg-white border border-slate-100 shadow-xl p-8 rounded-2xl">
                   <h4 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500 mb-6">JITU</h4>
                   <ul className="space-y-4">
                     {[
@@ -222,10 +220,10 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                       { l: 'U', t: 'nggul', d: 'Terbaik dalam prestasi' }
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-4">
-                        <span className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">{item.l}</span>
+                        <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">{item.l}</span>
                         <div>
-                          <strong className="text-white block">{item.t}</strong>
-                          <span className="text-slate-400 text-sm">{item.d}</span>
+                          <strong className="text-slate-900 block">{item.t}</strong>
+                          <span className="text-slate-500 text-sm">{item.d}</span>
                         </div>
                       </li>
                     ))}
@@ -349,14 +347,14 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
       </section>
 
       {/* JURUSAN SECTION */}
-      <Section id="jurusan" title="Program Keahlian" subtitle="Pilih jurusan sesuai minat dan bakatmu" className="bg-slate-900 text-white">
+      <Section id="jurusan" title="Program Keahlian" subtitle="Pilih jurusan sesuai minat dan bakatmu" className="bg-slate-50 text-slate-900">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {jurusanList.map((item, idx) => (
             <Link href={`/jurusan/${item.slug}`} key={item.id} className="group perspective">
               <motion.div 
                 whileHover={{ rotateX: 5, rotateY: 5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl bg-slate-800 border border-slate-700"
+                className="relative h-[400px] rounded-3xl overflow-hidden shadow-lg bg-white border border-slate-200"
               >
                 {/* Image */}
                 <SmartImage 
@@ -364,9 +362,9 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                   alt={item.title} 
                   fill 
                   style={{ objectFit: 'cover' }}
-                  className="group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-40"
+                  className="group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent" />
                 
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 w-full p-8">
@@ -374,14 +372,14 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                     <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs font-bold rounded-lg mb-2">
                       {item.singkatan || 'JURUSAN'}
                     </span>
-                    <h3 className="text-2xl font-bold text-white leading-tight mb-2">
+                    <h3 className="text-2xl font-bold text-slate-900 leading-tight mb-2">
                       {item.title}
                     </h3>
                   </div>
-                  <p className="text-slate-400 text-sm line-clamp-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
+                  <p className="text-slate-600 text-sm line-clamp-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
                     {item.short_desc}
                   </p>
-                  <div className="mt-4 pt-4 border-t border-slate-700 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 flex items-center text-primary-400 text-sm font-bold gap-2">
+                  <div className="mt-4 pt-4 border-t border-slate-200 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 flex items-center text-primary-600 text-sm font-bold gap-2">
                     Selengkapnya <ArrowRight size={16} />
                   </div>
                 </div>

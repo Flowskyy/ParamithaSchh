@@ -5,12 +5,12 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --surface: #f8fafc;
+  --background: #F8F9FF;
+  --foreground: #0A0A1A;
+  --surface: #F0F2FF;
   --primary: #4F8EF7;
-  --secondary: #64748b;
-  --border: #e2e8f0;
+  --secondary: #6B7280;
+  --border: rgba(0,0,0,0.08);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,18 +31,28 @@ body {
 
 ::selection { background: rgba(79,142,247,0.2); color: var(--primary); }
 
-/* Glass utility */
+/* Glass utility - Light Theme */
 .glass {
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* Mesh Gradient - Light Theme */
+.mesh-bg {
+  background-color: #F8F9FF;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(220, 80%, 90%, 1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(280, 80%, 95%, 1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(220, 80%, 95%, 1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(280, 80%, 90%, 1) 0px, transparent 50%);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #2563EB 0%, #4F8EF7 100%);
+  background: linear-gradient(135deg, #4F8EF7 0%, #F97316 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
