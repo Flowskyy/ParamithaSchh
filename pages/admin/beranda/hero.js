@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../../components/AdminLayout';
-import withAdmin from '../../utils/withAdmin';
-import { getHero, saveHero, getSekolahInfo, upsertSekolahInfo } from '../../services/api';
-import { showToast } from '../../utils/toast';
+import withAdmin from '../../../utils/withAdmin';
+import { getHero, saveHero, getSekolahInfo, upsertSekolahInfo } from '../../../services/api';
+import { showToast } from '../../../utils/toast';
 import { Save, Upload, Info, User } from 'lucide-react';
-import SmartImage from '../../components/SmartImage';
-import ImageUploader from '../../components/ImageUploader';
+import SmartImage from '../../../components/SmartImage';
+import ImageUploader from '../../../components/ImageUploader';
 import toast from 'react-hot-toast';
 
 function HeroAdmin() {

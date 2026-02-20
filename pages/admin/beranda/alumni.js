@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import AdminLayout from '../../components/AdminLayout';
-import withAdmin from '../../utils/withAdmin';
-import { getAlumni, saveAlumni, deleteAlumni } from '../../services/api';
-import { showToast } from '../../utils/toast';
+import AdminLayout from '../../../components/AdminLayout';
+import withAdmin from '../../../utils/withAdmin';
+import { getAlumni, saveAlumni, deleteAlumni } from '../../../services/api';
+import { showToast } from '../../../utils/toast';
 import { Plus, Edit, Trash, X, Save, Briefcase, GraduationCap } from 'lucide-react';
-import SmartImage from '../../components/SmartImage';
-import ImageUploader from '../../components/ImageUploader';
+import SmartImage from '../../../components/SmartImage';
+import ImageUploader from '../../../components/ImageUploader';
 
 function AlumniAdmin() {
   const [items, setItems] = useState([]);
