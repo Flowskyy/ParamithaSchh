@@ -54,7 +54,6 @@ export default function AdminLayout({ children }) {
     { href: '/admin/alumni', icon: Users, label: 'Alumni' },
     { href: '/admin/mitra', icon: Briefcase, label: 'Mitra' },
     { href: '/admin/galeri', icon: ImageIcon, label: 'Galeri' },
-    { href: '/admin/carousel', icon: ImageIcon, label: 'Slider' },
     { href: '/admin/log', icon: Activity, label: 'Activity Log' },
     { href: '/admin/debug', icon: Bug, label: 'System Check' },
   ];

@@ -295,7 +295,7 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900">Alumni Berprestasi</h3>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-center">
             {alumni.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -303,31 +303,30 @@ export default function Home({ sekolahInfo, alumniList, mitraList }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2"
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group hover:-translate-y-2 max-w-[280px] mx-auto w-full"
               >
-                <div className="relative h-64 bg-slate-100 overflow-hidden">
+                <div className="relative h-48 bg-slate-100 overflow-hidden">
                   <SmartImage 
                     src={item.foto_url || `https://ui-avatars.com/api/?name=${item.nama}&background=random`} 
                     alt={item.nama}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  {/* Overlay Gradient for Text Readability if needed, but clean is better */}
                 </div>
                 
-                <div className="p-6 relative">
+                <div className="p-4 relative">
                   {/* Jurusan Badge */}
-                  <div className="absolute -top-4 right-6 bg-[#F5C400] text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                  <div className="absolute -top-3 right-4 bg-[#F5C400] text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
                     {item.angkatan ? `Angkatan ${item.angkatan}` : 'Alumni'}
                   </div>
 
-                  <h4 className="text-lg font-bold text-slate-900 mb-1">{item.nama}</h4>
-                  <p className="text-[#1E1E8F] text-sm font-medium mb-4">{item.jurusan}</p>
+                  <h4 className="text-base font-bold text-slate-900 mb-1 line-clamp-1">{item.nama}</h4>
+                  <p className="text-[#1E1E8F] text-xs font-medium mb-3 line-clamp-1">{item.jurusan}</p>
                   
-                  <div className="pt-4 border-t border-slate-100">
-                    <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Karir Saat Ini</p>
-                    <p className="font-bold text-slate-800 text-sm">{item.perusahaan}</p>
-                    <p className="text-slate-600 text-sm">{item.jabatan || item.posisi}</p>
+                  <div className="pt-3 border-t border-slate-100">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Karir Saat Ini</p>
+                    <p className="font-bold text-slate-800 text-xs line-clamp-1">{item.perusahaan}</p>
+                    <p className="text-slate-600 text-xs line-clamp-1">{item.jabatan || item.posisi}</p>
                   </div>
                 </div>
               </motion.div>

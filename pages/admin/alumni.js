@@ -35,7 +35,7 @@ function AlumniAdmin() {
       jurusan: '',
       angkatan: '', // or tahun_lulus
       perusahaan: '',
-      jabatan: '', // or posisi
+      posisi: '', 
       foto_url: '',
       deskripsi: ''
     };
@@ -140,10 +140,10 @@ function AlumniAdmin() {
                     <label className="text-slate-600 text-sm font-medium">Jabatan / Posisi</label>
                     <input 
                       type="text" 
-                      value={formData.posisi || formData.jabatan || ''} 
-                      onChange={e => setFormData({...formData, posisi: e.target.value, jabatan: e.target.value})}
+                      value={formData.posisi || ''} 
+                      onChange={e => setFormData({...formData, posisi: e.target.value})}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                      placeholder="Posisi Pekerjaan"
+                      placeholder="Contoh: Senior Developer"
                     />
                   </div>
                 </div>
