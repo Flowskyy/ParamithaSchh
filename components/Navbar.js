@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Menu, X, ChevronDown, ArrowRight, Phone, MapPin, LayoutGrid } from 'lucide-react';
+import { Menu, X, ChevronDown, ArrowRight, Phone, MapPin, LayoutGrid, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SidebarModal from './SidebarModal';
 
@@ -52,7 +52,7 @@ export default function Navbar() {
   return (
     <>
       <nav className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'
+        scrolled ? 'bg-[#0f0f1a]/80 backdrop-blur-md shadow-sm py-3 border-b border-white/5' : 'bg-transparent py-5'
       }`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -62,10 +62,10 @@ export default function Navbar() {
                  <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain" sizes="48px" />
               </div>
               <div className="flex flex-col">
-                <span className={`font-bold text-lg leading-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+                <span className={`font-bold text-lg leading-tight transition-colors text-white`}>
                   SMK Paramitha 2
                 </span>
-                <span className={`text-[10px] uppercase tracking-widest font-medium ${scrolled ? 'text-primary-600' : 'text-primary-300'}`}>
+                <span className={`text-[10px] uppercase tracking-widest font-medium text-primary-400`}>
                   Jakarta
                 </span>
               </div>
@@ -82,11 +82,7 @@ export default function Navbar() {
                 >
                   <Link 
                     href={link.href}
-                    className={`flex items-center gap-1 font-medium text-sm transition-colors py-2 ${
-                      scrolled 
-                        ? 'text-slate-600 hover:text-primary-600' 
-                        : 'text-white/90 hover:text-white'
-                    }`}
+                    className={`flex items-center gap-1 font-medium text-sm transition-colors py-2 text-white/90 hover:text-white`}
                   >
                     {link.name}
                     {link.dropdown && <ChevronDown size={14} className="opacity-70 group-hover:rotate-180 transition-transform" />}
@@ -130,20 +126,16 @@ export default function Navbar() {
             {/* Sidebar Toggle */}
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className={`p-2 rounded-lg transition-colors ml-2 ${
-                scrolled ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
-              }`}
-              title="Menu Lengkap"
+              className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all ml-2 lg:ml-4 bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-sm`}
             >
-              <LayoutGrid size={24} />
+              <LayoutGrid size={18} />
+              <span className="text-xs font-bold uppercase tracking-wider">Info</span>
             </button>
 
             {/* Mobile Toggle */}
             <button 
               onClick={() => setIsOpen(true)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ml-1 ${
-                scrolled ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
-              }`}
+              className={`lg:hidden p-2 rounded-lg transition-colors ml-1 text-white hover:bg-white/10`}
             >
               <Menu size={24} />
             </button>

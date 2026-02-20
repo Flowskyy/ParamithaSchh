@@ -286,23 +286,23 @@ export default function Home({ hero, jurusan, fasilitas, alumni, mitra, sekolahI
                 </h2>
                 <div className="space-y-6 text-lg text-slate-600 leading-relaxed font-medium italic">
                   <p>
-                    "Kami Para Putra-Putri Siswa Paramitha<br/>
+                    &quot;Kami Para Putra-Putri Siswa Paramitha<br/>
                     Pewaris Penerus Cita Pembangunan Negara<br/>
                     Kami Semua Berusaha Tuk Mencapai Cita-Cita<br/>
-                    Giat Belajar Bekerja Berjuang Bersama Gembira"
+                    Giat Belajar Bekerja Berjuang Bersama Gembira&quot;
                   </p>
                   <p>
-                    "Sekolah Menengah Industri Pariwisata<br/>
+                    &quot;Sekolah Menengah Industri Pariwisata<br/>
                     Serta Teknologi Informatika<br/>
                     Dibina Dididik Jiwa Raganya<br/>
-                    Agar Berguna Tuk Nusa Bangsa"
+                    Agar Berguna Tuk Nusa Bangsa&quot;
                   </p>
                   <p className="font-bold text-primary-700">
-                    "Dunia Usaha Kita Memanggil Kita Semua<br/>
+                    &quot;Dunia Usaha Kita Memanggil Kita Semua<br/>
                     Marilah Giat Belajar<br/>
                     Jayalah Paramitha Kita<br/>
                     Marilah Giat Belajar<br/>
-                    Jayalah Paramitha Kita"
+                    Jayalah Paramitha Kita&quot;
                   </p>
                 </div>
               </motion.div>
