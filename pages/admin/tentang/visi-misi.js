@@ -70,7 +70,6 @@ function VisiMisiAdmin() {
               Read Only (Disabled)
             </span>
           </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
