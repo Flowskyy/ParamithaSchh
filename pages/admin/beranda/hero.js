@@ -20,10 +20,6 @@ function HeroAdmin() {
     email: '',
     address: '',
     map_url: '',
-    facebook: '',
-    instagram: '',
-    youtube: '',
-    tiktok: '',
     kepsek_name: '',
     kepsek_photo: '',
     kepsek_message: ''
@@ -196,46 +192,6 @@ function HeroAdmin() {
                   onChange={(e) => setInfo({...info, map_url: e.target.value})}
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
                   placeholder="https://www.google.com/maps/embed?..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">Facebook URL</label>
-                <input 
-                  type="text" 
-                  value={info.facebook || ''}
-                  onChange={(e) => setInfo({...info, facebook: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">Instagram URL</label>
-                <input 
-                  type="text" 
-                  value={info.instagram || ''}
-                  onChange={(e) => setInfo({...info, instagram: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">YouTube URL</label>
-                <input 
-                  type="text" 
-                  value={info.youtube || ''}
-                  onChange={(e) => setInfo({...info, youtube: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">TikTok URL</label>
-                <input 
-                  type="text" 
-                  value={info.tiktok || ''}
-                  onChange={(e) => setInfo({...info, tiktok: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
                 />
               </div>
             </div>

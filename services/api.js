@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { fallbackJurusan } from '../utils/fallbackData';
 
 // Helper to handle Supabase response (GET)
 // Returns data directly, or fallback on error
@@ -60,20 +61,70 @@ export async function saveCarousel(payload) {
 
 // ─── JURUSAN ───────────────────────────────────────────────────────
 export async function getJurusan() {
+  try {
+    // Try to fetch active jurusan only
+    const { data, error } = await supabase
+      .from('jurusan')
+      .select('*')
+      .eq('aktif', true)
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      // If error (e.g. column 'aktif' doesn't exist), try fetching all
+      console.warn('Error fetching active jurusan, retrying all...', error.message);
+      const { data: allData, error: allError } = await supabase
+        .from('jurusan')
+        .select('*')
+        .order('order_index', { ascending: true });
+        
+      if (allError) throw allError;
+      return allData || fallbackJurusan;
+    }
+    
+    return data || fallbackJurusan;
+  } catch (err) {
+    console.error('getJurusan Error:', err);
+    return fallbackJurusan;
+  }
+}
+
+export async function getJurusanAll() {
+  // Fetch ALL jurusan including non-active, ensure we select ALL columns
   return handleResponse(
     supabase.from('jurusan').select('*').order('order_index'),
-    []
+    fallbackJurusan
   );
 }
+
 export async function getJurusanBySlug(slug) {
-  return handleResponse(
-    supabase.from('jurusan').select('*').eq('slug', slug).single(),
-    null
-  );
+  try {
+    const { data, error } = await supabase
+      .from('jurusan')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+      
+    if (error) throw error;
+    return data || fallbackJurusan.find(j => j.slug === slug);
+  } catch (err) {
+    console.error('getJurusanBySlug Error:', err);
+    return fallbackJurusan.find(j => j.slug === slug);
+  }
 }
+
 export async function createJurusan(p) { return handleMutation(supabase.from('jurusan').insert(p)); }
 export async function updateJurusan(id, p) { return handleMutation(supabase.from('jurusan').update(p).eq('id', id)); }
+export async function updateJurusanOrder(id, order_index) {
+  return handleMutation(supabase.from('jurusan').update({ order_index }).eq('id', id));
+}
+
+export async function updateJurusanOrderBatch(updates) {
+  return handleMutation(supabase.from('jurusan').upsert(updates, { onConflict: 'id' }));
+}
 export async function deleteJurusan(id) { return handleMutation(supabase.from('jurusan').delete().eq('id', id)); }
+export async function toggleJurusanAktif(id, aktif) {
+  return handleMutation(supabase.from('jurusan').update({ aktif }).eq('id', id));
+}
 export async function saveJurusan(payload) { 
   if (payload.id) return updateJurusan(payload.id, payload); 
   return createJurusan(payload); 
@@ -384,4 +435,3 @@ export async function upsertMottoMars(p) {
   if (p.id) return handleMutation(supabase.from('motto_mars').update(p).eq('id', p.id));
   return handleMutation(supabase.from('motto_mars').insert(p));
 }
-

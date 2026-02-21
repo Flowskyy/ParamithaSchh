@@ -8,7 +8,6 @@ import {
   Info,
   GraduationCap,
   BookOpen, 
-  Image as ImageIcon, 
   BarChart,
   Settings,
   LogOut, 
@@ -24,7 +23,7 @@ import { initStorageBuckets } from '../services/api';
 export default function AdminLayout({ children }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [jurusanItems, setJurusanItems] = useState([]);
   
   // State for dropdown menus
   const [openMenus, setOpenMenus] = useState({
@@ -32,18 +31,19 @@ export default function AdminLayout({ children }) {
     tentang: false,
     ppdb: false,
     jurusan: false,
-    media: false,
-    laporan: false
+    laporan: false,
   });
 
-  const [jurusanItems, setJurusanItems] = useState([]);
-
   useEffect(() => {
+    // Initialize buckets
+    initStorageBuckets().catch(console.error);
+
+    // Load jurusan for sidebar
     async function loadJurusan() {
       const { data } = await supabase.from('jurusan').select('id, slug, name').order('order_index');
       if (data) {
         setJurusanItems(data.map(j => ({ 
-          href: `/admin/jurusan?slug=${j.slug}`, 
+          href: `/admin/jurusan?edit=${j.slug}`, 
           label: j.name 
         })));
       }
@@ -51,6 +51,7 @@ export default function AdminLayout({ children }) {
     loadJurusan();
   }, []);
 
+  // Menu structure with CORRECT paths
   const menuStructure = [
     { 
       type: 'single',
@@ -64,10 +65,10 @@ export default function AdminLayout({ children }) {
       label: 'Beranda',
       icon: Home,
       items: [
-        { href: '/admin/beranda/hero', label: 'Hero' },
-        { href: '/admin/beranda/alumni', label: 'Alumni' },
-        { href: '/admin/beranda/mitra', label: 'Mitra' },
-        { href: '/admin/beranda/cta', label: 'CTA', disabled: true },
+        { href: '/admin/beranda/hero', label: 'Hero Section' },
+        { href: '/admin/beranda/alumni', label: 'Alumni Sukses' },
+        { href: '/admin/beranda/mitra', label: 'Mitra Industri' },
+        { href: '/admin/sosmed', label: 'Sosial Media' },
       ]
     },
     {
@@ -77,13 +78,9 @@ export default function AdminLayout({ children }) {
       icon: Info,
       items: [
         { href: '/admin/tentang/profil', label: 'Profil Sekolah' },
-        { href: '/admin/tentang/visi-misi', label: 'Visi & Misi', disabled: true },
-        { href: '/admin/tentang/sejarah', label: 'Sejarah', disabled: true },
         { href: '/admin/tentang/sambutan-kepsek', label: 'Sambutan Kepsek' },
         { href: '/admin/tentang/fasilitas', label: 'Fasilitas' },
-        { href: '/admin/tentang/galeri', label: 'Galeri' },
-        { href: '/admin/testimonial', label: 'Testimonial' },
-        { href: '/admin/tentang/motto-mars', label: 'Motto & Mars', disabled: true },
+        { href: '/admin/tentang/galeri', label: 'Galeri Foto' },
       ]
     },
     {
@@ -93,7 +90,7 @@ export default function AdminLayout({ children }) {
       icon: GraduationCap,
       items: [
         { href: '/admin/ppdb/jadwal', label: 'Jadwal Pendaftaran' },
-        { href: '/admin/ppdb/pendaftar', label: 'Form Pendaftar' },
+        { href: '/admin/ppdb/pendaftar', label: 'Data Pendaftar' },
         { href: '/admin/ppdb/persyaratan', label: 'Persyaratan' },
       ]
     },
@@ -103,8 +100,9 @@ export default function AdminLayout({ children }) {
       label: 'Jurusan',
       icon: BookOpen,
       items: [
-        { href: '/admin/jurusan/baru', label: '+ Buat Jurusan Baru', special: true },
-        ...jurusanItems
+        { href: '/admin/jurusan', label: 'Semua Jurusan' },
+        ...jurusanItems,
+        { href: '/admin/jurusan?action=new', label: '+ Tambah Jurusan', special: true },
       ]
     },
     {
@@ -113,8 +111,8 @@ export default function AdminLayout({ children }) {
       label: 'Laporan',
       icon: BarChart,
       items: [
-        { href: '/admin/report', label: 'Report', disabled: true },
-        { href: '/admin/log', label: 'Log Aktivitas', disabled: true },
+        { href: '/admin/report', label: 'Laporan PPDB', disabled: true },
+        { href: '/admin/log', label: 'Log Aktivitas' },
       ]
     },
     { 
@@ -125,112 +123,70 @@ export default function AdminLayout({ children }) {
     },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll);
-    
-    // Initialize buckets on layout mount
-    initStorageBuckets().catch(console.error);
-    
-    // Open menu based on current path
-    const path = router.asPath; // Use asPath to catch query params
-    
-    const newOpenMenus = { ...openMenus };
-    let hasUpdate = false;
-
-    menuStructure.forEach(item => {
-      if (item.type === 'dropdown') {
-        // Check if any child matches the current path
-        const isActive = item.items.some(sub => {
-          // Exact match or starts with (for nested routes)
-          // Handle query params comparison carefully
-          if (sub.href.includes('?')) {
-            return path === sub.href;
-          }
-          return path.startsWith(sub.href);
-        });
-
-        if (isActive && !newOpenMenus[item.id]) {
-          newOpenMenus[item.id] = true;
-          hasUpdate = true;
-        }
-      }
-    });
-
-    if (hasUpdate) {
-      setOpenMenus(newOpenMenus);
-    }
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.asPath, jurusanItems]);
-
-  const toggleMenu = (menu) => {
-    setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+  const toggleMenu = (menuId) => {
+    setOpenMenus(prev => ({ ...prev, [menuId]: !prev[menuId] }));
   };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      showToast.error('Error logging out');
+      showToast.error('Gagal logout');
     } else {
       router.push('/admin');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF] text-slate-900 font-sans selection:bg-[#C0161C] selection:text-white">
-      {/* Mobile Header */}
-      <div className={`lg:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between transition-all duration-300 ${
-        scrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm' : 'bg-transparent'
-      }`}>
+    <div className="flex min-h-screen bg-[#F8F9FF] font-sans text-slate-900">
+      
+      {/* MOBILE HEADER (Visible only on mobile) */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#1E1E8F] text-white px-4 py-3 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200">
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white">
             <Image src="/images/logo.jpg" alt="Logo" width={32} height={32} className="object-cover" />
           </div>
-          <span className="font-bold text-lg text-slate-800">Admin Panel</span>
+          <span className="font-bold text-lg">Admin Panel</span>
         </div>
-        <button 
-          onClick={() => setSidebarOpen(true)}
-          className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
-        >
+        <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-white/10 rounded-lg">
           <Menu size={24} />
         </button>
       </div>
 
-      {/* Sidebar Overlay */}
+      {/* OVERLAY (Mobile only) */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 z-50 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 bottom-0 w-72 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 lg:translate-x-0 shadow-xl lg:shadow-none ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+      {/* SIDEBAR — selalu visible di desktop (lg:translate-x-0) */}
+      <aside className={`
+        fixed top-0 left-0 bottom-0 w-64 bg-[#1E1E8F] text-white z-50 
+        transform transition-transform duration-300 ease-in-out shadow-xl
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Sidebar Header */}
+        <div className="h-16 flex items-center px-6 border-b border-white/10 bg-[#151570]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 shadow-sm">
-              <Image src="/images/logo.jpg" alt="Logo" width={40} height={40} className="object-cover" />
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white">
+              <Image src="/images/logo.jpg" alt="Logo" width={32} height={32} className="object-cover" />
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-tight text-slate-900">SMK Paramitha</h1>
-              <p className="text-xs text-[#C0161C] font-bold tracking-wide">ADMINISTRATOR</p>
+              <h1 className="font-bold text-sm leading-tight">SMK Paramitha</h1>
+              <p className="text-[10px] text-blue-200 font-bold tracking-wider">ADMINISTRATOR</p>
             </div>
           </div>
           <button 
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 hover:bg-slate-100 rounded-lg text-slate-400"
+            className="lg:hidden ml-auto p-1 hover:bg-white/10 rounded text-white/70"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-4 overflow-y-auto h-[calc(100vh-140px)] custom-scrollbar">
-          <p className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Main Menu</p>
-          
+        {/* Sidebar Menu */}
+        <div className="p-4 overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar">
           <div className="space-y-1">
             {menuStructure.map((item) => {
               if (item.type === 'single') {
@@ -239,22 +195,21 @@ export default function AdminLayout({ children }) {
                   <Link 
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                       isActive 
-                        ? 'bg-[#C0161C] text-white shadow-lg shadow-[#C0161C]/25' 
-                        : 'text-slate-500 hover:text-[#C0161C] hover:bg-red-50'
+                        ? 'bg-white text-[#1E1E8F] font-bold shadow-md' 
+                        : 'text-white/80 hover:bg-white/10 hover:text-white'
                     }`}
                   >
-                    <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-[#C0161C] transition-colors'} />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon size={20} className={isActive ? 'text-[#1E1E8F]' : 'text-white/70'} />
+                    <span className="text-sm">{item.label}</span>
                   </Link>
                 );
               } else {
                 const isOpen = openMenus[item.id];
+                // Check if any child is active
                 const hasActiveChild = item.items.some(sub => {
-                   if (sub.href.includes('?')) {
-                      return router.asPath === sub.href;
-                   }
+                   if (sub.href.includes('?')) return router.asPath === sub.href;
                    return router.pathname.startsWith(sub.href);
                 });
                 
@@ -262,33 +217,23 @@ export default function AdminLayout({ children }) {
                   <div key={item.id} className="space-y-1">
                     <button
                       onClick={() => toggleMenu(item.id)}
-                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
                         hasActiveChild 
-                          ? 'bg-red-50 text-[#C0161C]' 
-                          : 'text-slate-500 hover:text-[#C0161C] hover:bg-red-50'
+                          ? 'bg-white/10 text-white font-semibold' 
+                          : 'text-white/80 hover:bg-white/10 hover:text-white'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon size={20} className={hasActiveChild ? 'text-[#C0161C]' : 'text-slate-400 group-hover:text-[#C0161C] transition-colors'} />
-                        <span className="font-medium">{item.label}</span>
+                        <item.icon size={20} className={hasActiveChild ? 'text-white' : 'text-white/70'} />
+                        <span className="text-sm">{item.label}</span>
                       </div>
-                      {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                      {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                     </button>
                     
                     {isOpen && (
-                      <div className="pl-11 pr-2 space-y-1">
+                      <div className="pl-11 pr-2 space-y-1 mt-1 mb-2">
                         {item.items.map(sub => {
-                          if (sub.disabled) {
-                            return (
-                              <div
-                                key={sub.href}
-                                className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-slate-300 cursor-not-allowed select-none"
-                              >
-                                <span>{sub.label}</span>
-                                <span className="ml-auto text-[10px] font-bold border border-slate-200 px-1.5 py-0.5 rounded bg-slate-50 text-slate-400">Locked</span>
-                              </div>
-                            );
-                          }
+                          if (sub.disabled) return null; // Skip disabled items or render differently
 
                           const isSubActive = sub.href.includes('?') 
                             ? router.asPath === sub.href
@@ -298,13 +243,13 @@ export default function AdminLayout({ children }) {
                             <Link
                               key={sub.href}
                               href={sub.href}
-                              className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                              className={`block py-2 px-3 rounded-lg text-xs transition-all ${
                                 isSubActive
-                                  ? 'bg-[#C0161C] text-white shadow-md shadow-[#C0161C]/20'
-                                  : 'text-slate-500 hover:text-[#C0161C] hover:bg-red-50'
-                              } ${sub.special ? 'text-yellow-600 font-bold hover:text-yellow-700 hover:bg-yellow-50' : ''}`}
+                                  ? 'bg-[#C0161C] text-white font-bold shadow-sm'
+                                  : 'text-white/60 hover:text-white hover:bg-white/5'
+                              } ${sub.special ? 'text-[#F5C400] font-bold' : ''}`}
                             >
-                              <span>{sub.label}</span>
+                              {sub.label}
                             </Link>
                           );
                         })}
@@ -315,25 +260,42 @@ export default function AdminLayout({ children }) {
               }
             })}
           </div>
-        </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-100 bg-white/95 backdrop-blur-xl">
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors group"
-          >
-            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Sign Out</span>
-          </button>
+          <div className="mt-8 pt-4 border-t border-white/10">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-white/60 hover:bg-red-500/20 hover:text-red-200 transition-colors"
+            >
+              <LogOut size={20} />
+              <span className="text-sm font-medium">Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className={`lg:ml-72 min-h-screen transition-all duration-300 ${sidebarOpen ? 'blur-sm lg:blur-none' : ''}`}>
-        <div className="p-4 lg:p-8 pt-20 lg:pt-8 max-w-7xl mx-auto">
+      {/* MAIN CONTENT */}
+      <div className="lg:ml-64 flex-1 flex flex-col min-h-screen bg-[#F8F9FF]">
+        {/* Top Bar Desktop */}
+        <header className="hidden lg:flex h-16 bg-white border-b border-slate-200 items-center justify-between px-8 sticky top-0 z-30 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-800">
+            Panel Administrasi
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm font-bold text-slate-800">Administrator</p>
+              <p className="text-xs text-slate-500">smkparamitha2@gmail.com</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden">
+               <Image src="/images/logo.jpg" alt="Admin" width={40} height={40} />
+            </div>
+          </div>
+        </header>
+
+        {/* Content Wrapper */}
+        <main className="p-4 lg:p-8 pt-20 lg:pt-8 flex-1">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

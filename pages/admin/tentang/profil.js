@@ -11,10 +11,7 @@ function ProfilSekolahAdmin() {
     phone: '',
     email: '',
     address: '',
-    map_url: '',
-    facebook: '',
-    instagram: '',
-    youtube: ''
+    map_url: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -111,43 +108,6 @@ function ProfilSekolahAdmin() {
             </div>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
-              <Share2 size={20} className="text-primary-600" /> Social Media
-            </h2>
-            
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">Facebook URL</label>
-                <input 
-                  type="text" 
-                  value={info.facebook || ''}
-                  onChange={(e) => setInfo({...info, facebook: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">Instagram URL</label>
-                <input 
-                  type="text" 
-                  value={info.instagram || ''}
-                  onChange={(e) => setInfo({...info, instagram: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-slate-700 text-sm font-bold">YouTube URL</label>
-                <input 
-                  type="text" 
-                  value={info.youtube || ''}
-                  onChange={(e) => setInfo({...info, youtube: e.target.value})}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
-                />
-              </div>
-            </div>
-          </section>
         </div>
 
         <div className="space-y-8">

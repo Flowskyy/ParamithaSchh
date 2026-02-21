@@ -1,251 +1,223 @@
-import { useEffect, useState } from 'react';
-import AdminLayout from '../../components/AdminLayout';
-import withAdmin from '../../utils/withAdmin';
-import { getReport, initStorageBuckets, getActivityLog } from '../../services/api';
-import { seedDatabase } from '../../utils/seed';
-import { BookOpen, Users, Image as ImageIcon, Building, Database, ArrowRight, Clock, ChevronRight } from 'lucide-react';
-import Head from 'next/head';
-import Link from 'next/link';
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
+import Head from 'next/head'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { 
+  BarChart3, Users, Image as ImageIcon, Briefcase, 
+  Settings, ExternalLink, Clock, Activity, FileText
+} from 'lucide-react'
+import { getReport, getActivityLog } from '../../services/api'
+import withAdmin from '../../utils/withAdmin'
+import AdminLayout from '../../components/AdminLayout'
 
-function Dashboard() {
+function AdminDashboard({ user }) {
   const [stats, setStats] = useState({
     jurusan: 0,
     galeri: 0,
     testimonial: 0,
     fasilitas: 0,
-    alumni: 0
-  });
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
-  const router = useRouter();
-
-  // Get current date for header
-  const today = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+    carousel: 0,
+    alumni: 0,
+    mitra: 0,
+    pendaftar: 0
+  })
+  const [activities, setActivities] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function loadData() {
+    const fetchData = async () => {
+      setLoading(true)
       try {
-        // Initialize buckets
-        const bucketResult = await initStorageBuckets();
-        if (!bucketResult.success) {
-           console.error("Bucket Init Failed:", bucketResult.message);
-           // Optional: toast.error("Storage buckets failed to initialize");
-        }
-        
-        // Fetch stats and logs
         const [reportData, logData] = await Promise.all([
           getReport(),
-          getActivityLog(5)
-        ]);
-        
-        if (reportData) setStats(reportData);
-        if (logData) setLogs(logData);
+          getActivityLog(10)
+        ])
+        setStats(reportData)
+        setActivities(logData || [])
       } catch (error) {
-        console.error("Dashboard Load Error:", error);
+        console.error('Dashboard fetch error:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    loadData();
-  }, []);
+    fetchData()
+  }, [])
 
-  const handleSeed = async () => {
-    if (!confirm('Apakah Anda yakin ingin mengisi database dengan data dummy? Ini hanya akan mengisi data jika tabel kosong.')) return;
-    
-    setSeeding(true);
-    const result = await seedDatabase();
-    setSeeding(false);
-    
-    if (result.success) {
-      toast.success(result.message);
-      // Reload stats
-      const data = await getReport();
-      if (data) setStats(data);
-    } else {
-      toast.error('Gagal seeding database: ' + result.message);
-    }
-  };
-
-  const statCards = [
-    { 
-      title: 'Total Jurusan', 
-      value: stats.jurusan, 
-      icon: BookOpen, 
-      color: 'bg-[#C0161C]', // Merah
-      textColor: 'text-[#C0161C]',
-      bgColor: 'bg-red-50'
-    },
-    { 
-      title: 'Total Fasilitas', 
-      value: stats.fasilitas, 
-      icon: Building, 
-      color: 'bg-[#1E1E8F]', // Navy
-      textColor: 'text-[#1E1E8F]',
-      bgColor: 'bg-indigo-50'
-    },
-    { 
-      title: 'Total Galeri', 
-      value: stats.galeri, 
-      icon: ImageIcon, 
-      color: 'bg-[#F5C400]', // Emas
-      textColor: 'text-[#F5C400]',
-      bgColor: 'bg-yellow-50'
-    },
-    { 
-      title: 'Total Alumni', 
-      value: stats.alumni || 0, 
-      icon: Users, 
-      color: 'bg-green-600', // Hijau
-      textColor: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-  ];
-
-  const quickActions = [
-    { label: 'Kelola Jurusan', href: '/admin/jurusan', icon: BookOpen, color: 'text-[#C0161C]' },
-    { label: 'Kelola Alumni', href: '/admin/alumni', icon: Users, color: 'text-green-600' },
-    { label: 'Kelola Galeri', href: '/admin/galeri', icon: ImageIcon, color: 'text-[#F5C400]' },
-    { label: 'Kelola Fasilitas', href: '/admin/fasilitas', icon: Building, color: 'text-[#1E1E8F]' },
-  ];
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  const StatCard = ({ title, count, icon: Icon, color, href }) => (
+    <Link href={href} className="block group">
+      <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 relative overflow-hidden">
+        {/* Background Icon Decoration */}
+        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+          <Icon className="w-24 h-24" style={{ color }} />
+        </div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+              <Icon className="w-6 h-6" style={{ color }} />
+            </div>
+            <span className="text-slate-500 font-medium">{title}</span>
+          </div>
+          <div className="text-4xl font-bold text-[#0A0A1A] mb-2">{count}</div>
+          <div className="text-sm text-slate-400 group-hover:text-[#C0161C] transition-colors flex items-center gap-1 font-medium">
+            Kelola Data <ExternalLink className="w-3 h-3" />
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
 
   return (
     <AdminLayout>
-      <Head>
-        <title>Dashboard - Admin Panel</title>
-      </Head>
-      
-      <div className="bg-[#F8F9FF] min-h-screen p-6">
+      <Head><title>Dashboard — Admin SMK Paramitha 2</title></Head>
+
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Selamat Datang, Admin</h1>
-            <p className="text-slate-500 mt-1 flex items-center gap-2">
-              <Clock size={14} />
-              {today}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button 
-              onClick={handleSeed}
-              disabled={seeding}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium disabled:opacity-50 shadow-sm"
-            >
-              <Database size={16} />
-              {seeding ? 'Seeding...' : 'Seed Database'}
-            </button>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-[#0A0A1A] mb-2">
+            Selamat Datang, <span className="text-[#C0161C]">Admin</span>
+          </h1>
+          <p className="text-slate-500">
+            Ringkasan aktivitas dan statistik website SMK Paramitha 2 Jakarta.
+          </p>
         </div>
 
         {/* Stats Grid */}
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
-        >
-          {statCards.map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <motion.div variants={item} key={idx} className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl ${card.bgColor} flex items-center justify-center ${card.textColor}`}>
-                    <Icon size={24} />
-                  </div>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${card.bgColor} ${card.textColor}`}>
-                    +2.5%
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold text-slate-900 mb-1">
-                    {loading ? '...' : card.value}
-                  </h3>
-                  <p className="text-slate-500 text-sm font-medium">{card.title}</p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard 
+            title="Jurusan" 
+            count={loading ? '-' : stats.jurusan} 
+            icon={Briefcase} 
+            color="#C0161C"
+            href="/admin/jurusan" 
+          />
+          <StatCard 
+            title="Pendaftar PPDB" 
+            count={loading ? '-' : stats.pendaftar} 
+            icon={Users} 
+            color="#1E1E8F"
+            href="/admin/ppdb/pendaftar" 
+          />
+          <StatCard 
+            title="Galeri Foto" 
+            count={loading ? '-' : stats.galeri} 
+            icon={ImageIcon} 
+            color="#F5C400"
+            href="/admin/tentang/galeri" 
+          />
+          <StatCard 
+            title="Mitra Industri" 
+            count={loading ? '-' : stats.mitra} 
+            icon={Briefcase} 
+            color="#10B981"
+            href="/admin/mitra" 
+          />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
-          <div className="lg:col-span-2">
-             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-6">Quick Actions</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {quickActions.map((action, idx) => {
-                    const Icon = action.icon;
-                    return (
-                      <Link 
-                        key={idx} 
-                        href={action.href}
-                        className="flex items-center p-4 border border-slate-100 rounded-xl hover:bg-slate-50 hover:border-slate-200 transition-all group"
-                      >
-                        <div className={`p-3 rounded-lg bg-gray-50 group-hover:bg-white group-hover:shadow-sm transition-all mr-4 ${action.color}`}>
-                          <Icon size={24} />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-slate-900 group-hover:text-[#1E1E8F] transition-colors">{action.label}</h4>
-                          <p className="text-xs text-slate-400">Manage data</p>
-                        </div>
-                        <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
-                      </Link>
-                    );
-                  })}
-                </div>
-             </div>
-          </div>
-
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Recent Activity */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full">
-              <h3 className="text-lg font-bold text-slate-900 mb-6">Recent Activity</h3>
-              <div className="space-y-6">
-                {logs.length > 0 ? (
-                  logs.map((log, idx) => (
-                    <div key={idx} className="flex gap-4">
-                      <div className="w-2 h-2 mt-2 rounded-full bg-[#1E1E8F]" />
-                      <div>
-                        <p className="text-sm text-slate-800 font-medium">{log.action}</p>
-                        <p className="text-xs text-slate-500">{log.target} • {new Date(log.created_at).toLocaleDateString()}</p>
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 h-full">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-[#0A0A1A] flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-[#F5C400]" />
+                  Aktivitas Terbaru
+                </h3>
+                <Link href="/admin/log" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  Lihat Semua
+                </Link>
+              </div>
+              
+              <div className="space-y-4">
+                {loading ? (
+                  <div className="text-center py-10 text-slate-400">Memuat aktivitas...</div>
+                ) : activities.length === 0 ? (
+                  <div className="text-center py-10 text-slate-400">Belum ada aktivitas tercatat.</div>
+                ) : (
+                  activities.map((log) => (
+                    <div key={log.id} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
+                      <div className="mt-1">
+                        <div className="w-2 h-2 rounded-full bg-[#F5C400]"></div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-slate-800 font-medium">{log.action}</p>
+                        <p className="text-sm text-slate-500 mt-1">
+                          {log.target} • <span className="text-slate-400">{log.admin_email}</span>
+                        </p>
+                      </div>
+                      <div className="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(log.created_at).toLocaleDateString('id-ID', { 
+                          day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
+                        })}
                       </div>
                     </div>
                   ))
-                ) : (
-                  <div className="text-center py-8 text-slate-400">
-                    <p className="text-sm">Belum ada aktivitas tercatat</p>
-                  </div>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+              <h3 className="text-xl font-bold text-[#0A0A1A] mb-6 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-[#1E1E8F]" />
+                Menu Cepat
+              </h3>
+              
+              <div className="grid gap-3">
+                {[
+                  { label: 'Edit Hero & Slider', href: '/admin/beranda/hero', icon: BarChart3 },
+                  { label: 'Kelola Fasilitas', href: '/admin/tentang/fasilitas', icon: Settings },
+                  { label: 'Kelola Jurusan', href: '/admin/jurusan', icon: Briefcase },
+                  { label: 'Kelola PPDB', href: '/admin/ppdb/pendaftar', icon: Users },
+                  { label: 'Kelola Galeri', href: '/admin/tentang/galeri', icon: ImageIcon },
+                  { label: 'Mitra Industri', href: '/admin/mitra', icon: Briefcase },
+                ].map((item, idx) => (
+                  <Link 
+                    key={idx}
+                    href={item.href}
+                    className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-blue-50 hover:border-blue-100 group transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5 text-slate-400 group-hover:text-[#1E1E8F] transition-colors" />
+                      <span className="text-slate-700 font-medium group-hover:text-[#1E1E8F]">{item.label}</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-[#1E1E8F] group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-8 p-4 rounded-xl bg-gradient-to-br from-[#1E1E8F]/5 to-[#C0161C]/5 border border-slate-100">
+                <h4 className="font-bold text-slate-800 mb-2">Butuh Bantuan?</h4>
+                <p className="text-sm text-slate-500 mb-4">
+                  Hubungi tim developer jika mengalami kendala teknis pada sistem admin.
+                </p>
+                <a href="mailto:support@paramitha.sch.id" className="text-sm font-semibold text-[#1E1E8F] hover:text-[#C0161C]">
+                  Contact Support →
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
     </AdminLayout>
-  );
+  )
 }
 
-export default withAdmin(Dashboard);
+function ArrowRight({ className }) {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" height="24" viewBox="0 0 24 24" 
+      fill="none" stroke="currentColor" strokeWidth="2" 
+      strokeLinecap="round" strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )
+}
+
+export default withAdmin(AdminDashboard)
