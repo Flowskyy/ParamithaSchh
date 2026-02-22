@@ -197,3 +197,33 @@ export const fallbackJurusan = [
     ]
   }
 ];
+
+export const fallbackFasilitas = [];
+export const fallbackGaleri = [];
+export const fallbackTestimonial = [];
+export const fallbackAlumni = [];
+export const fallbackMitra = [];
+export const fallbackJadwalPPDB = [];
+export const fallbackPersyaratanPPDB = [];
+export const fallbackPendaftar = [];
+export const fallbackSejarah = [];
+export const fallbackCarousel = [];
+
+export const fallbackVisiMisi = {
+  visi: 'Menjadi SMK Unggulan yang menghasilkan lulusan kompeten, berkarakter, dan berdaya saing global.',
+  misi: [
+    'Menyelenggarakan pendidikan berkualitas berbasis industri.',
+    'Membangun karakter siswa yang beriman, bertakwa, dan berakhlak mulia.',
+    'Mengembangkan potensi siswa melalui kegiatan ekstrakurikuler dan kokurikuler.',
+    'Menjalin kerjasama dengan dunia usaha dan dunia industri.'
+  ]
+};
+
+export const fallbackHero = {
+  title: 'Selamat Datang di SMK Paramitha 2',
+  subtitle: 'Sekolah Menengah Kejuruan Pusat Keunggulan',
+  description: 'Mencetak generasi unggul, kompeten, dan siap kerja dengan fasilitas modern dan kurikulum berbasis industri.',
+  image_url: '/images/hero-bg.jpg',
+  cta_text: 'Daftar Sekarang',
+  cta_link: '/ppdb'
+};

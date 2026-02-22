@@ -57,7 +57,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="w-full lg:w-1/3 flex-shrink-0 sticky top-28"
+                className="w-full lg:w-1/3 flex-shrink-0 lg:sticky top-28"
               >
                 <div className="bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 relative">
                   <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-slate-100">
@@ -95,13 +95,6 @@ export default function SambutanKepsek({ sekolahInfo }) {
                 className="w-full lg:w-2/3"
               >
                 <div className="prose prose-lg prose-slate max-w-none">
-                  <div className="relative mb-8 pl-8 md:pl-12 border-l-4 border-[#F5C400]">
-                    <Quote className="absolute top-0 left-2 text-[#F5C400]/20 -ml-8 -mt-4 w-16 h-16" />
-                    <p className="text-2xl font-serif text-[#1E1E8F] italic leading-relaxed m-0">
-                      &quot;{finalGreeting}&quot;
-                    </p>
-                  </div>
-
                   <div className="space-y-6 text-slate-600 leading-relaxed text-justify">
                     {finalMessage ? (
                       <div className="whitespace-pre-wrap">{finalMessage}</div>

@@ -1,5 +1,21 @@
 import { supabase } from './supabase';
-import { fallbackJurusan } from '../utils/fallbackData';
+import { 
+  fallbackJurusan, 
+  fallbackSekolahInfo, 
+  fallbackMottoMars,
+  fallbackSejarah,
+  fallbackVisiMisi,
+  fallbackFasilitas,
+  fallbackGaleri,
+  fallbackTestimonial,
+  fallbackAlumni,
+  fallbackMitra,
+  fallbackJadwalPPDB,
+  fallbackPersyaratanPPDB,
+  fallbackPendaftar,
+  fallbackHero,
+  fallbackCarousel
+} from '../utils/fallbackData';
 
 // Helper to handle Supabase response (GET)
 // Returns data directly, or fallback on error
@@ -35,7 +51,7 @@ const handleMutation = async (promise) => {
 export async function getHero() {
   return handleResponse(
     supabase.from('hero').select('*').order('created_at', { ascending: false }).limit(1).single(),
-    null
+    fallbackHero || null
   );
 }
 export async function upsertHero(payload) {
@@ -48,7 +64,7 @@ export async function saveHero(payload) { return upsertHero(payload); }
 export async function getCarousel() {
   return handleResponse(
     supabase.from('carousel').select('*').order('order_index'),
-    []
+    fallbackCarousel || []
   );
 }
 export async function createCarousel(p) { return handleMutation(supabase.from('carousel').insert(p)); }
@@ -125,6 +141,47 @@ export async function deleteJurusan(id) { return handleMutation(supabase.from('j
 export async function toggleJurusanAktif(id, aktif) {
   return handleMutation(supabase.from('jurusan').update({ aktif }).eq('id', id));
 }
+
+export async function addJurusanGallery(id, imageUrl) {
+  try {
+    const { data: current, error } = await supabase
+      .from('jurusan')
+      .select('gallery')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    
+    const gallery = current?.gallery || [];
+    const newGallery = [...gallery, imageUrl];
+    
+    return handleMutation(supabase.from('jurusan').update({ gallery: newGallery }).eq('id', id));
+  } catch (err) {
+    console.error('addJurusanGallery Error:', err);
+    return { data: null, error: err };
+  }
+}
+
+export async function removeJurusanGallery(id, imageUrl) {
+  try {
+    const { data: current, error } = await supabase
+      .from('jurusan')
+      .select('gallery')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    
+    const gallery = current?.gallery || [];
+    const newGallery = gallery.filter(url => url !== imageUrl);
+    
+    return handleMutation(supabase.from('jurusan').update({ gallery: newGallery }).eq('id', id));
+  } catch (err) {
+    console.error('removeJurusanGallery Error:', err);
+    return { data: null, error: err };
+  }
+}
+
 export async function saveJurusan(payload) { 
   if (payload.id) return updateJurusan(payload.id, payload); 
   return createJurusan(payload); 
@@ -134,7 +191,7 @@ export async function saveJurusan(payload) {
 export async function getFasilitas() {
   return handleResponse(
     supabase.from('fasilitas').select('*').order('order_index'),
-    []
+    fallbackFasilitas || []
   );
 }
 export async function createFasilitas(p) { return handleMutation(supabase.from('fasilitas').insert(p)); }
@@ -152,10 +209,10 @@ export async function getGaleri(kategori = null) {
     if (kategori) q = q.eq('category', kategori);
     const { data, error } = await q;
     if (error) throw error;
-    return data || [];
+    return data || fallbackGaleri || [];
   } catch (err) {
     console.error('getGaleri Error:', err);
-    return [];
+    return fallbackGaleri || [];
   }
 }
 export async function createGaleri(p) { return handleMutation(supabase.from('galeri').insert(p)); }
@@ -170,7 +227,7 @@ export async function saveGaleri(payload) {
 export async function getTestimonial() {
   return handleResponse(
     supabase.from('testimonial').select('*').order('created_at', { ascending: false }),
-    []
+    fallbackTestimonial || []
   );
 }
 export async function createTestimonial(p) { return handleMutation(supabase.from('testimonial').insert(p)); }
@@ -185,7 +242,7 @@ export async function saveTestimonial(payload) {
 export async function getAlumni() {
   return handleResponse(
     supabase.from('alumni').select('*').order('order_index'),
-    []
+    fallbackAlumni || []
   );
 }
 export async function createAlumni(p) { return handleMutation(supabase.from('alumni').insert(p)); }
@@ -200,7 +257,7 @@ export async function saveAlumni(payload) {
 export async function getMitra() {
   return handleResponse(
     supabase.from('mitra_perusahaan').select('*').order('order_index'),
-    []
+    fallbackMitra || []
   );
 }
 export async function createMitra(p) { return handleMutation(supabase.from('mitra_perusahaan').insert(p)); }
@@ -215,7 +272,7 @@ export async function saveMitra(payload) {
 export async function getSekolahInfo() {
   return handleResponse(
     supabase.from('sekolah_info').select('*').order('created_at', { ascending: false }).limit(1).single(),
-    null
+    fallbackSekolahInfo
   );
 }
 export async function upsertSekolahInfo(payload) {
@@ -270,47 +327,7 @@ export const uploadImage = async (file, bucket, folder = '') => {
   }
 };
 
-// NEW: Init Buckets
-export const initStorageBuckets = async () => {
-  const buckets = ['hero', 'jurusan', 'fasilitas', 'galeri', 'alumni', 'carousel', 'media', 'mitra', 'testimonial', 'images'];
-  
-  try {
-    // List all existing buckets first
-    const { data: existingBuckets, error } = await supabase.storage.listBuckets();
-    
-    if (error) {
-      console.error('Error listing buckets:', error);
-      return;
-    }
-    
-    const existingIds = existingBuckets.map(b => b.id);
-    
-    for (const bucket of buckets) {
-      if (!existingIds.includes(bucket)) {
-        console.log(`Creating bucket: ${bucket}`);
-        const { data, error: createError } = await supabase.storage.createBucket(bucket, { 
-          public: true,
-          fileSizeLimit: 5242880, // 5MB
-          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'] 
-        });
-        
-        if (createError) {
-          console.error(`Error creating bucket ${bucket}:`, createError);
-        } else {
-          console.log(`Bucket ${bucket} created successfully.`);
-        }
-      } else {
-         // Optional: Update public status if needed, but usually not required if already exists
-         // console.log(`Bucket ${bucket} already exists.`);
-      }
-    }
-    
-    return { success: true, message: 'Buckets initialized' };
-  } catch (err) {
-    console.error('Unexpected error in initStorageBuckets:', err);
-    return { success: false, message: err.message };
-  }
-};
+// REMOVED: initStorageBuckets - Buckets must be created manually in Supabase Dashboard
 
 export async function uploadFile(bucket, path, file) {
   try {
@@ -374,7 +391,7 @@ export async function getReport() {
 export async function getJadwalPPDB() {
   return handleResponse(
     supabase.from('jadwal_ppdb').select('*').order('created_at', { ascending: true }),
-    []
+    fallbackJadwalPPDB || []
   );
 }
 export async function createJadwalPPDB(p) { return handleMutation(supabase.from('jadwal_ppdb').insert(p)); }
@@ -384,7 +401,7 @@ export async function deleteJadwalPPDB(id) { return handleMutation(supabase.from
 export async function getPersyaratanPPDB() {
   return handleResponse(
     supabase.from('persyaratan_ppdb').select('*').order('created_at', { ascending: true }),
-    []
+    fallbackPersyaratanPPDB || []
   );
 }
 export async function createPersyaratanPPDB(p) { return handleMutation(supabase.from('persyaratan_ppdb').insert(p)); }
@@ -394,7 +411,7 @@ export async function deletePersyaratanPPDB(id) { return handleMutation(supabase
 export async function getPendaftar() {
   return handleResponse(
     supabase.from('pendaftar').select('*').order('created_at', { ascending: false }),
-    []
+    fallbackPendaftar || []
   );
 }
 export async function createPendaftar(p) { return handleMutation(supabase.from('pendaftar').insert(p)); }
@@ -405,7 +422,7 @@ export async function deletePendaftar(id) { return handleMutation(supabase.from(
 export async function getSejarah() {
   return handleResponse(
     supabase.from('sejarah').select('*').order('year', { ascending: true }),
-    []
+    fallbackSejarah || []
   );
 }
 export async function createSejarah(p) { return handleMutation(supabase.from('sejarah').insert(p)); }
@@ -416,7 +433,7 @@ export async function deleteSejarah(id) { return handleMutation(supabase.from('s
 export async function getVisiMisi() {
   return handleResponse(
     supabase.from('visi_misi').select('*').limit(1).single(),
-    null
+    fallbackVisiMisi || null
   );
 }
 export async function upsertVisiMisi(p) {
@@ -428,7 +445,7 @@ export async function upsertVisiMisi(p) {
 export async function getMottoMars() {
   return handleResponse(
     supabase.from('motto_mars').select('*').limit(1).single(),
-    null
+    fallbackMottoMars || null
   );
 }
 export async function upsertMottoMars(p) {

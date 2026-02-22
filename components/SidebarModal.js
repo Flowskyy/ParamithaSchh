@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
+import { getSekolahInfo } from '../services/api';
+
+// TikTok Icon Component
+const TikTokIcon = ({ size = 18, className = "" }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 export default function SidebarModal({ isOpen, onClose, links }) {
-  const [openSubmenu, setOpenSubmenu] = React.useState(null);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [info, setInfo] = useState(null);
+
+  useEffect(() => {
+    async function loadInfo() {
+      const data = await getSekolahInfo();
+      if (data) setInfo(data);
+    }
+    loadInfo();
+  }, []);
 
   // Prevent scrolling when modal is open
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -24,10 +51,11 @@ export default function SidebarModal({ isOpen, onClose, links }) {
   };
 
   const socialLinks = [
-    { icon: <Facebook size={16} />, href: 'https://facebook.com/smkparamitha2', color: 'hover:text-[#1E1E8F]' },
-    { icon: <Instagram size={16} />, href: 'https://instagram.com/smkparamitha2', color: 'hover:text-[#C0161C]' },
-    { icon: <Youtube size={16} />, href: 'https://youtube.com/@smkparamitha2', color: 'hover:text-[#C0161C]' },
-  ];
+    { icon: <Facebook size={16} />, href: info?.facebook || '#', color: 'hover:text-[#1E1E8F]' },
+    { icon: <Instagram size={16} />, href: info?.instagram || '#', color: 'hover:text-[#C0161C]' },
+    { icon: <Youtube size={16} />, href: info?.youtube || '#', color: 'hover:text-[#C0161C]' },
+    { icon: <TikTokIcon size={16} />, href: info?.tiktok || '#', color: 'hover:text-[#C0161C]' },
+  ].filter(link => link.href && link.href !== '#'); // Only show if link exists
 
   return (
     <AnimatePresence>

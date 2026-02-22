@@ -1,21 +1,27 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
-import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
-import '../styles/globals.css';
+import PageLoader from '../components/PageLoader';
 import RealtimeReloader from '../components/RealtimeReloader';
+import '../styles/globals.css';
 
-// Configure NProgress
-NProgress.configure({ showSpinner: false, speed: 400, minimum: 0.1 });
+// Note: NProgress removed in favor of PageLoader overlay
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const handleStart = () => NProgress.start();
-    const handleStop = () => NProgress.done();
+    const handleStart = (url, { shallow }) => {
+      if (!shallow) {
+        setLoading(true);
+      }
+    };
+    const handleStop = () => {
+      // Add a small delay to prevent flickering on fast loads
+      setTimeout(() => setLoading(false), 500);
+    };
 
     router.events.on('routeChangeStart', handleStart);
     router.events.on('routeChangeComplete', handleStop);
@@ -35,6 +41,9 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.jpg" />
         <meta name="description" content="SMK Paramitha 2 Jakarta - Vocational School" />
       </Head>
+      
+      {loading && <PageLoader />}
+      
       <RealtimeReloader />
       <Component {...pageProps} />
       <Toaster position="top-right" />

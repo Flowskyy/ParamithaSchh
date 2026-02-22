@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { showToast } from '../utils/toast';
 import Image from 'next/image';
-import { initStorageBuckets } from '../services/api';
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
@@ -35,9 +34,6 @@ export default function AdminLayout({ children }) {
   });
 
   useEffect(() => {
-    // Initialize buckets
-    initStorageBuckets().catch(console.error);
-
     // Load jurusan for sidebar
     async function loadJurusan() {
       const { data } = await supabase.from('jurusan').select('id, slug, name').order('order_index');
@@ -123,8 +119,56 @@ export default function AdminLayout({ children }) {
     },
   ];
 
+  // Auto-expand menu based on active route
+  useEffect(() => {
+    const path = router.pathname;
+    const asPath = router.asPath;
+    
+    const activeMenu = menuStructure.find(item => {
+      if (item.type !== 'dropdown') return false;
+      
+      // Check if any child matches
+      return item.items.some(sub => {
+        if (sub.href.includes('?')) return asPath === sub.href;
+        return path.startsWith(sub.href);
+      });
+    });
+
+    if (activeMenu) {
+      setOpenMenus(prev => {
+        // Only update if not already open to avoid loops, 
+        // but we want to enforce "accordion" style (others closed)
+        // So we just set the state to exactly what we want.
+        const newState = {
+          beranda: false,
+          tentang: false,
+          ppdb: false,
+          jurusan: false,
+          laporan: false,
+        };
+        newState[activeMenu.id] = true;
+        
+        // Simple comparison to avoid unnecessary re-renders
+        if (JSON.stringify(prev) === JSON.stringify(newState)) return prev;
+        
+        return newState;
+      });
+    }
+  }, [router.pathname, router.asPath, jurusanItems.length]); // Depend on length to re-run when items load
+
   const toggleMenu = (menuId) => {
-    setOpenMenus(prev => ({ ...prev, [menuId]: !prev[menuId] }));
+    setOpenMenus(prev => {
+      const newState = {
+        beranda: false,
+        tentang: false,
+        ppdb: false,
+        jurusan: false,
+        laporan: false,
+      };
+      // Toggle current, close others
+      newState[menuId] = !prev[menuId];
+      return newState;
+    });
   };
 
   const handleLogout = async () => {

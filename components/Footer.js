@@ -166,9 +166,9 @@ export default function Footer() {
 
         {/* Merged Copyright Section */}
         <div className="pt-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-slate-500 text-base font-medium">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-slate-500 text-base font-medium text-center md:text-left">
             <p>© {new Date().getFullYear()} SMK Paramitha 2 Jakarta. All rights reserved.</p>
-            <p className="flex items-center gap-3">
+            <p className="flex items-center gap-3 justify-center md:justify-start">
               Developed by <span className="text-[#1E1E8F] font-bold text-lg">RPL Students</span>
             </p>
           </div>

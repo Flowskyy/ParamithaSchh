@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ChevronDown, Menu, LayoutGrid } from 'lucide-react';
 import SidebarModal from './SidebarModal';
-import { supabase } from '../services/supabase';
+import { getJurusan } from '../services/api';
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,12 +21,12 @@ export default function Navbar() {
     
     // Fetch Jurusan dynamically
     async function loadJurusan() {
-      const { data } = await supabase.from('jurusan').select('slug, name, short_desc').order('order_index');
+      const data = await getJurusan();
       if (data) {
         setJurusanItems(data.map(j => ({ 
           name: j.name, 
           href: `/jurusan/${j.slug}`, 
-          desc: j.short_desc ? j.short_desc.substring(0, 30) + '...' : 'Program Keahlian',
+          desc: j.short_desc ? j.short_desc.substring(0, 30) + '...' : (j.deskripsi ? j.deskripsi.substring(0, 30) + '...' : 'Program Keahlian'),
           isHighlight: false 
         })));
       }
@@ -51,21 +51,21 @@ export default function Navbar() {
       name: 'Tentang Kami', 
       href: '#', 
       dropdown: [
-        { name: 'Lihat Semua', href: '/tentang', desc: 'Tentang Sekolah', isHighlight: true },
+        { name: 'Lihat Semua', href: '/tentang', desc: 'Tentang Sekolah', isHighlight: router.asPath === '/tentang' },
         { name: 'Sejarah Sekolah', href: '/tentang/sejarah', desc: 'Perjalanan & Milestone' },
         { name: 'Visi & Misi', href: '/tentang/visi-misi', desc: 'Tujuan & Nilai Utama' },
         { name: 'Motto & Mars', href: '/tentang/motto-mars', desc: 'Semangat & Identitas' },
         { name: 'Sambutan Kepsek', href: '/tentang/sambutan-kepsek', desc: 'Pesan Kepala Sekolah' },
         { name: 'Fasilitas', href: '/tentang/fasilitas', desc: 'Sarana Prasarana' },
         { name: 'Galeri', href: '/tentang/galeri', desc: 'Dokumentasi Kegiatan' },
-      ]
+      ].map(item => ({ ...item, isHighlight: item.isHighlight || router.asPath === item.href }))
     },
     { 
       name: 'Jurusan', 
       href: '#',
       dropdown: [
-        { name: 'Semua Jurusan', href: '/jurusan', desc: 'Daftar Program Keahlian', isHighlight: true },
-        ...jurusanItems
+        { name: 'Semua Jurusan', href: '/jurusan', desc: 'Daftar Program Keahlian', isHighlight: router.asPath === '/jurusan' },
+        ...jurusanItems.map(item => ({ ...item, isHighlight: router.asPath === item.href }))
       ] 
     },
     { name: 'Hubungi Kami', href: '/contact' },

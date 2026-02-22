@@ -10,7 +10,9 @@ import {
   toggleJurusanAktif,
   updateJurusanOrder,
   updateJurusanOrderBatch,
-  uploadImage 
+  uploadImage,
+  addJurusanGallery,
+  removeJurusanGallery
 } from '../../services/api'
 import withAdmin from '../../utils/withAdmin'
 import { toastSuccess, toastError, toastLoading, toastDismiss } from '../../utils/toast'
@@ -39,6 +41,7 @@ function AdminJurusan() {
     image_url: '',
     kompetensi: [],
     prospek_karir: [],
+    gallery: [],
     aktif: true
   })
   
@@ -145,6 +148,7 @@ function AdminJurusan() {
         image_url: jurusan.image_url || '',
         kompetensi: Array.isArray(jurusan.kompetensi) ? jurusan.kompetensi : [],
         prospek_karir: Array.isArray(jurusan.prospek_karir) ? jurusan.prospek_karir : [],
+        gallery: Array.isArray(jurusan.gallery) ? jurusan.gallery : [],
         aktif: jurusan.aktif ?? true
       })
     } else {
@@ -159,6 +163,7 @@ function AdminJurusan() {
         image_url: '',
         kompetensi: [],
         prospek_karir: [],
+        gallery: [],
         aktif: true
       })
     }
@@ -178,6 +183,57 @@ function AdminJurusan() {
     } else {
       setFormData(prev => ({ ...prev, image_url: url }))
       toastSuccess('Gambar terupload')
+    }
+  }
+
+  const handleGalleryUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const toastId = toastLoading('Mengupload foto...')
+    const { url, error } = await uploadImage(file, 'jurusan', `${formData.slug || 'temp'}/gallery`)
+    
+    if (error) {
+      toastDismiss(toastId)
+      toastError('Gagal upload: ' + error)
+      return
+    }
+
+    if (editingId) {
+      // Direct save to DB
+      const { error: dbError } = await addJurusanGallery(editingId, url)
+      if (dbError) {
+        toastDismiss(toastId)
+        toastError('Gagal simpan ke DB')
+      } else {
+        setFormData(prev => ({ ...prev, gallery: [...prev.gallery, url] }))
+        toastDismiss(toastId)
+        toastSuccess('Foto ditambahkan')
+      }
+    } else {
+      // Just local state
+      setFormData(prev => ({ ...prev, gallery: [...prev.gallery, url] }))
+      toastDismiss(toastId)
+      toastSuccess('Foto terupload (Draft)')
+    }
+  }
+
+  const handleDeleteGallery = async (url) => {
+    if (!confirm('Hapus foto ini?')) return
+
+    if (editingId) {
+      const toastId = toastLoading('Menghapus...')
+      const { error } = await removeJurusanGallery(editingId, url)
+      if (error) {
+        toastDismiss(toastId)
+        toastError('Gagal hapus')
+      } else {
+        setFormData(prev => ({ ...prev, gallery: prev.gallery.filter(u => u !== url) }))
+        toastDismiss(toastId)
+        toastSuccess('Foto dihapus')
+      }
+    } else {
+      setFormData(prev => ({ ...prev, gallery: prev.gallery.filter(u => u !== url) }))
     }
   }
 
@@ -223,7 +279,8 @@ function AdminJurusan() {
       fetchData(true) // Silent refresh
     } catch (error) {
       toastDismiss(toastId)
-      toastError('Gagal menyimpan data')
+      const msg = error.message || 'Gagal menyimpan data'
+      toastError(msg)
       console.error(error)
     }
   }

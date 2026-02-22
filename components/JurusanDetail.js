@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Briefcase, Phone, GraduationCap, Award, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle, Briefcase, Phone, GraduationCap, Award, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import Image from 'next/image';
 
 const SectionHeader = ({ title, subtitle, center }) => (
   <div className={`mb-12 ${center ? 'text-center' : ''}`}>
@@ -10,6 +12,8 @@ const SectionHeader = ({ title, subtitle, center }) => (
 );
 
 export default function JurusanDetail({ jurusan, sekolahInfo }) {
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
   if (!jurusan) return null;
 
   // Jika jurusan tidak aktif, tampilkan pesan tidak tersedia
@@ -42,7 +46,8 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
     warna_primer, 
     warna_sekunder, 
     kompetensi = [], 
-    prospek_karir = [] 
+    prospek_karir = [],
+    gallery = [] // Default to empty array
   } = jurusan;
 
   // Animation variants
@@ -53,6 +58,19 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
 
   const stagger = {
     visible: { transition: { staggerChildren: 0.1 } }
+  };
+
+  const openLightbox = (index) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
+  
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setLightboxIndex((prev) => (prev + 1) % gallery.length);
+  };
+  
+  const prevImage = (e) => {
+    e.stopPropagation();
+    setLightboxIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
   };
 
   return (
@@ -258,7 +276,46 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
         </div>
       </section>
 
-      {/* 5. CTA */}
+      {/* 5. SECTION GALERI FOTO (NEW) */}
+      {gallery && gallery.length > 0 && (
+        <section className="py-20 bg-[#F8F8FF]">
+          <div className="container mx-auto px-4">
+            <SectionHeader 
+              title={`Galeri Kegiatan ${name}`}
+              subtitle="Dokumentasi kegiatan praktik dan pembelajaran siswa"
+              center
+            />
+
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+            >
+              {gallery.map((imgUrl, idx) => (
+                <motion.div 
+                  key={idx}
+                  variants={fadeInUp}
+                  className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-pointer shadow-md"
+                  onClick={() => openLightbox(idx)}
+                >
+                  <img 
+                    src={imgUrl} 
+                    alt={`Galeri ${name} ${idx + 1}`} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                    <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-8 h-8" />
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* 6. CTA */}
       <section 
         className="py-20 text-white text-center"
         style={{ 
@@ -295,6 +352,54 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
           </motion.div>
         </div>
       </section>
+
+      {/* LIGHTBOX MODAL */}
+      <AnimatePresence>
+        {lightboxIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+            onClick={closeLightbox}
+          >
+            <button 
+              className="absolute top-4 right-4 text-white/70 hover:text-white p-2 z-50 bg-black/20 rounded-full backdrop-blur-md"
+              onClick={closeLightbox}
+            >
+              <X className="w-8 h-8" />
+            </button>
+
+            <button 
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 z-50 bg-black/20 rounded-full backdrop-blur-md"
+              onClick={prevImage}
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+
+            <button 
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 z-50 bg-black/20 rounded-full backdrop-blur-md"
+              onClick={nextImage}
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+
+            <div 
+              className="relative w-full max-w-5xl h-[80vh] flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img 
+                src={gallery[lightboxIndex]} 
+                alt={`Lightbox ${lightboxIndex + 1}`} 
+                className="max-w-full max-h-full object-contain rounded-md shadow-2xl"
+              />
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 bg-black/40 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
+                {lightboxIndex + 1} / {gallery.length}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
