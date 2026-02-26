@@ -14,7 +14,8 @@ import {
   fallbackPersyaratanPPDB,
   fallbackPendaftar,
   fallbackHero,
-  fallbackCarousel
+  fallbackCarousel,
+  fallbackHomepageSections
 } from '../utils/fallbackData';
 
 // Helper to handle Supabase response (GET)
@@ -50,7 +51,7 @@ const handleMutation = async (promise) => {
 // ─── HERO ──────────────────────────────────────────────────────────
 export async function getHero() {
   return handleResponse(
-    supabase.from('hero').select('*').order('created_at', { ascending: false }).limit(1).single(),
+    supabase.from('hero').select('id, title, subtitle, description, image_url, cta_text, cta_url, created_at').order('created_at', { ascending: false }).limit(1).single(),
     fallbackHero || null
   );
 }
@@ -278,6 +279,19 @@ export async function getSekolahInfo() {
 export async function upsertSekolahInfo(payload) {
   if (payload.id) return handleMutation(supabase.from('sekolah_info').update(payload).eq('id', payload.id));
   return handleMutation(supabase.from('sekolah_info').insert(payload));
+}
+
+// ─── HOMEPAGE SECTIONS ─────────────────────────────────────────────
+export async function getHomepageSections() {
+  return handleResponse(
+    supabase.from('homepage_sections').select('*').order('order_index'),
+    fallbackHomepageSections
+  );
+}
+
+export async function updateHomepageSectionOrder(updates) {
+  // updates is array of { id, order_index }
+  return handleMutation(supabase.from('homepage_sections').upsert(updates, { onConflict: 'id' }));
 }
 
 // ─── ACTIVITY LOG ──────────────────────────────────────────────────

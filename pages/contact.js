@@ -61,20 +61,39 @@ export default function ContactPage({ sekolahInfo }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const toastId = showToast.loading('Menyiapkan pesan WhatsApp...');
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const waNumber = info?.wa_kontak || '085183092819';
+      // Format number: remove non-digits, replace leading 0 with 62
+      const cleanNumber = waNumber.replace(/\D/g, '');
+      const finalNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
 
-    // Success feedback
-    showToast.success('Pesan berhasil dikirim!');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: ''
-    });
-    setIsSubmitting(false);
+      const message = `*PESAN BARU - HUBUNGI KAMI*%0A%0A` +
+        `*Nama:* ${formData.name}%0A` +
+        `*Email:* ${formData.email}%0A` +
+        `*WhatsApp:* ${formData.phone}%0A` +
+        `*Subjek:* ${formData.subject}%0A` +
+        `*Pesan:* ${formData.message}%0A%0A` +
+        `_Pesan dikirim dari website SMK Paramitha 2 Jakarta._`;
+
+      showToast.success('Mengarahkan ke WhatsApp...', toastId);
+      
+      setTimeout(() => {
+        window.open(`https://wa.me/${finalNumber}?text=${message}`, '_blank');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+        setIsSubmitting(false);
+      }, 1000);
+    } catch (err) {
+      showToast.error('Gagal membuka WhatsApp', toastId);
+      setIsSubmitting(false);
+    }
   };
 
   const socialLinks = [

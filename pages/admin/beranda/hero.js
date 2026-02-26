@@ -20,6 +20,8 @@ function HeroAdmin() {
     email: '',
     address: '',
     map_url: '',
+    wa_ppdb: '',
+    wa_kontak: '',
     kepsek_name: '',
     kepsek_photo: '',
     kepsek_message: ''
@@ -193,6 +195,30 @@ function HeroAdmin() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all"
                   placeholder="https://www.google.com/maps/embed?..."
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-slate-700 text-sm font-bold text-green-600">WhatsApp PPDB</label>
+                <input 
+                  type="text" 
+                  value={info.wa_ppdb || ''}
+                  onChange={(e) => setInfo({...info, wa_ppdb: e.target.value})}
+                  className="w-full bg-slate-50 border border-green-200 rounded-lg p-3 text-slate-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all"
+                  placeholder="085183092819"
+                />
+                <p className="text-[10px] text-slate-400 italic">Nomor untuk menerima pendaftaran PPDB online</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-slate-700 text-sm font-bold text-green-600">WhatsApp Hubungi Kami</label>
+                <input 
+                  type="text" 
+                  value={info.wa_kontak || ''}
+                  onChange={(e) => setInfo({...info, wa_kontak: e.target.value})}
+                  className="w-full bg-slate-50 border border-green-200 rounded-lg p-3 text-slate-900 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none transition-all"
+                  placeholder="085183092819"
+                />
+                <p className="text-[10px] text-slate-400 italic">Nomor untuk menerima pesan dari halaman kontak</p>
               </div>
             </div>
           </section>

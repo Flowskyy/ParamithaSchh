@@ -9,7 +9,7 @@ function CTAAdmin() {
   const [info, setInfo] = useState({
     cta_title: '',
     cta_description: '',
-    cta_link: '',
+    cta_url: '',
     cta_button_text: ''
   });
   const [loading, setLoading] = useState(true);
@@ -99,7 +99,7 @@ function CTAAdmin() {
                     <label className="text-slate-700 text-sm font-bold">Link URL</label>
                     <input 
                       type="text" 
-                      value={info.cta_link || ''}
+                      value={info.cta_url || ''}
                       readOnly
                       disabled
                       className="w-full bg-slate-100 border border-slate-200 rounded-lg p-3 text-slate-500 cursor-not-allowed"

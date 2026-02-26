@@ -72,37 +72,43 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
     setIsSubmitting(true);
     
     // Simulate loading/toast
-    const toastId = showToast.loading('Mengirim pendaftaran...');
+    const toastId = showToast.loading('Menyiapkan pesan WhatsApp...');
 
     try {
-      // Prepare payload
+      // 1. Simpan ke Database (Opsional, tapi bagus untuk backup)
       const payload = {
         ...formData,
         created_at: new Date().toISOString()
       };
+      await createPendaftar(payload);
 
-      // Call API
-      const { data, error } = await createPendaftar(payload);
+      // 2. Redirect ke WhatsApp
+      const waNumber = sekolahInfo?.wa_ppdb || '085183092819';
+      // Format number: remove non-digits, replace leading 0 with 62
+      const cleanNumber = waNumber.replace(/\D/g, '');
+      const finalNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
 
-      if (error) {
-        showToast.error('Gagal mengirim pendaftaran. Silakan coba lagi.', toastId);
-        console.error("Submission Error:", error);
-      } else {
-        showToast.success('Pendaftaran berhasil dikirim!', toastId);
-        setFormData({
-          nama: '',
-          nisn: '',
-          asal_sekolah: '',
-          email: '',
-          whatsapp: '',
-          jurusan: 'RPL',
-          pesan: ''
-        });
-      }
+      const message = `*PENDAFTARAN PPDB ONLINE - SMK PARAMITHA 2*%0A%0A` +
+        `*Nama:* ${formData.nama}%0A` +
+        `*NISN:* ${formData.nisn}%0A` +
+        `*Asal Sekolah:* ${formData.asal_sekolah}%0A` +
+        `*Email:* ${formData.email}%0A` +
+        `*WhatsApp:* ${formData.whatsapp}%0A` +
+        `*Jurusan Pilihan:* ${formData.jurusan}%0A` +
+        `*Pesan:* ${formData.pesan || '-'}%0A%0A` +
+        `_Mohon informasi selanjutnya terkait pendaftaran ini. Terima kasih._`;
+
+      showToast.success('Mengarahkan ke WhatsApp...', toastId);
+      
+      // Small delay before redirect
+      setTimeout(() => {
+        window.open(`https://wa.me/${finalNumber}?text=${message}`, '_blank');
+        setIsSubmitting(false);
+      }, 1000);
+
     } catch (err) {
       showToast.error('Terjadi kesalahan sistem.', toastId);
       console.error("System Error:", err);
-    } finally {
       setIsSubmitting(false);
     }
   };

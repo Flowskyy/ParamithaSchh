@@ -24,7 +24,9 @@ export const fallbackSekolahInfo = {
   facebook: 'https://facebook.com/smkparamitha2',
   instagram: 'https://instagram.com/smkparamitha2',
   youtube: 'https://youtube.com/@smkparamitha2',
-  tiktok: 'https://tiktok.com/@smkparamitha2'
+  tiktok: 'https://tiktok.com/@smkparamitha2',
+  wa_ppdb: '085183092819',
+  wa_kontak: '085183092819'
 };
 
 export const fallbackJurusan = [
@@ -209,6 +211,15 @@ export const fallbackPendaftar = [];
 export const fallbackSejarah = [];
 export const fallbackCarousel = [];
 
+export const fallbackHomepageSections = [
+  { id: 'hero', label: 'Hero Section', component: 'HeroSection', order_index: 0, is_active: true },
+  { id: 'sambutan', label: 'Sambutan Kepala Sekolah', component: 'SambutanSection', order_index: 1, is_active: true },
+  { id: 'jurusan', label: 'Daftar Jurusan', component: 'JurusanSection', order_index: 2, is_active: true },
+  { id: 'teaching_factory', label: 'Teaching Factory', component: 'TeachingFactorySection', order_index: 3, is_active: true },
+  { id: 'alumni', label: 'Alumni Sukses', component: 'AlumniSection', order_index: 4, is_active: true },
+  { id: 'mitra', label: 'Mitra Industri', component: 'MitraSection', order_index: 5, is_active: true },
+];
+
 export const fallbackVisiMisi = {
   visi: 'Menjadi SMK Unggulan yang menghasilkan lulusan kompeten, berkarakter, dan berdaya saing global.',
   misi: [
@@ -225,5 +236,5 @@ export const fallbackHero = {
   description: 'Mencetak generasi unggul, kompeten, dan siap kerja dengan fasilitas modern dan kurikulum berbasis industri.',
   image_url: '/images/hero-bg.jpg',
   cta_text: 'Daftar Sekarang',
-  cta_link: '/ppdb'
+  cta_url: '/ppdb'
 };

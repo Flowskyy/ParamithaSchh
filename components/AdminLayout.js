@@ -62,6 +62,7 @@ export default function AdminLayout({ children }) {
       icon: Home,
       items: [
         { href: '/admin/beranda/hero', label: 'Hero Section' },
+        { href: '/admin/beranda/sections', label: 'Atur Urutan Section' },
         { href: '/admin/beranda/alumni', label: 'Alumni Sukses' },
         { href: '/admin/beranda/mitra', label: 'Mitra Industri' },
         { href: '/admin/sosmed', label: 'Sosial Media' },
