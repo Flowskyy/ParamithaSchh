@@ -18,17 +18,17 @@ function ActivityLog() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-log/header" aria-label="Admin Activity Log Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Activity Log</h1>
           <p className="text-slate-500">Track system changes and user actions</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 text-slate-500 text-sm border-b border-slate-200">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm" data-section="admin-log/table-card" aria-label="Activity Log Table Card">
+        <div className="overflow-x-auto" data-section="admin-log/table-wrapper" aria-label="Activity Log Table Wrapper">
+          <table className="w-full text-left" data-section="admin-log/table" aria-label="Activity Log Table">
+            <thead className="bg-slate-50 text-slate-500 text-sm border-b border-slate-200" data-section="admin-log/table-header" aria-label="Activity Log Table Header">
               <tr>
                 <th className="p-4 font-bold">Action</th>
                 <th className="p-4 font-bold">Description</th>
@@ -36,9 +36,9 @@ function ActivityLog() {
                 <th className="p-4 font-bold">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100" data-section="admin-log/table-body" aria-label="Activity Log Table Body">
               {logs.length > 0 ? logs.map((log) => (
-                <tr key={log.id} className="text-slate-600 text-sm hover:bg-slate-50 transition-colors">
+                <tr key={log.id} className="text-slate-600 text-sm hover:bg-slate-50 transition-colors" data-section="admin-log/table-row" aria-label={`Log Row ${log.id}`}>
                   <td className="p-4 font-medium text-slate-900">
                     <span className="bg-slate-100 px-2 py-1 rounded text-xs font-bold text-slate-700">{log.action}</span>
                   </td>

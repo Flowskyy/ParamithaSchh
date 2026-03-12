@@ -83,10 +83,9 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
       await createPendaftar(payload);
 
       // 2. Redirect ke WhatsApp
-      const waNumber = sekolahInfo?.wa_ppdb || '085183092819';
-      // Format number: remove non-digits, replace leading 0 with 62
+      const waNumber = '6282124706301';
       const cleanNumber = waNumber.replace(/\D/g, '');
-      const finalNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+      const finalNumber = cleanNumber;
 
       const message = `*PENDAFTARAN PPDB ONLINE - SMK PARAMITHA 2*%0A%0A` +
         `*Nama:* ${formData.nama}%0A` +
@@ -131,11 +130,11 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
 
 
   return (
-    <Layout>
-      <Head>
-        <title>PPDB Online — SMK Paramitha 2</title>
-      </Head>
-
+    <Layout 
+      title="Pendaftaran PPDB 2026 — SMK Paramitha 2 Jakarta"
+      description="Daftar PPDB SMK Paramitha 2 Jakarta tahun ajaran 2026/2027. Pilih jurusan impianmu: RPL, DKV, Perhotelan, Kuliner, dan ULW. Proses mudah via WhatsApp!"
+      keywords="PPDB SMK 2026, Pendaftaran SMK Jakarta, Jurusan RPL Jakarta, Beasiswa SMK Jakarta"
+    >
       {/* 1. Hero Section */}
       <section className="relative min-h-screen md:min-h-[80vh] flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
@@ -432,7 +431,7 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
               Butuh Bantuan Pendaftaran?
             </h2>
             <a
-              href="https://wa.me/6221865037"
+              href="https://wa.me/6282124706301"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 bg-[#25D366] text-white font-bold px-8 py-4 rounded-full hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-xl"

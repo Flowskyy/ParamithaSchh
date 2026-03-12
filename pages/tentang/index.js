@@ -69,14 +69,12 @@ export default function TentangPage({ sekolahInfo }) {
   }
 
   return (
-    <Layout>
-      <Head>
-        <title>Tentang Kami — SMK Paramitha 2</title>
-        <meta name="description" content="Profil lengkap SMK Paramitha 2 Jakarta: Sejarah, Visi Misi, Fasilitas, dan Keunggulan." />
-      </Head>
-
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-[#C0161C] to-[#1E1E8F] text-white">
+    <Layout 
+      title="Tentang Kami — SMK Paramitha 2 Jakarta"
+      description="Profil lengkap SMK Paramitha 2 Jakarta: Sejarah, Visi Misi, Fasilitas modern, dan keunggulan pendidikan vokasi berbasis industri."
+      keywords="Profil SMK Paramitha 2, Visi Misi SMK, Fasilitas SMK Jakarta, Sejarah SMK Paramitha"
+    >
+      <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-[#C0161C] to-[#1E1E8F] text-white" data-section="about/hero" aria-label="Tentang Hero">
         <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10 mix-blend-overlay"></div>
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.h1 
@@ -98,17 +96,18 @@ export default function TentangPage({ sekolahInfo }) {
         </div>
       </section>
 
-      {/* Grid Menu Section */}
-      <section className="py-20 bg-[#F8F8FF]">
+      <section className="py-20 bg-[#F8F8FF]" data-section="about/menu" aria-label="Menu Tentang">
         <div className="container mx-auto px-6">
           <motion.div 
             variants={container}
             initial="hidden"
             animate="show"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            data-section="about/menu-grid"
+            aria-label="Grid Menu Tentang"
           >
             {menuItems.map((menu, index) => (
-              <motion.div key={index} variants={item}>
+              <motion.div key={index} variants={item} data-section="about/menu-item" aria-label={`Menu ${menu.title}`}>
                 <Link href={menu.href} className="group block h-full">
                   <div className="bg-white rounded-2xl p-8 h-full shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2 border border-transparent group-hover:border-[#C0161C]/20 relative overflow-hidden">
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${menu.color} transition-transform group-hover:scale-110`}>

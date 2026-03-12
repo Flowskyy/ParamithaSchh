@@ -119,8 +119,8 @@ export default function DebugPage() {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="max-w-4xl mx-auto space-y-8" data-section="admin-debug/root" aria-label="Admin Debug Root">
+        <div className="flex items-center justify-between" data-section="admin-debug/header" aria-label="System Diagnostics Header">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">System Diagnostics</h1>
             <p className="text-slate-500">Check connection status for Database and Storage</p>
@@ -136,7 +136,7 @@ export default function DebugPage() {
         </div>
 
         {hasRLSError && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm" data-section="admin-debug/rls-warning" aria-label="RLS Policy Warning">
             <div className="flex items-start gap-3">
               <AlertTriangle className="text-red-500 mt-1" size={24} />
               <div>
@@ -153,8 +153,7 @@ export default function DebugPage() {
           </div>
         )}
 
-        {/* Auth Status */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6" data-section="admin-debug/auth" aria-label="Authentication Status">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="text-[#1E1E8F]" size={24} />
             <h2 className="text-lg font-bold text-slate-900">Authentication</h2>
@@ -165,8 +164,7 @@ export default function DebugPage() {
           </div>
         </div>
 
-        {/* Database Status */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6" data-section="admin-debug/database" aria-label="Database Tables Status">
           <div className="flex items-center gap-3 mb-4">
             <Database className="text-[#1E1E8F]" size={24} />
             <h2 className="text-lg font-bold text-slate-900">Database Tables</h2>
@@ -174,7 +172,7 @@ export default function DebugPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {checks.database.details.map((item) => (
-              <div key={item.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div key={item.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100" data-section="admin-debug/database-item" aria-label={`Database ${item.name}`}>
                 <span className="font-medium text-slate-700">{item.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">{item.message}</span>
@@ -186,8 +184,7 @@ export default function DebugPage() {
           </div>
         </div>
 
-        {/* Storage Status */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6" data-section="admin-debug/storage" aria-label="Storage Buckets Status">
           <div className="flex items-center gap-3 mb-4">
             <HardDrive className="text-[#1E1E8F]" size={24} />
             <h2 className="text-lg font-bold text-slate-900">Storage Buckets</h2>
@@ -195,7 +192,7 @@ export default function DebugPage() {
           </div>
           <div className="space-y-3">
             {checks.storage.details.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100" data-section="admin-debug/storage-item" aria-label={`Bucket ${item.name}`}>
                 <span className="font-medium text-slate-700">{item.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">{item.message}</span>

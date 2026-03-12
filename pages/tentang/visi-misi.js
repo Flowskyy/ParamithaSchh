@@ -13,12 +13,12 @@ export default function VisiMisiPage({ sekolahInfo }) {
   const mission = (info.mission && info.mission.length > 0) ? info.mission : []
 
   return (
-    <Layout>
-      <Head>
-        <title>Visi & Misi — SMK Paramitha 2</title>
-        <meta name="description" content="Visi dan Misi SMK Paramitha 2 Jakarta." />
-      </Head>
-
+    <Layout 
+      sekolahInfo={info}
+      title="Visi & Misi — SMK Paramitha 2 Jakarta"
+      description="Visi dan Misi SMK Paramitha 2 Jakarta: Menjadi SMK Pusat Keunggulan yang menghasilkan tamatan berkarakter Profil Pelajar Pancasila, kompeten, dan berdaya saing global."
+      keywords="Visi SMK Paramitha 2, Misi SMK Paramitha 2, Filosofi SMK Paramitha"
+    >
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 bg-white text-center">
         <div className="container mx-auto px-6">

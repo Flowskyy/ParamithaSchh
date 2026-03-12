@@ -42,7 +42,7 @@ function CTAAdmin() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-beranda-cta/header" aria-label="Beranda CTA Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Call To Action (CTA)</h1>
           <p className="text-slate-500">Manage the CTA section content usually at the bottom of the home page</p>
@@ -54,14 +54,14 @@ function CTAAdmin() {
           </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-8">
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm opacity-75 pointer-events-none select-none grayscale-[0.5]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" data-section="admin-beranda-cta/grid" aria-label="Beranda CTA Grid">
+        <div className="space-y-8" data-section="admin-beranda-cta/left-column" aria-label="Kolom Kiri">
+          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm opacity-75 pointer-events-none select-none grayscale-[0.5]" data-section="admin-beranda-cta/content-card" aria-label="CTA Content Card">
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
               <ExternalLink size={20} className="text-primary-600" /> CTA Content
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-4" data-section="admin-beranda-cta/content-fields" aria-label="CTA Content Fields">
               <div className="space-y-2">
                 <label className="text-slate-700 text-sm font-bold">CTA Title</label>
                 <input 
@@ -110,8 +110,8 @@ function CTAAdmin() {
           </section>
         </div>
 
-        <div className="space-y-8">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm sticky top-6">
+        <div className="space-y-8" data-section="admin-beranda-cta/right-column" aria-label="Kolom Kanan">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm sticky top-6" data-section="admin-beranda-cta/preview-card" aria-label="CTA Preview Card">
                 <h3 className="text-slate-900 font-bold mb-4">Preview (Approximate)</h3>
                 <div className="bg-primary-600 text-white p-8 rounded-xl text-center space-y-4">
                     <h2 className="text-2xl font-bold">{info.cta_title || 'CTA Title'}</h2>

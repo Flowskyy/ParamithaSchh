@@ -117,7 +117,7 @@ function AdminSections() {
         <title>Atur Section Beranda — Admin SMK Paramitha 2</title>
       </Head>
 
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4" data-section="admin-beranda-sections/header" aria-label="Beranda Sections Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
             <Layout className="text-[#1E1E8F]" />
@@ -144,7 +144,7 @@ function AdminSections() {
         </div>
       </div>
 
-      <div className="max-w-3xl">
+      <div className="max-w-3xl" data-section="admin-beranda-sections/editor" aria-label="Editor Urutan Section">
         {isReady ? (
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="homepage-sections" type="SECTION">
@@ -153,6 +153,8 @@ function AdminSections() {
                   {...provided.droppableProps} 
                   ref={provided.innerRef}
                   className="space-y-4 min-h-[100px]"
+                  data-section="admin-beranda-sections/list"
+                  aria-label="Daftar Section"
                 >
                   {sections.map((item, index) => (
                     <Draggable key={item.id} draggableId={item.id} index={index}>
@@ -166,6 +168,8 @@ function AdminSections() {
                               ? 'shadow-2xl ring-2 ring-[#1E1E8F] ring-offset-2 ring-offset-white z-50 bg-slate-50' 
                               : 'shadow-sm border-slate-100 hover:border-slate-300 hover:shadow-md'}
                           `}
+                          data-section="admin-beranda-sections/item"
+                          aria-label={`Section ${item.id}`}
                         >
                           <div className="flex items-center gap-4">
                             <div 
@@ -191,6 +195,8 @@ function AdminSections() {
                                   ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200' 
                                   : 'bg-slate-100 text-slate-400 hover:bg-slate-200 border border-slate-200'}
                               `}
+                              data-section="admin-beranda-sections/toggle"
+                              aria-label={`Toggle ${item.id}`}
                             >
                               {item.is_active !== false ? (
                                 <>
@@ -224,7 +230,7 @@ function AdminSections() {
         )}
       </div>
 
-      <div className="mt-12 p-6 bg-blue-50 rounded-2xl border border-blue-100 max-w-3xl">
+      <div className="mt-12 p-6 bg-blue-50 rounded-2xl border border-blue-100 max-w-3xl" data-section="admin-beranda-sections/tips" aria-label="Tips Pengaturan">
         <h4 className="text-[#1E1E8F] font-bold mb-2 flex items-center gap-2">
           <RefreshCw size={18} />
           Tips Pengaturan

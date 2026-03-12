@@ -5,10 +5,17 @@ import { getJurusanBySlug, getSekolahInfo } from '../../services/api'
 import { fallbackJurusan, fallbackSekolahInfo } from '../../utils/fallbackData'
 
 export default function Page({ jurusan, sekolahInfo }) {
+  const finalJurusan = jurusan || fallbackJurusan.find(j => j.slug === 'rpl');
+  
   return (
-    <Layout sekolahInfo={sekolahInfo || fallbackSekolahInfo}>
-      <Head><title>{jurusan?.name || 'Jurusan'} — SMK Paramitha 2</title></Head>
-      <JurusanDetail jurusan={jurusan} sekolahInfo={sekolahInfo} />
+    <Layout 
+      sekolahInfo={sekolahInfo || fallbackSekolahInfo}
+      title={`${finalJurusan?.name || 'RPL'} — SMK Paramitha 2 Jakarta`}
+      description={`Pelajari kompetensi keahlian ${finalJurusan?.name} di SMK Paramitha 2 Jakarta. Cetak programmer handal dan siap kerja.`}
+      keywords={`RPL SMK Paramitha 2, Jurusan Programmer, SMK Teknologi Jakarta`}
+      ogImage={finalJurusan?.image_url}
+    >
+      <JurusanDetail jurusan={finalJurusan} sekolahInfo={sekolahInfo} />
     </Layout>
   )
 }

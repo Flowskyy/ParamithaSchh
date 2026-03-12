@@ -18,15 +18,15 @@ export const fallbackMottoMars = {
 
 export const fallbackSekolahInfo = {
   name: 'SMK Paramitha 2 Jakarta',
-  phone: '021-8650377 | 021-8651435',
+  phone: '6282124706301',
   email: 'smkparamitha2@gmail.com',
-  address: 'Jl. Komp. DDN Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Kec. Duren Sawit, Kota Jakarta Timur, 13450',
+  address: 'Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Duren Sawit, Jakarta Timur',
   facebook: 'https://facebook.com/smkparamitha2',
   instagram: 'https://instagram.com/smkparamitha2',
   youtube: 'https://youtube.com/@smkparamitha2',
   tiktok: 'https://tiktok.com/@smkparamitha2',
-  wa_ppdb: '085183092819',
-  wa_kontak: '085183092819'
+  wa_ppdb: '6282124706301',
+  wa_kontak: '6282124706301'
 };
 
 export const fallbackJurusan = [
@@ -38,7 +38,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#3D3DB5',
     singkatan: 'RPL',
     aktif: true,
-    deskripsi: 'Mempelajari cara pengembangan perangkat lunak termasuk pembuatan, pemeliharaan, manajemen organisasi pengembangan perangkat lunak dan manajemen kualitas.',
+    description: 'Mempelajari cara pengembangan perangkat lunak termasuk pembuatan, pemeliharaan, manajemen organisasi pengembangan perangkat lunak dan manajemen kualitas.',
     kompetensi: [
       'Pemrograman Web & Mobile',
       'Basis Data',
@@ -62,7 +62,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#E6B800',
     singkatan: 'ULW',
     aktif: true,
-    deskripsi: 'Kompetensi keahlian yang mempelajari kegiatan yang bersifat komersial yang mengatur, menyediakan, dan menyelenggarakan pelayanan bagi seseorang, sekelompok orang untuk melakukan perjalanan wisata.',
+    description: 'Kompetensi keahlian yang mempelajari kegiatan yang bersifat komersial yang mengatur, menyediakan, dan menyelenggarakan pelayanan bagi seseorang, sekelompok orang untuk melakukan perjalanan wisata.',
     kompetensi: [
       'Pemesanan Tiket Penerbangan',
       'Perencanaan Perjalanan Wisata',
@@ -86,7 +86,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#0284C7',
     singkatan: 'PH',
     aktif: true,
-    deskripsi: 'Mempelajari tentang pengelolaan hotel, mulai dari pelayanan tamu, penataan kamar, hingga manajemen operasional hotel secara menyeluruh.',
+    description: 'Mempelajari tentang pengelolaan hotel, mulai dari pelayanan tamu, penataan kamar, hingga manajemen operasional hotel secara menyeluruh.',
     kompetensi: [
       'Front Office',
       'Housekeeping',
@@ -110,7 +110,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#A01218',
     singkatan: 'KL',
     aktif: true,
-    deskripsi: 'Mempelajari teknik memasak, penyajian makanan, manajemen dapur, serta kewirausahaan di bidang kuliner.',
+    description: 'Mempelajari teknik memasak, penyajian makanan, manajemen dapur, serta kewirausahaan di bidang kuliner.',
     kompetensi: [
       'Tata Boga',
       'Pengolahan Makanan Kontinental',
@@ -134,7 +134,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#2d2d2d',
     singkatan: 'DKV',
     aktif: true,
-    deskripsi: 'Mempelajari ilmu tentang penyampaian pesan (komunikasi) dengan menggunakan elemen-elemen visual atau rupa.',
+    description: 'Mempelajari ilmu tentang penyampaian pesan (komunikasi) dengan menggunakan elemen-elemen visual atau rupa.',
     kompetensi: [
       'Desain Grafis Percetakan',
       'Desain Media Interaktif',
@@ -158,7 +158,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#15803D',
     singkatan: 'ML',
     aktif: true,
-    deskripsi: 'Mempelajari perencanaan, pelaksanaan, dan pengawasan perpindahan dan penyimpanan barang/jasa serta informasi terkait.',
+    description: 'Mempelajari perencanaan, pelaksanaan, dan pengawasan perpindahan dan penyimpanan barang/jasa serta informasi terkait.',
     kompetensi: [
       'Administrasi Gudang',
       'Pengelolaan Distribusi',
@@ -182,7 +182,7 @@ export const fallbackJurusan = [
     warna_sekunder: '#6D28D9',
     singkatan: 'TKJ',
     aktif: false,
-    deskripsi: 'Mempelajari cara merakit komputer dan instalasi program komputer, serta memasang jaringan komputer.',
+    description: 'Mempelajari cara merakit komputer dan instalasi program komputer, serta memasang jaringan komputer.',
     kompetensi: [
       'Perakitan Komputer',
       'Sistem Operasi Jaringan',

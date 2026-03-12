@@ -102,8 +102,8 @@ export default function AdminPersyaratanPPDB() {
         <title>Kelola Persyaratan PPDB - Admin SMK Paramitha</title>
       </Head>
 
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="space-y-6" data-section="admin-ppdb-persyaratan/root" aria-label="PPDB Persyaratan Root">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-section="admin-ppdb-persyaratan/header" aria-label="Header Persyaratan">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Persyaratan Berkas PPDB</h1>
             <p className="text-slate-500">Kelola daftar dokumen persyaratan pendaftaran</p>
@@ -117,9 +117,9 @@ export default function AdminPersyaratanPPDB() {
           </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" data-section="admin-ppdb-persyaratan/table-card" aria-label="Tabel Persyaratan">
+          <div className="overflow-x-auto" data-section="admin-ppdb-persyaratan/table-wrapper">
+            <table className="w-full text-left text-sm" data-section="admin-ppdb-persyaratan/table">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-4 font-semibold text-slate-700 w-16">No</th>
@@ -128,7 +128,7 @@ export default function AdminPersyaratanPPDB() {
                   <th className="px-6 py-4 font-semibold text-slate-700 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100" data-section="admin-ppdb-persyaratan/table-body">
                 {loading ? (
                   <tr>
                     <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
@@ -195,8 +195,8 @@ export default function AdminPersyaratanPPDB() {
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" data-section="admin-ppdb-persyaratan/modal-overlay" aria-label="Overlay Form Persyaratan">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden" data-section="admin-ppdb-persyaratan/modal-card" aria-label="Form Persyaratan">
             <div className="flex items-center justify-between p-6 border-b border-slate-100">
               <h3 className="font-bold text-lg text-slate-900">
                 {editingItem ? 'Edit Persyaratan' : 'Tambah Persyaratan Baru'}
@@ -209,7 +209,7 @@ export default function AdminPersyaratanPPDB() {
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4" data-section="admin-ppdb-persyaratan/form" aria-label="Form Persyaratan Fields">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Deskripsi Persyaratan</label>
                 <textarea

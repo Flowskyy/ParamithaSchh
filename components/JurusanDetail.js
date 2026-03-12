@@ -42,13 +42,18 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
   const { 
     name, 
     singkatan, 
-    deskripsi, 
+    description, // Fix: deskripsi -> description
+    deskripsi, // Keep for fallback
     warna_primer, 
     warna_sekunder, 
     kompetensi = [], 
-    prospek_karir = [],
+    prospek = [], // Fix: prospek_karir -> prospek
+    prospek_karir = [], // Keep for fallback
     gallery = [] // Default to empty array
   } = jurusan;
+
+  const finalDescription = description || deskripsi;
+  const finalProspek = prospek && prospek.length > 0 ? prospek : prospek_karir;
 
   // Animation variants
   const fadeInUp = {
@@ -106,7 +111,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               </motion.h1>
               
               <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl leading-relaxed">
-                {deskripsi}
+                {finalDescription}
               </motion.p>
               
               <motion.div variants={fadeInUp}>
@@ -261,7 +266,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             variants={stagger}
             className="flex flex-wrap justify-center gap-4"
           >
-            {prospek_karir.map((career, idx) => (
+            {finalProspek.map((career, idx) => (
               <motion.div 
                 key={idx}
                 variants={fadeInUp}

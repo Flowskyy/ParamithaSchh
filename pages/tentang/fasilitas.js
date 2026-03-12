@@ -30,14 +30,14 @@ export default function FasilitasPage({ fasilitas, sekolahInfo }) {
   })
 
   return (
-    <Layout>
-      <Head>
-        <title>Fasilitas — SMK Paramitha 2</title>
-        <meta name="description" content="Fasilitas lengkap penunjang kegiatan belajar mengajar di SMK Paramitha 2 Jakarta." />
-      </Head>
-
+    <Layout 
+      sekolahInfo={sekolahInfo}
+      title="Fasilitas Sekolah — SMK Paramitha 2 Jakarta"
+      description="Jelajahi fasilitas modern dan lengkap di SMK Paramitha 2 Jakarta. Laboratorium standar industri, perpustakaan digital, dan sarana olahraga."
+      keywords="Fasilitas SMK Paramitha 2, Laboratorium SMK, Fasilitas Pendidikan Jakarta, Sarana Prasarana Sekolah"
+    >
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 bg-[#080810] text-white overflow-hidden">
+      <section className="relative py-20 md:py-32 bg-[#080810] text-white overflow-hidden" data-section="facilities/hero" aria-label="Fasilitas Hero">
         <div className="absolute inset-0 bg-gradient-to-br from-[#1E1E8F]/80 to-[#C0161C]/80 z-0" />
         <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-20 mix-blend-overlay z-0" />
         
@@ -61,11 +61,11 @@ export default function FasilitasPage({ fasilitas, sekolahInfo }) {
       </section>
 
       {/* Filter Section */}
-      <section className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm">
+      <section className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm" data-section="facilities/filters" aria-label="Fasilitas Filter">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Categories */}
-          <div className="flex overflow-x-auto pb-2 md:pb-0 w-full md:w-auto hide-scrollbar gap-2">
+          <div className="flex overflow-x-auto pb-2 md:pb-0 w-full md:w-auto hide-scrollbar gap-2" data-section="facilities/categories">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -82,7 +82,7 @@ export default function FasilitasPage({ fasilitas, sekolahInfo }) {
           </div>
 
           {/* Search */}
-          <div className="relative w-full md:w-64">
+          <div className="relative w-full md:w-64" data-section="facilities/search">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
@@ -96,7 +96,7 @@ export default function FasilitasPage({ fasilitas, sekolahInfo }) {
       </section>
 
       {/* Grid Masonry Section */}
-      <section className="py-12 bg-[#F8F8FF] min-h-screen">
+      <section className="py-12 bg-[#F8F8FF] min-h-screen" data-section="facilities/grid" aria-label="Fasilitas Grid">
         <div className="container mx-auto px-6">
           
           {filteredFasilitas.length === 0 ? (

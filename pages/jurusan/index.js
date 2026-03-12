@@ -31,12 +31,12 @@ export default function JurusanList({ jurusanList, sekolahInfo }) {
   }
 
   return (
-    <Layout sekolahInfo={info}>
-      <Head>
-        <title>Program Keahlian — SMK Paramitha 2</title>
-        <meta name="description" content="Pilihan program keahlian unggulan di SMK Paramitha 2 Jakarta." />
-      </Head>
-
+    <Layout 
+      sekolahInfo={info}
+      title="Program Keahlian — SMK Paramitha 2 Jakarta"
+      description="Pilihan program keahlian unggulan di SMK Paramitha 2 Jakarta: Rekayasa Perangkat Lunak, Desain Komunikasi Visual, Perhotelan, Kuliner, dan Usaha Layanan Wisata."
+      keywords="Jurusan SMK Paramitha 2, Jurusan RPL, Jurusan DKV, Jurusan Perhotelan, Jurusan Kuliner, Jurusan ULW"
+    >
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden text-center text-white"
         style={{

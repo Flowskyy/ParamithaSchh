@@ -48,7 +48,7 @@ export default function UpdatePassword() {
         <title>Update Password - SMK Paramitha 2</title>
       </Head>
       
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden" data-section="admin-update-password/root" aria-label="Admin Update Password Root">
         {/* Background Mesh */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-100 rounded-full blur-[120px]" />
@@ -59,6 +59,8 @@ export default function UpdatePassword() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-2xl relative z-10"
+          data-section="admin-update-password/card"
+          aria-label="Update Password Card"
         >
           <div className="flex flex-col items-center mb-8">
             <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 shadow-2xl shadow-primary-200 mb-4 bg-white">
@@ -68,7 +70,7 @@ export default function UpdatePassword() {
             <p className="text-slate-500 text-sm">Enter your new password below</p>
           </div>
 
-          <form onSubmit={handleUpdatePassword} className="space-y-5">
+          <form onSubmit={handleUpdatePassword} className="space-y-5" data-section="admin-update-password/form" aria-label="Update Password Form">
             <div className="space-y-2">
               <label className="text-slate-700 text-sm font-medium ml-1">New Password</label>
               <input 

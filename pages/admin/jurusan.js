@@ -30,17 +30,18 @@ function AdminJurusan() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   
-  // Form State
+  // Form State - Using DB column names
   const [formData, setFormData] = useState({
     name: '',
     singkatan: '',
     slug: '',
-    deskripsi: '',
+    description: '', // Fix: deskripsi -> description
+    short_desc: '',
     warna_primer: '#C0161C',
     warna_sekunder: '#1E1E8F',
     image_url: '',
     kompetensi: [],
-    prospek_karir: [],
+    prospek: [], // Fix: prospek_karir -> prospek
     gallery: [],
     aktif: true
   })
@@ -142,12 +143,13 @@ function AdminJurusan() {
         name: jurusan.name || '',
         singkatan: jurusan.singkatan || '',
         slug: jurusan.slug || '',
-        deskripsi: jurusan.deskripsi || '',
+        description: jurusan.description || '', // Fix: deskripsi -> description
+        short_desc: jurusan.short_desc || '',
         warna_primer: jurusan.warna_primer || '#C0161C',
         warna_sekunder: jurusan.warna_sekunder || '#1E1E8F',
         image_url: jurusan.image_url || '',
         kompetensi: Array.isArray(jurusan.kompetensi) ? jurusan.kompetensi : [],
-        prospek_karir: Array.isArray(jurusan.prospek_karir) ? jurusan.prospek_karir : [],
+        prospek: Array.isArray(jurusan.prospek) ? jurusan.prospek : [], // Fix: prospek_karir -> prospek
         gallery: Array.isArray(jurusan.gallery) ? jurusan.gallery : [],
         aktif: jurusan.aktif ?? true
       })
@@ -157,12 +159,13 @@ function AdminJurusan() {
         name: '',
         singkatan: '',
         slug: '',
-        deskripsi: '',
+        description: '',
+        short_desc: '',
         warna_primer: '#C0161C',
         warna_sekunder: '#1E1E8F',
         image_url: '',
         kompetensi: [],
-        prospek_karir: [],
+        prospek: [],
         gallery: [],
         aktif: true
       })
@@ -302,427 +305,382 @@ function AdminJurusan() {
     }))
   }
 
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="p-12 text-center">
-          <InlineLoader className="text-blue-600" />
-          <p className="mt-4 text-slate-500">Memuat data jurusan...</p>
-        </div>
-      )
-    }
-
-    if (jurusanList.length === 0) {
-      return (
-        <div className="p-12 text-center text-slate-500">
-          <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8 opacity-50" />
-          </div>
-          <p>Belum ada data jurusan.</p>
-        </div>
-      )
-    }
-
-    if (!winReady) return null
-
-    return (
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 text-sm uppercase tracking-wider">
-                <th className="p-4 w-12"></th>
-                <th className="p-6 font-semibold">Jurusan</th>
-                <th className="p-6 font-semibold">Singkatan</th>
-                <th className="p-6 font-semibold">Warna</th>
-                <th className="p-6 font-semibold">Status</th>
-                <th className="p-6 font-semibold text-right">Aksi</th>
-              </tr>
-            </thead>
-            <Droppable droppableId="jurusan-list">
-              {(provided) => (
-                <tbody 
-                  {...provided.droppableProps} 
-                  ref={provided.innerRef}
-                  className="divide-y divide-slate-100"
-                >
-                  {jurusanList.map((jurusan, index) => (
-                    <Draggable key={jurusan.id} draggableId={jurusan.id} index={index}>
-                      {(provided) => (
-                        <tr 
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className={`group hover:bg-slate-50 transition-colors ${!jurusan.aktif ? 'opacity-60 grayscale-[0.5]' : ''}`}
-                        >
-                          <td className="p-4 text-center">
-                            <div 
-                              {...provided.dragHandleProps}
-                              className="cursor-grab text-slate-400 hover:text-slate-600 active:cursor-grabbing p-2"
-                            >
-                              <GripVertical className="w-5 h-5" />
-                            </div>
-                          </td>
-                          <td className="p-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
-                                {jurusan.image_url ? (
-                                  <img src={jurusan.image_url} alt="" className="w-full h-full object-cover" />
-                                ) : (
-                                  <div 
-                                    className="w-full h-full flex items-center justify-center text-xs font-bold text-white"
-                                    style={{ background: `linear-gradient(135deg, ${jurusan.warna_primer}, ${jurusan.warna_sekunder})` }}
-                                  >
-                                    {jurusan.singkatan}
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <div className="font-bold text-slate-800 text-lg">{jurusan.name}</div>
-                                <div className="text-sm text-slate-500 max-w-xs truncate">{jurusan.deskripsi}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-6">
-                            <span className="px-3 py-1 rounded-md bg-slate-100 border border-slate-200 font-mono text-sm text-slate-600">
-                              {jurusan.singkatan}
-                            </span>
-                          </td>
-                          <td className="p-6">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: jurusan.warna_primer }} title="Primer" />
-                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: jurusan.warna_sekunder }} title="Sekunder" />
-                            </div>
-                          </td>
-                          <td className="p-6">
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input 
-                                type="checkbox" 
-                                className="sr-only peer"
-                                checked={jurusan.aktif}
-                                onChange={() => handleToggleAktif(jurusan.id, jurusan.aktif)}
-                              />
-                              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                              <span className="ml-3 text-sm font-medium text-slate-600">
-                                {jurusan.aktif ? 'Aktif' : 'Nonaktif'}
-                              </span>
-                            </label>
-                          </td>
-                          <td className="p-6 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button 
-                                onClick={() => openModal(jurusan)}
-                                className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                                title="Edit"
-                              >
-                                <Edit className="w-5 h-5" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(jurusan.id)}
-                                className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                                title="Hapus"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </tbody>
-              )}
-            </Droppable>
-          </table>
-        </div>
-      </DragDropContext>
-    )
-  }
+  if (!winReady) return null
 
   return (
     <AdminLayout>
-      <Head><title>Kelola Jurusan — Admin SMK Paramitha 2</title></Head>
+      <Head>
+        <title>Kelola Jurusan — Admin SMK Paramitha 2</title>
+      </Head>
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800">Jurusan & Program Keahlian</h1>
-            <p className="text-slate-500 mt-1">Kelola daftar jurusan yang tersedia di sekolah</p>
-          </div>
-          <button 
-            onClick={() => openModal()}
-            className="btn-primary flex items-center gap-2 shadow-lg shadow-blue-500/20"
-          >
-            <Plus className="w-5 h-5" />
-            Tambah Jurusan
-          </button>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Kelola Jurusan</h1>
+          <p className="text-slate-500">Atur program keahlian dan kompetensi siswa</p>
         </div>
-
-        {/* List */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-          {renderContent()}
-        </div>
+        <button 
+          onClick={() => openModal()}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#1E1E8F] text-white rounded-xl hover:bg-[#151560] transition-all shadow-lg shadow-blue-900/20 font-bold"
+        >
+          <Plus size={20} />
+          <span>Tambah Jurusan</span>
+        </button>
       </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+          <RefreshCw className="animate-spin text-[#1E1E8F] mb-4" size={40} />
+          <p className="text-slate-500 font-medium">Memuat data jurusan...</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Urutan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Jurusan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Singkatan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                </tr>
+              </thead>
+              <DragDropContext onDragEnd={handleOnDragEnd}>
+                <Droppable droppableId="jurusan-list">
+                  {(provided) => (
+                    <tbody {...provided.droppableProps} ref={provided.innerRef} className="divide-y divide-slate-100">
+                      {jurusanList.map((item, index) => (
+                        <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                          {(provided, snapshot) => (
+                            <tr 
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`group hover:bg-slate-50/50 transition-colors ${snapshot.isDragging ? 'bg-white shadow-2xl z-50' : ''}`}
+                            >
+                              <td className="px-6 py-4">
+                                <div {...provided.dragHandleProps} className="p-2 text-slate-300 hover:text-slate-500 cursor-grab active:cursor-grabbing">
+                                  <GripVertical size={20} />
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-4">
+                                  <div 
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-inner"
+                                    style={{ backgroundColor: item.warna_primer }}
+                                  >
+                                    <span className="font-bold text-lg">{item.singkatan?.[0]}</span>
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-slate-800">{item.name}</div>
+                                    <div className="text-xs text-slate-400 font-mono">/{item.slug}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 font-mono text-sm text-slate-600">
+                                {item.singkatan}
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex justify-center">
+                                  <button
+                                    onClick={() => handleToggleAktif(item.id, item.aktif)}
+                                    className={`
+                                      flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all
+                                      ${item.aktif 
+                                        ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                        : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}
+                                    `}
+                                  >
+                                    {item.aktif ? <Check size={12} strokeWidth={3} /> : <X size={12} strokeWidth={3} />}
+                                    {item.aktif ? 'AKTIF' : 'NON-AKTIF'}
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button 
+                                    onClick={() => openModal(item)}
+                                    className="p-2 text-slate-400 hover:text-[#1E1E8F] hover:bg-blue-50 rounded-lg transition-all"
+                                    title="Edit"
+                                  >
+                                    <Edit size={18} />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDelete(item.id)}
+                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                    title="Hapus"
+                                  >
+                                    <Trash2 size={18} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </tbody>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* MODAL FORM */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl rounded-2xl border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-2xl">
-              <h2 className="text-2xl font-bold text-slate-800">
-                {editingId ? 'Edit Jurusan' : 'Tambah Jurusan Baru'}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-                <X className="w-6 h-6" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800">
+                  {editingId ? 'Edit Jurusan' : 'Tambah Jurusan Baru'}
+                </h2>
+                <p className="text-sm text-slate-500">Lengkapi detail informasi jurusan</p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+              >
+                <X size={24} />
               </button>
             </div>
-            
-            <div className="p-6 overflow-y-auto custom-scrollbar">
-              <form onSubmit={handleSubmit} className="space-y-8">
-                
-                {/* 1. INFO UTAMA */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1">Nama Jurusan</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={formData.name}
-                        onChange={handleNameChange}
-                        className="input-field w-full bg-slate-50 border-slate-200 focus:border-blue-500 text-slate-800 p-3 rounded-xl border focus:ring-2 focus:ring-blue-200 outline-none"
-                        placeholder="Contoh: Rekayasa Perangkat Lunak"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Singkatan</label>
-                        <input 
-                          type="text" 
-                          required
-                          value={formData.singkatan}
-                          onChange={e => setFormData({...formData, singkatan: e.target.value})}
-                          className="input-field w-full bg-slate-50 border-slate-200 text-slate-800 p-3 rounded-xl border focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
-                          placeholder="RPL"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Slug (URL)</label>
-                        <input 
-                          type="text" 
-                          required
-                          value={formData.slug}
-                          onChange={e => setFormData({...formData, slug: e.target.value})}
-                          className="input-field w-full bg-slate-50 border-slate-200 text-slate-800 p-3 rounded-xl border focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
-                          placeholder="rpl"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1">Deskripsi Singkat</label>
-                      <textarea 
-                        rows={4}
-                        value={formData.deskripsi}
-                        onChange={e => setFormData({...formData, deskripsi: e.target.value})}
-                        className="input-field w-full bg-slate-50 border-slate-200 text-slate-800 p-3 rounded-xl border focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
-                        placeholder="Deskripsi singkat tentang jurusan ini..."
-                      />
-                    </div>
-                  </div>
 
-                  <div className="space-y-6">
-                    {/* Colors */}
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                      <label className="block text-sm font-medium text-slate-600 mb-3">Warna Identitas</label>
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label className="text-xs text-slate-500 mb-1 block">Primer</label>
-                          <div className="flex items-center gap-2">
-                            <input 
-                              type="color" 
-                              value={formData.warna_primer}
-                              onChange={e => setFormData({...formData, warna_primer: e.target.value})}
-                              className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0"
-                            />
-                            <span className="text-sm font-mono text-slate-600">{formData.warna_primer}</span>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs text-slate-500 mb-1 block">Sekunder</label>
-                          <div className="flex items-center gap-2">
-                            <input 
-                              type="color" 
-                              value={formData.warna_sekunder}
-                              onChange={e => setFormData({...formData, warna_sekunder: e.target.value})}
-                              className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0"
-                            />
-                            <span className="text-sm font-mono text-slate-600">{formData.warna_sekunder}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div 
-                        className="h-12 rounded-lg w-full flex items-center justify-center text-white font-bold text-sm shadow-lg"
-                        style={{ background: `linear-gradient(to right, ${formData.warna_primer}, ${formData.warna_sekunder})` }}
-                      >
-                        Preview Gradient
-                      </div>
-                    </div>
-
-                    {/* Image */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Gambar Cover / Icon</label>
-                      <div className="flex items-center gap-4">
-                        <div className="w-24 h-24 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden relative group">
-                          {formData.image_url ? (
-                            <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
-                          ) : (
-                            <Search className="text-slate-300" />
-                          )}
-                          {uploading && (
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                              <RefreshCw className="w-6 h-6 text-white animate-spin" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 rounded-lg text-sm text-slate-700 transition-colors border border-slate-200 shadow-sm">
-                            <Upload className="w-4 h-4" />
-                            Upload Gambar
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                          </label>
-                          <p className="text-xs text-slate-500 mt-2">Format: JPG, PNG, WEBP. Max 2MB.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <hr className="border-slate-200" />
-
-                {/* 2. KOMPETENSI & PROSPEK */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Kompetensi */}
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <label className="text-lg font-semibold text-slate-800">Kompetensi Keahlian</label>
-                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
-                        {formData.kompetensi.length} item
-                      </span>
-                    </div>
-                    <div className="flex gap-2 mb-4">
-                      <input 
-                        type="text" 
-                        value={tempKompetensi}
-                        onChange={e => setTempKompetensi(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addArrayItem('kompetensi', tempKompetensi, setTempKompetensi))}
-                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:border-blue-500 outline-none"
-                        placeholder="Tambah kompetensi..."
-                      />
-                      <button 
-                        type="button"
-                        onClick={() => addArrayItem('kompetensi', tempKompetensi, setTempKompetensi)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg"
-                      >
-                        <Plus className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                      {formData.kompetensi.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 group">
-                          <span className="text-sm text-slate-700">{item}</span>
-                          <button 
-                            type="button"
-                            onClick={() => removeArrayItem('kompetensi', idx)}
-                            className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 rounded"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {formData.kompetensi.length === 0 && (
-                        <p className="text-sm text-slate-400 italic text-center py-4">Belum ada kompetensi ditambahkan.</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Prospek Karir */}
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <label className="text-lg font-semibold text-slate-800">Prospek Karir</label>
-                      <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
-                        {formData.prospek_karir.length} item
-                      </span>
-                    </div>
-                    <div className="flex gap-2 mb-4">
-                      <input 
-                        type="text" 
-                        value={tempProspek}
-                        onChange={e => setTempProspek(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addArrayItem('prospek_karir', tempProspek, setTempProspek))}
-                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:border-green-500 outline-none"
-                        placeholder="Tambah prospek karir..."
-                      />
-                      <button 
-                        type="button"
-                        onClick={() => addArrayItem('prospek_karir', tempProspek, setTempProspek)}
-                        className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg"
-                      >
-                        <Plus className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                      {formData.prospek_karir.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 group">
-                          <span className="text-sm text-slate-700">{item}</span>
-                          <button 
-                            type="button"
-                            onClick={() => removeArrayItem('prospek_karir', idx)}
-                            className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 rounded"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {formData.prospek_karir.length === 0 && (
-                        <p className="text-sm text-slate-400 italic text-center py-4">Belum ada prospek karir ditambahkan.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-6 border-t border-slate-200">
-                  <label className="flex items-center cursor-pointer">
+            {/* Modal Body (Form) */}
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Section 1: Dasar */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Nama Jurusan</label>
                     <input 
-                      type="checkbox" 
-                      className="sr-only peer"
-                      checked={formData.aktif}
-                      onChange={e => setFormData({...formData, aktif: e.target.checked})}
+                      type="text" 
+                      value={formData.name}
+                      onChange={handleNameChange}
+                      required
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#1E1E8F] outline-none transition-all"
+                      placeholder="Contoh: Rekayasa Perangkat Lunak"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                    <span className="ml-3 text-sm font-medium text-slate-700">Status Aktif</span>
-                  </label>
+                  </div>
 
-                  <div className="flex gap-4">
-                    <button 
-                      type="button" 
-                      onClick={() => setIsModalOpen(false)}
-                      className="px-6 py-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors font-medium"
-                    >
-                      Batal
-                    </button>
-                    <button 
-                      type="submit"
-                      className="px-8 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
-                    >
-                      <Save className="w-5 h-5" />
-                      Simpan Data
-                    </button>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-slate-700">Singkatan</label>
+                      <input 
+                        type="text" 
+                        value={formData.singkatan}
+                        onChange={(e) => setFormData({...formData, singkatan: e.target.value})}
+                        required
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#1E1E8F] outline-none transition-all"
+                        placeholder="RPL"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-slate-700">Slug URL</label>
+                      <input 
+                        type="text" 
+                        value={formData.slug}
+                        onChange={(e) => setFormData({...formData, slug: e.target.value})}
+                        required
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#1E1E8F] outline-none transition-all"
+                        placeholder="rpl"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Warna Branding</label>
+                    <div className="flex items-center gap-4">
+                      <input 
+                        type="color" 
+                        value={formData.warna_primer}
+                        onChange={(e) => setFormData({...formData, warna_primer: e.target.value})}
+                        className="w-12 h-12 rounded-lg cursor-pointer border-0 p-0"
+                      />
+                      <input 
+                        type="text" 
+                        value={formData.warna_primer}
+                        onChange={(e) => setFormData({...formData, warna_primer: e.target.value})}
+                        className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Gambar Cover</label>
+                    <div className="relative group">
+                      {formData.image_url ? (
+                        <div className="relative aspect-video rounded-2xl overflow-hidden shadow-md">
+                          <img src={formData.image_url} alt="Cover" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, image_url: ''})}
+                            className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-100 hover:border-slate-300 transition-all">
+                          <div className="p-4 bg-white rounded-full shadow-sm mb-2">
+                            <Upload className="text-slate-400" size={24} />
+                          </div>
+                          <span className="text-xs font-medium text-slate-500">{uploading ? 'Mengupload...' : 'Klik untuk Upload Cover'}</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                        </label>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-              </form>
-            </div>
+                {/* Section 2: Konten */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Deskripsi Utama</label>
+                    <textarea 
+                      value={formData.description} // Fix: deskripsi -> description
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      rows="4"
+                      required
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#1E1E8F] outline-none transition-all resize-none"
+                      placeholder="Jelaskan secara detail tentang jurusan ini..."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Short Description (SEO/Navbar)</label>
+                    <textarea 
+                      value={formData.short_desc}
+                      onChange={(e) => setFormData({...formData, short_desc: e.target.value})}
+                      rows="2"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-[#1E1E8F] outline-none transition-all resize-none text-xs"
+                      placeholder="Deskripsi singkat untuk tampilan menu..."
+                    />
+                  </div>
+
+                  {/* Kompetensi & Prospek Karir (Dynamic Tags) */}
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-slate-700 flex items-center justify-between">
+                        <span>Kompetensi Keahlian</span>
+                        <span className="text-[10px] text-slate-400">{formData.kompetensi.length} Item</span>
+                      </label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {formData.kompetensi.map((tag, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-[#1E1E8F] text-xs font-bold rounded-lg border border-blue-100">
+                            {tag}
+                            <button type="button" onClick={() => removeArrayItem('kompetensi', idx)}><X size={12} /></button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={tempKompetensi}
+                          onChange={(e) => setTempKompetensi(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('kompetensi', tempKompetensi, setTempKompetensi))}
+                          className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                          placeholder="Tambah kompetensi..."
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => addArrayItem('kompetensi', tempKompetensi, setTempKompetensi)}
+                          className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200"
+                        >
+                          <Plus size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-slate-700 flex items-center justify-between">
+                        <span>Prospek Karir</span>
+                        <span className="text-[10px] text-slate-400">{formData.prospek.length} Item</span>
+                      </label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {formData.prospek.map((tag, idx) => ( // Fix: prospek_karir -> prospek
+                          <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-lg border border-orange-100">
+                            {tag}
+                            <button type="button" onClick={() => removeArrayItem('prospek', idx)}><X size={12} /></button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={tempProspek}
+                          onChange={(e) => setTempProspek(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('prospek', tempProspek, setTempProspek))}
+                          className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                          placeholder="Tambah prospek..."
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => addArrayItem('prospek', tempProspek, setTempProspek)}
+                          className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200"
+                        >
+                          <Plus size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gallery Section */}
+              <div className="mt-8 pt-8 border-t border-slate-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-slate-700">Galeri Foto Jurusan</label>
+                  <label className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold cursor-pointer transition-all">
+                    <Plus size={16} />
+                    <span>Tambah Foto</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={handleGalleryUpload} />
+                  </label>
+                </div>
+                
+                {formData.gallery.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {formData.gallery.map((url, idx) => (
+                      <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group shadow-sm">
+                        <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => handleDeleteGallery(url)}
+                          className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-10 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center">
+                    <AlertCircle className="text-slate-300 mb-2" size={32} />
+                    <p className="text-xs text-slate-400">Belum ada foto galeri.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Footer */}
+              <div className="mt-10 pt-6 border-t border-slate-100 flex items-center justify-end gap-4">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-6 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit"
+                  className="px-10 py-3 bg-[#1E1E8F] text-white rounded-xl font-bold hover:bg-[#151560] transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
+                >
+                  <Save size={20} />
+                  <span>Simpan Jurusan</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

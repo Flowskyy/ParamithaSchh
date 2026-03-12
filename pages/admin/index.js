@@ -74,7 +74,7 @@ export default function AdminLogin() {
         <title>Admin Login - SMK Paramitha 2</title>
       </Head>
       
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden" data-section="admin-login/root" aria-label="Admin Login Root">
         {/* Background Mesh */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-100 rounded-full blur-[120px]" />
@@ -85,6 +85,8 @@ export default function AdminLogin() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-2xl relative z-10"
+          data-section="admin-login/card"
+          aria-label="Admin Login Card"
         >
           <div className="flex flex-col items-center mb-8">
             <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 shadow-2xl shadow-primary-200 mb-4 bg-white">
@@ -94,7 +96,7 @@ export default function AdminLogin() {
             <p className="text-slate-500 text-sm">Sign in to manage your school website</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-5" data-section="admin-login/form" aria-label="Admin Login Form">
             <div className="space-y-2">
               <label className="text-slate-700 text-sm font-medium ml-1">Email Address</label>
               <div className="relative">
@@ -125,7 +127,7 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end" data-section="admin-login/reset-password" aria-label="Reset Password">
               <button
                 type="button"
                 onClick={handleResetPassword}

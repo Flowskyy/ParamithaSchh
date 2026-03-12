@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../services/supabase';
+import supabase from '../services/supabase';
 import { toastSuccess } from '../utils/toast';
 
 export default function RealtimeReloader() {

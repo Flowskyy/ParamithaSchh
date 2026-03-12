@@ -56,13 +56,14 @@ export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
   )
 
   return (
-    <Layout>
-      <Head>
-        <title>Motto & Mars — SMK Paramitha 2</title>
-      </Head>
-
+    <Layout 
+      sekolahInfo={sekolahInfo}
+      title="Motto & Mars — SMK Paramitha 2 Jakarta"
+      description="Kenali nilai-nilai karakter PINK JITU dan semangat Mars SMK Paramitha 2 Jakarta. Membentuk kepribadian unggul dan profesional."
+      keywords="Motto SMK Paramitha 2, Mars SMK Paramitha 2, PINK JITU, Karakter Siswa SMK"
+    >
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-[#9e1c4c] to-[#C0161C] py-20 text-center px-4 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#9e1c4c] to-[#C0161C] py-20 text-center px-4 relative overflow-hidden" data-section="motto/hero" aria-label="Motto Hero">
         <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-10"></div>
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
@@ -74,17 +75,17 @@ export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
       </div>
 
       {/* Cards Section */}
-      <div className="bg-slate-50 py-20 px-4 md:px-8">
+      <div className="bg-slate-50 py-20 px-4 md:px-8" data-section="motto/values" aria-label="Nilai PINK JITU">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* PINK Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-section="motto/pink-row">
             {pink.map((item, idx) => (
               <Card key={`pink-${idx}`} item={item} index={idx} delay={idx * 0.1} />
             ))}
           </div>
 
           {/* JITU Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-section="motto/jitu-row">
             {jitu.map((item, idx) => (
               <Card key={`jitu-${idx}`} item={item} index={idx} delay={0.4 + (idx * 0.1)} />
             ))}
@@ -93,7 +94,7 @@ export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
       </div>
 
       {/* Mars Section */}
-      <div className="bg-white py-20 px-4 relative">
+      <div className="bg-white py-20 px-4 relative" data-section="motto/mars" aria-label="Mars Sekolah">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-[#C0161C] rounded-full flex items-center justify-center text-white shadow-lg shadow-red-200">

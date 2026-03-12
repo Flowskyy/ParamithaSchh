@@ -14,12 +14,12 @@ export default function SejarahPage({ sekolahInfo, sejarahList }) {
   const milestones = sejarahList || []
 
   return (
-    <Layout>
-      <Head>
-        <title>Sejarah — SMK Paramitha 2</title>
-        <meta name="description" content="Sejarah perjalanan SMK Paramitha 2 dari masa ke masa menjadi sekolah unggulan." />
-      </Head>
-
+    <Layout 
+      sekolahInfo={info}
+      title="Sejarah Perjalanan — SMK Paramitha 2 Jakarta"
+      description="Pelajari sejarah dan perjalanan panjang SMK Paramitha 2 Jakarta dalam mencetak generasi profesional dan siap kerja sejak awal berdiri."
+      keywords="Sejarah SMK Paramitha 2, Asal usul SMK Paramitha, Milestones SMK Paramitha"
+    >
       {/* Hero Section */}
       <section className="relative py-24 md:py-32 overflow-hidden bg-[#080810] text-white">
         <div className="absolute inset-0 bg-gradient-to-r from-[#C0161C]/90 to-[#1E1E8F]/90 z-0" />

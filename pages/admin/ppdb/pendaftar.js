@@ -130,8 +130,8 @@ export default function AdminPendaftarPPDB() {
         <title>Data Pendaftar PPDB - Admin SMK Paramitha</title>
       </Head>
 
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="space-y-6" data-section="admin-ppdb-pendaftar/root" aria-label="PPDB Pendaftar Root">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-section="admin-ppdb-pendaftar/header" aria-label="Header Pendaftar">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Data Pendaftar PPDB</h1>
             <p className="text-slate-500">Kelola data calon siswa baru</p>
@@ -146,7 +146,7 @@ export default function AdminPendaftarPPDB() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4" data-section="admin-ppdb-pendaftar/filters" aria-label="Filter Pendaftar">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
@@ -176,9 +176,9 @@ export default function AdminPendaftarPPDB() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" data-section="admin-ppdb-pendaftar/table-card" aria-label="Tabel Pendaftar">
+          <div className="overflow-x-auto" data-section="admin-ppdb-pendaftar/table-wrapper">
+            <table className="w-full text-left text-sm" data-section="admin-ppdb-pendaftar/table">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-4 font-semibold text-slate-700">Tanggal Daftar</th>
@@ -189,7 +189,7 @@ export default function AdminPendaftarPPDB() {
                   <th className="px-6 py-4 font-semibold text-slate-700 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100" data-section="admin-ppdb-pendaftar/table-body">
                 {loading ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
@@ -255,7 +255,7 @@ export default function AdminPendaftarPPDB() {
           </div>
           
           {/* Footer stats */}
-          <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 text-sm text-slate-500 flex justify-between items-center">
+          <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 text-sm text-slate-500 flex justify-between items-center" data-section="admin-ppdb-pendaftar/table-footer">
             <span>Menampilkan {filteredData.length} dari {pendaftar.length} pendaftar</span>
           </div>
         </div>
@@ -263,8 +263,8 @@ export default function AdminPendaftarPPDB() {
 
       {/* Edit Modal */}
       {editingPendaftar && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg:black/50 backdrop-blur-sm" data-section="admin-ppdb-pendaftar/modal-overlay" aria-label="Overlay Edit Pendaftar">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] overflow-y-auto" data-section="admin-ppdb-pendaftar/modal-card" aria-label="Modal Edit Pendaftar">
             <div className="flex items-center justify-between p-6 border-b border-slate-100 sticky top-0 bg-white z-10">
               <h3 className="font-bold text-lg text-slate-900">Edit Data Pendaftar</h3>
               <button 
@@ -275,8 +275,8 @@ export default function AdminPendaftarPPDB() {
               </button>
             </div>
             
-            <form onSubmit={handleSave} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSave} className="p-6 space-y-6" data-section="admin-ppdb-pendaftar/form" aria-label="Form Edit Pendaftar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-section="admin-ppdb-pendaftar/form-grid">
                 <div className="space-y-4">
                   <h4 className="font-bold text-slate-900 border-b pb-2">Informasi Pribadi</h4>
                   

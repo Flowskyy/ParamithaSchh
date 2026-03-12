@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import supabase from './supabase';
 import { 
   fallbackJurusan, 
   fallbackSekolahInfo, 
@@ -27,7 +27,8 @@ const handleResponse = async (promise, fallback = null) => {
       console.error('Supabase Error (GET):', error);
       return fallback;
     }
-    return data;
+    // Return data if not null/undefined (including empty array)
+    return data !== null && data !== undefined ? data : fallback;
   } catch (err) {
     console.error('Network/Unexpected Error (GET):', err);
     return fallback;
@@ -82,31 +83,24 @@ export async function getJurusan() {
     // Try to fetch active jurusan only
     const { data, error } = await supabase
       .from('jurusan')
-      .select('*')
+      .select('id, name, slug, singkatan, aktif, description, short_desc, warna_primer, order_index, image_url, deskripsi')
       .eq('aktif', true)
       .order('order_index', { ascending: true });
 
     if (error) {
-      // If error (e.g. column 'aktif' doesn't exist), try fetching all
-      console.warn('Error fetching active jurusan, retrying all...', error.message);
-      const { data: allData, error: allError } = await supabase
-        .from('jurusan')
-        .select('*')
-        .order('order_index', { ascending: true });
-        
-      if (allError) throw allError;
-      return allData || fallbackJurusan;
+      console.error('getJurusan Error:', error.message);
+      return fallbackJurusan.filter(j => j.aktif !== false);
     }
     
-    return data || fallbackJurusan;
+    return data !== null ? data : [];
   } catch (err) {
-    console.error('getJurusan Error:', err);
-    return fallbackJurusan;
+    console.error('getJurusan Catch Error:', err);
+    return fallbackJurusan.filter(j => j.aktif !== false);
   }
 }
 
 export async function getJurusanAll() {
-  // Fetch ALL jurusan including non-active, ensure we select ALL columns
+  // Fetch ALL jurusan including non-active
   return handleResponse(
     supabase.from('jurusan').select('*').order('order_index'),
     fallbackJurusan
@@ -130,7 +124,11 @@ export async function getJurusanBySlug(slug) {
 }
 
 export async function createJurusan(p) { return handleMutation(supabase.from('jurusan').insert(p)); }
-export async function updateJurusan(id, p) { return handleMutation(supabase.from('jurusan').update(p).eq('id', id)); }
+export async function updateJurusan(id, p) { 
+  // Clean payload from extra fields that might not be in DB
+  const { id: _, created_at: __, ...payload } = p;
+  return handleMutation(supabase.from('jurusan').update(payload).eq('id', id)); 
+}
 export async function updateJurusanOrder(id, order_index) {
   return handleMutation(supabase.from('jurusan').update({ order_index }).eq('id', id));
 }
@@ -174,7 +172,7 @@ export async function removeJurusanGallery(id, imageUrl) {
     if (error) throw error;
     
     const gallery = current?.gallery || [];
-    const newGallery = gallery.filter(url => url !== imageUrl);
+    const newGallery = gallery.filter(img => img !== imageUrl);
     
     return handleMutation(supabase.from('jurusan').update({ gallery: newGallery }).eq('id', id));
   } catch (err) {
@@ -183,66 +181,10 @@ export async function removeJurusanGallery(id, imageUrl) {
   }
 }
 
-export async function saveJurusan(payload) { 
-  if (payload.id) return updateJurusan(payload.id, payload); 
-  return createJurusan(payload); 
-}
-
-// ─── FASILITAS ─────────────────────────────────────────────────────
-export async function getFasilitas() {
-  return handleResponse(
-    supabase.from('fasilitas').select('*').order('order_index'),
-    fallbackFasilitas || []
-  );
-}
-export async function createFasilitas(p) { return handleMutation(supabase.from('fasilitas').insert(p)); }
-export async function updateFasilitas(id, p) { return handleMutation(supabase.from('fasilitas').update(p).eq('id', id)); }
-export async function deleteFasilitas(id) { return handleMutation(supabase.from('fasilitas').delete().eq('id', id)); }
-export async function saveFasilitas(payload) { 
-  if (payload.id) return updateFasilitas(payload.id, payload); 
-  return createFasilitas(payload); 
-}
-
-// ─── GALERI ────────────────────────────────────────────────────────
-export async function getGaleri(kategori = null) {
-  try {
-    let q = supabase.from('galeri').select('*').order('created_at', { ascending: false });
-    if (kategori) q = q.eq('category', kategori);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || fallbackGaleri || [];
-  } catch (err) {
-    console.error('getGaleri Error:', err);
-    return fallbackGaleri || [];
-  }
-}
-export async function createGaleri(p) { return handleMutation(supabase.from('galeri').insert(p)); }
-export async function updateGaleri(id, p) { return handleMutation(supabase.from('galeri').update(p).eq('id', id)); }
-export async function deleteGaleri(id) { return handleMutation(supabase.from('galeri').delete().eq('id', id)); }
-export async function saveGaleri(payload) { 
-  if (payload.id) return updateGaleri(payload.id, payload); 
-  return createGaleri(payload); 
-}
-
-// ─── TESTIMONIAL ───────────────────────────────────────────────────
-export async function getTestimonial() {
-  return handleResponse(
-    supabase.from('testimonial').select('*').order('created_at', { ascending: false }),
-    fallbackTestimonial || []
-  );
-}
-export async function createTestimonial(p) { return handleMutation(supabase.from('testimonial').insert(p)); }
-export async function updateTestimonial(id, p) { return handleMutation(supabase.from('testimonial').update(p).eq('id', id)); }
-export async function deleteTestimonial(id) { return handleMutation(supabase.from('testimonial').delete().eq('id', id)); }
-export async function saveTestimonial(payload) { 
-  if (payload.id) return updateTestimonial(payload.id, payload); 
-  return createTestimonial(payload); 
-}
-
-// ─── ALUMNI (New) ──────────────────────────────────────────────────
+// ─── ALUMNI ────────────────────────────────────────────────────────
 export async function getAlumni() {
   return handleResponse(
-    supabase.from('alumni').select('*').order('order_index'),
+    supabase.from('alumni').select('*').order('created_at', { ascending: false }),
     fallbackAlumni || []
   );
 }
@@ -272,7 +214,7 @@ export async function saveMitra(payload) {
 // ─── SEKOLAH INFO ──────────────────────────────────────────────────
 export async function getSekolahInfo() {
   return handleResponse(
-    supabase.from('sekolah_info').select('*').order('created_at', { ascending: false }).limit(1).single(),
+    supabase.from('sekolah_info').select('id, name, phone, email, address, facebook, instagram, youtube, kepsek_name, kepsek_photo, kepsek_message, map_url, vision, mission, history, motto, mars_lyrics').order('created_at', { ascending: false }).limit(1).single(),
     fallbackSekolahInfo
   );
 }
@@ -347,122 +289,94 @@ export async function uploadFile(bucket, path, file) {
   try {
     const result = await supabase.storage.from(bucket).upload(path, file, { cacheControl: '3600', upsert: true });
     return result;
-  } catch (err) {
-    console.error('uploadFile Error:', err);
-    return { data: null, error: err };
-  }
-}
-export async function deleteFile(bucket, path) {
-  try {
-    const result = await supabase.storage.from(bucket).remove([path]);
-    return result;
-  } catch (err) {
-    console.error('deleteFile Error:', err);
-    return { data: null, error: err };
+  } catch (error) {
+    return { data: null, error };
   }
 }
 
-// ─── REPORT ────────────────────────────────────────────────────────
-export async function getReport() {
-  try {
-    const [j, g, t, f, c, a, m, p] = await Promise.all([
-      supabase.from('jurusan').select('id', { count: 'exact', head: true }),
-      supabase.from('galeri').select('id', { count: 'exact', head: true }),
-      supabase.from('testimonial').select('id', { count: 'exact', head: true }),
-      supabase.from('fasilitas').select('id', { count: 'exact', head: true }),
-      supabase.from('carousel').select('id', { count: 'exact', head: true }),
-      supabase.from('alumni').select('id', { count: 'exact', head: true }),
-      supabase.from('mitra_perusahaan').select('id', { count: 'exact', head: true }),
-      supabase.from('pendaftar').select('id', { count: 'exact', head: true })
-    ]);
-    
-    return {
-      jurusan: j.count || 0,
-      galeri: g.count || 0,
-      testimonial: t.count || 0,
-      fasilitas: f.count || 0,
-      carousel: c.count || 0,
-      alumni: a.count || 0,
-      mitra: m.count || 0,
-      pendaftar: p.count || 0
-    };
-  } catch (err) {
-    console.error('getReport Error:', err);
-    return {
-      jurusan: 0,
-      galeri: 0,
-      testimonial: 0,
-      fasilitas: 0,
-      carousel: 0,
-      alumni: 0,
-      mitra: 0,
-      pendaftar: 0
-    };
-  }
-}
-
-// ─── PPDB ────────────────────────────────────────────────────────
+// ─── PPDB ──────────────────────────────────────────────────────────
 export async function getJadwalPPDB() {
-  return handleResponse(
-    supabase.from('jadwal_ppdb').select('*').order('created_at', { ascending: true }),
-    fallbackJadwalPPDB || []
-  );
+  return handleResponse(supabase.from('jadwal_ppdb').select('*').order('order_index'), fallbackJadwalPPDB);
 }
-export async function createJadwalPPDB(p) { return handleMutation(supabase.from('jadwal_ppdb').insert(p)); }
-export async function updateJadwalPPDB(id, p) { return handleMutation(supabase.from('jadwal_ppdb').update(p).eq('id', id)); }
-export async function deleteJadwalPPDB(id) { return handleMutation(supabase.from('jadwal_ppdb').delete().eq('id', id)); }
-
 export async function getPersyaratanPPDB() {
-  return handleResponse(
-    supabase.from('persyaratan_ppdb').select('*').order('created_at', { ascending: true }),
-    fallbackPersyaratanPPDB || []
-  );
+  return handleResponse(supabase.from('persyaratan_ppdb').select('*').order('order_index'), fallbackPersyaratanPPDB);
 }
-export async function createPersyaratanPPDB(p) { return handleMutation(supabase.from('persyaratan_ppdb').insert(p)); }
-export async function updatePersyaratanPPDB(id, p) { return handleMutation(supabase.from('persyaratan_ppdb').update(p).eq('id', id)); }
-export async function deletePersyaratanPPDB(id) { return handleMutation(supabase.from('persyaratan_ppdb').delete().eq('id', id)); }
-
+export async function createPendaftar(p) {
+  return handleMutation(supabase.from('pendaftar').insert(p));
+}
 export async function getPendaftar() {
-  return handleResponse(
-    supabase.from('pendaftar').select('*').order('created_at', { ascending: false }),
-    fallbackPendaftar || []
-  );
+  return handleResponse(supabase.from('pendaftar').select('*').order('created_at', { ascending: false }), []);
 }
-export async function createPendaftar(p) { return handleMutation(supabase.from('pendaftar').insert(p)); }
 export async function updatePendaftar(id, p) { return handleMutation(supabase.from('pendaftar').update(p).eq('id', id)); }
-export async function deletePendaftar(id) { return handleMutation(supabase.from('pendaftar').delete().eq('id', id)); }
 
-// ─── SEJARAH (Timeline) ──────────────────────────────────────────────
+// ─── FASILITAS ─────────────────────────────────────────────────────
+export async function getFasilitas() {
+  return handleResponse(supabase.from('fasilitas').select('*').order('created_at', { ascending: false }), fallbackFasilitas || []);
+}
+export async function createFasilitas(p) { return handleMutation(supabase.from('fasilitas').insert(p)); }
+export async function updateFasilitas(id, p) { return handleMutation(supabase.from('fasilitas').update(p).eq('id', id)); }
+export async function deleteFasilitas(id) { return handleMutation(supabase.from('fasilitas').delete().eq('id', id)); }
+export async function saveFasilitas(payload) {
+  if (payload.id) return updateFasilitas(payload.id, payload);
+  return createFasilitas(payload);
+}
+
+// ─── GALERI ────────────────────────────────────────────────────────
+export async function getGaleri() {
+  return handleResponse(supabase.from('galeri').select('*').order('created_at', { ascending: false }), fallbackGaleri || []);
+}
+export async function createGaleri(p) { return handleMutation(supabase.from('galeri').insert(p)); }
+export async function updateGaleri(id, p) { return handleMutation(supabase.from('galeri').update(p).eq('id', id)); }
+export async function deleteGaleri(id) { return handleMutation(supabase.from('galeri').delete().eq('id', id)); }
+export async function saveGaleri(payload) {
+  if (payload.id) return updateGaleri(payload.id, payload);
+  return createGaleri(payload);
+}
+
+// ─── SEJARAH ───────────────────────────────────────────────────────
 export async function getSejarah() {
-  return handleResponse(
-    supabase.from('sejarah').select('*').order('year', { ascending: true }),
-    fallbackSejarah || []
-  );
+  return handleResponse(supabase.from('sejarah').select('*').order('year', { ascending: true }), fallbackSejarah || []);
 }
 export async function createSejarah(p) { return handleMutation(supabase.from('sejarah').insert(p)); }
 export async function updateSejarah(id, p) { return handleMutation(supabase.from('sejarah').update(p).eq('id', id)); }
 export async function deleteSejarah(id) { return handleMutation(supabase.from('sejarah').delete().eq('id', id)); }
 
-// ─── VISI MISI ───────────────────────────────────────────────────────
-export async function getVisiMisi() {
-  return handleResponse(
-    supabase.from('visi_misi').select('*').limit(1).single(),
-    fallbackVisiMisi || null
-  );
+// ─── MOTTO & MARS ──────────────────────────────────────────────────
+export async function getMottoMars() {
+  return handleResponse(supabase.from('motto_mars').select('*').limit(1).single(), fallbackMottoMars);
 }
-export async function upsertVisiMisi(p) {
-  if (p.id) return handleMutation(supabase.from('visi_misi').update(p).eq('id', p.id));
-  return handleMutation(supabase.from('visi_misi').insert(p));
+export async function upsertMottoMars(payload) {
+  if (payload.id) return handleMutation(supabase.from('motto_mars').update(payload).eq('id', payload.id));
+  return handleMutation(supabase.from('motto_mars').insert(payload));
 }
 
-// ─── MOTTO MARS ──────────────────────────────────────────────────────
-export async function getMottoMars() {
-  return handleResponse(
-    supabase.from('motto_mars').select('*').limit(1).single(),
-    fallbackMottoMars || null
-  );
-}
-export async function upsertMottoMars(p) {
-  if (p.id) return handleMutation(supabase.from('motto_mars').update(p).eq('id', p.id));
-  return handleMutation(supabase.from('motto_mars').insert(p));
+// ─── PPDB JADWAL & PERSYARATAN ─────────────────────────────────────
+export async function createJadwalPPDB(p) { return handleMutation(supabase.from('jadwal_ppdb').insert(p)); }
+export async function updateJadwalPPDB(id, p) { return handleMutation(supabase.from('jadwal_ppdb').update(p).eq('id', id)); }
+export async function deleteJadwalPPDB(id) { return handleMutation(supabase.from('jadwal_ppdb').delete().eq('id', id)); }
+
+export async function createPersyaratanPPDB(p) { return handleMutation(supabase.from('persyaratan_ppdb').insert(p)); }
+export async function updatePersyaratanPPDB(id, p) { return handleMutation(supabase.from('persyaratan_ppdb').update(p).eq('id', id)); }
+export async function deletePersyaratanPPDB(id) { return handleMutation(supabase.from('persyaratan_ppdb').delete().eq('id', id)); }
+
+// ─── DASHBOARD / REPORT ────────────────────────────────────────────
+export async function getReport() {
+  try {
+    const [pendaftar, alumni, mitra, jurusan] = await Promise.all([
+      supabase.from('pendaftar').select('id', { count: 'exact' }),
+      supabase.from('alumni').select('id', { count: 'exact' }),
+      supabase.from('mitra_perusahaan').select('id', { count: 'exact' }),
+      supabase.from('jurusan').select('id', { count: 'exact' }),
+    ]);
+    
+    return {
+      pendaftar: pendaftar.count || 0,
+      alumni: alumni.count || 0,
+      mitra: mitra.count || 0,
+      jurusan: jurusan.count || 0,
+    };
+  } catch (error) {
+    console.error('getReport error:', error);
+    return { pendaftar: 0, alumni: 0, mitra: 0, jurusan: 0 };
+  }
 }

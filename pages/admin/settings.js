@@ -36,19 +36,19 @@ function Settings() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-settings/header" aria-label="Admin Settings Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
           <p className="text-slate-500">Manage your account settings</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl" data-section="admin-settings/card" aria-label="Change Password Card">
         <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
           <Lock size={20} className="text-primary-600" /> Change Password
         </h2>
         
-        <form onSubmit={handleUpdatePassword} className="space-y-6">
+        <form onSubmit={handleUpdatePassword} className="space-y-6" data-section="admin-settings/form" aria-label="Change Password Form">
           <div className="space-y-2">
             <label className="text-slate-700 text-sm font-bold">New Password</label>
             <input 
@@ -71,7 +71,7 @@ function Settings() {
             />
           </div>
 
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-4" data-section="admin-settings/actions" aria-label="Form Actions">
             <button 
               type="submit"
               disabled={loading}

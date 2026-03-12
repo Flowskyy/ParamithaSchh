@@ -151,7 +151,7 @@ function MitraAdmin() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-beranda-mitra/header" aria-label="Beranda Mitra Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Manage Mitra</h1>
           <p className="text-slate-500 text-sm">Partner industri dan perusahaan</p>
@@ -165,14 +165,14 @@ function MitraAdmin() {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto" data-section="admin-beranda-mitra/modal-overlay" aria-label="Overlay Edit Mitra">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl" data-section="admin-beranda-mitra/modal-card" aria-label="Modal Edit Mitra">
             <div className="flex justify-between items-center p-6 border-b border-slate-100">
               <h3 className="text-xl font-bold text-slate-900">{editing === 'new' ? 'Add New Mitra' : 'Edit Mitra'}</h3>
               <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button>
             </div>
             
-            <form onSubmit={handleSave} className="p-6 space-y-6">
+            <form onSubmit={handleSave} className="p-6 space-y-6" data-section="admin-beranda-mitra/form" aria-label="Form Edit Mitra">
               <div className="space-y-2">
                 <label className="text-slate-600 text-xs uppercase font-bold tracking-wider">Nama Perusahaan</label>
                 <input 
@@ -230,8 +230,8 @@ function MitraAdmin() {
         </div>
       )}
 
-      <div className="max-w-3xl">
-        <Reorder.Group axis="y" values={items} onReorder={handleReorder}>
+      <div className="max-w-3xl" data-section="admin-beranda-mitra/list" aria-label="Daftar Mitra">
+        <Reorder.Group axis="y" values={items} onReorder={handleReorder} data-section="admin-beranda-mitra/reorder-group" aria-label="Kelompok Reorder Mitra">
           {items.map((item) => (
             <MitraItem 
               key={item.id} 
@@ -243,7 +243,7 @@ function MitraAdmin() {
         </Reorder.Group>
         
         {items.length === 0 && !loading && (
-          <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+          <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200 border-dashed" data-section="admin-beranda-mitra/empty-state" aria-label="Kosong Mitra">
             <Building2 size={48} className="mx-auto mb-4 opacity-20 text-slate-400" />
             <p>No partners found.</p>
           </div>

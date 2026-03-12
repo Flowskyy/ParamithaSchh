@@ -70,9 +70,9 @@ function AdminDashboard({ user }) {
     <AdminLayout>
       <Head><title>Dashboard — Admin SMK Paramitha 2</title></Head>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto" data-section="admin-dashboard/main" aria-label="Admin Dashboard Main">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8" data-section="admin-dashboard/header" aria-label="Admin Dashboard Header">
           <h1 className="text-3xl font-bold text-[#0A0A1A] mb-2">
             Selamat Datang, <span className="text-[#C0161C]">Admin</span>
           </h1>
@@ -82,7 +82,7 @@ function AdminDashboard({ user }) {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-section="admin-dashboard/stats-row-1" aria-label="Statistik Utama">
           <StatCard 
             title="Jurusan" 
             count={loading ? '-' : stats.jurusan} 
@@ -114,7 +114,7 @@ function AdminDashboard({ user }) {
         </div>
         
         {/* Second Row Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-section="admin-dashboard/stats-row-2" aria-label="Statistik Tambahan">
           <StatCard 
             title="Alumni" 
             count={loading ? '-' : stats.alumni} 
@@ -146,7 +146,7 @@ function AdminDashboard({ user }) {
         </div>
 
         {/* Activity Log Section */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6" data-section="admin-dashboard/activity-log" aria-label="Log Aktivitas Terbaru">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-[#0A0A1A] flex items-center gap-2">
               <Activity className="w-5 h-5 text-[#C0161C]" />
@@ -162,7 +162,7 @@ function AdminDashboard({ user }) {
               <p className="text-slate-400 text-center py-4">Belum ada aktivitas tercatat.</p>
             ) : (
               activities.map((log) => (
-                <div key={log.id} className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-100">
+                <div key={log.id} className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 border border-slate-100" data-section="admin-dashboard/activity-item" aria-label={`Aktivitas ${log.action}`}>
                   <div className="p-2 bg-white rounded-full border border-slate-100 shadow-sm">
                     <Clock className="w-4 h-4 text-slate-400" />
                   </div>

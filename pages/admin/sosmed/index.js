@@ -62,7 +62,7 @@ function SosmedPage() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-sosmed/header" aria-label="Admin Sosmed Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Social Media</h1>
           <p className="text-slate-500">Manage links to your social media profiles</p>
@@ -76,12 +76,12 @@ function SosmedPage() {
         </button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl" data-section="admin-sosmed/card" aria-label="Sosmed Card">
         <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
           <Share2 size={20} className="text-primary-600" /> Social Media Links
         </h2>
         
-        <div className="space-y-6">
+        <div className="space-y-6" data-section="admin-sosmed/form-fields" aria-label="Form Sosmed">
           {/* Facebook */}
           <div className="space-y-2">
             <label className="text-slate-700 text-sm font-bold flex items-center gap-2">

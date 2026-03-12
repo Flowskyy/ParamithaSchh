@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, Loader2, Instagram, Youtube, Facebook } from 'lucide-react';
 import { toast } from 'react-hot-toast'; // Using direct toast as per common pattern, or utils if preferred. The prompt mentioned toastSuccess.
 import { getSekolahInfo } from '../services/api';
+import { fallbackSekolahInfo } from '../utils/fallbackData';
 import { showToast } from '../utils/toast';
 
 // TikTok Icon Component (Outlined to match Lucide)
@@ -39,7 +40,7 @@ const WhatsAppIcon = ({ size = 20, className = "" }) => (
 );
 
 export default function ContactPage({ sekolahInfo }) {
-  const [info, setInfo] = useState(sekolahInfo || {});
+  const [info, setInfo] = useState(sekolahInfo || fallbackSekolahInfo);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -64,10 +65,10 @@ export default function ContactPage({ sekolahInfo }) {
     const toastId = showToast.loading('Menyiapkan pesan WhatsApp...');
 
     try {
-      const waNumber = info?.wa_kontak || '085183092819';
-      // Format number: remove non-digits, replace leading 0 with 62
+      // Use wa_kontak from API data, fallback to fallbackSekolahInfo
+      const waNumber = info.wa_kontak || fallbackSekolahInfo.wa_kontak;
       const cleanNumber = waNumber.replace(/\D/g, '');
-      const finalNumber = cleanNumber.startsWith('0') ? '62' + cleanNumber.slice(1) : cleanNumber;
+      const finalNumber = cleanNumber;
 
       const message = `*PESAN BARU - HUBUNGI KAMI*%0A%0A` +
         `*Nama:* ${formData.name}%0A` +
@@ -104,13 +105,14 @@ export default function ContactPage({ sekolahInfo }) {
   ];
 
   return (
-    <Layout>
-      <Head>
-        <title>Hubungi Kami — SMK Paramitha 2</title>
-      </Head>
+    <Layout 
+      title="Hubungi Kami — SMK Paramitha 2 Jakarta"
+      description="Hubungi SMK Paramitha 2 Jakarta untuk informasi pendaftaran PPDB, kerjasama industri, atau pertanyaan umum."
+      keywords="Kontak SMK Paramitha 2, Lokasi SMK Paramitha 2, Alamat SMK Jakarta Timur"
+    >
+      <div className="bg-[#F8F9FF] min-h-screen" data-section="contact/root" aria-label="Contact Page Root">
 
-      {/* 1. Hero Section */}
-      <section className="relative py-24 bg-gradient-to-r from-[#C0161C] to-[#1E1E8F] overflow-hidden">
+      <section className="relative py-24 bg-gradient-to-r from-[#C0161C] to-[#1E1E8F] overflow-hidden" data-section="contact/hero" aria-label="Contact Hero">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div
@@ -133,17 +135,17 @@ export default function ContactPage({ sekolahInfo }) {
         </div>
       </section>
 
-      {/* 2. Section Info Kontak + Form */}
-      <section className="py-16 md:py-24 bg-[#F8F8FF]">
+      <section className="py-16 md:py-24 bg-[#F8F8FF]" data-section="contact/content" aria-label="Contact Content">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Left: Contact Info Card */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               className="bg-[#1E1E8F] text-white p-8 md:p-12 rounded-2xl shadow-xl h-full flex flex-col justify-between relative overflow-hidden"
+              data-section="contact/info-card"
+              aria-label="Contact Info Card"
             >
               {/* Decorative Circle */}
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
@@ -159,7 +161,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Alamat</h3>
                       <p className="text-white/80 leading-relaxed">
-                        {info.address || 'Jl. Komp. DDN Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Kec. Duren Sawit, Kota Jakarta Timur, 13450'}
+                        {info.address || fallbackSekolahInfo.address}
                       </p>
                     </div>
                   </div>
@@ -171,7 +173,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Telepon</h3>
                       <p className="text-white/80">
-                        {info.phone || '021-8650377 | 021-8651435'}
+                        {info.phone || fallbackSekolahInfo.phone}
                       </p>
                     </div>
                   </div>
@@ -183,7 +185,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Email</h3>
                       <p className="text-white/80">
-                        {info.email || 'smkparamitha2@gmail.com'}
+                        {info.email || fallbackSekolahInfo.email}
                       </p>
                     </div>
                   </div>
@@ -222,18 +224,19 @@ export default function ContactPage({ sekolahInfo }) {
               </div>
             </motion.div>
 
-            {/* Right: Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               className="bg-white p-8 md:p-12 rounded-2xl shadow-lg border border-slate-100"
+              data-section="contact/form-card"
+              aria-label="Contact Form Card"
             >
               <h2 className="text-3xl font-bold text-[#0A0A1A] mb-2">Kirim Pesan</h2>
               <p className="text-[#6B7280] mb-8">Silakan isi formulir di bawah ini.</p>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" data-section="contact/form" aria-label="Contact Form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-[#0A0A1A]">Nama Lengkap</label>
@@ -323,8 +326,7 @@ export default function ContactPage({ sekolahInfo }) {
         </div>
       </section>
 
-      {/* 3. Section Peta Lokasi */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" data-section="contact/maps" aria-label="Contact Maps">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -353,8 +355,7 @@ export default function ContactPage({ sekolahInfo }) {
         </div>
       </section>
 
-      {/* 4. Section CTA PPDB */}
-      <section className="py-20 bg-gradient-to-r from-[#C0161C] to-[#1E1E8F] text-white text-center">
+      <section className="py-20 bg-gradient-to-r from-[#C0161C] to-[#1E1E8F] text-white text-center" data-section="contact/cta" aria-label="Contact CTA PPDB">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -370,10 +371,12 @@ export default function ContactPage({ sekolahInfo }) {
             </p>
             
             <a
-              href="https://wa.me/6221865037"
+              href={`https://wa.me/${info.wa_ppdb || fallbackSekolahInfo.wa_ppdb}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 bg-[#25D366] text-white font-bold px-8 py-4 rounded-full hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-xl"
+              data-section="contact/cta-link"
+              aria-label="WhatsApp PPDB Link"
             >
               <WhatsAppIcon size={24} />
               Chat WhatsApp Sekarang
@@ -381,6 +384,7 @@ export default function ContactPage({ sekolahInfo }) {
           </motion.div>
         </div>
       </section>
+      </div>
     </Layout>
   );
 }

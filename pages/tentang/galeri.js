@@ -55,14 +55,14 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
   }, [selectedImage, filteredGaleri])
 
   return (
-    <Layout>
-      <Head>
-        <title>Galeri — SMK Paramitha 2</title>
-        <meta name="description" content="Dokumentasi kegiatan dan prestasi siswa SMK Paramitha 2 Jakarta." />
-      </Head>
-
+    <Layout 
+      sekolahInfo={sekolahInfo}
+      title="Galeri Kegiatan — SMK Paramitha 2 Jakarta"
+      description="Lihat dokumentasi foto kegiatan, prestasi, dan momen berharga siswa SMK Paramitha 2 Jakarta. Inspirasi pendidikan vokasi modern."
+      keywords="Galeri SMK Paramitha 2, Foto Kegiatan SMK, Dokumentasi Sekolah, Prestasi Siswa SMK"
+    >
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 bg-[#080810] text-white">
+      <section className="relative py-20 md:py-32 bg-[#080810] text-white" data-section="gallery/hero" aria-label="Galeri Hero">
         <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E8F]/90 to-[#080810]/50 z-0" />
         <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-20 mix-blend-overlay z-0" />
         
@@ -86,9 +86,9 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
       </section>
 
       {/* Filter Section */}
-      <section className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm">
+      <section className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm" data-section="gallery/filters" aria-label="Galeri Filter">
         <div className="container mx-auto px-6">
-          <div className="flex overflow-x-auto pb-2 md:pb-0 hide-scrollbar gap-2 justify-center md:justify-start">
+          <div className="flex overflow-x-auto pb-2 md:pb-0 hide-scrollbar gap-2 justify-center md:justify-start" data-section="gallery/categories">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -106,8 +106,8 @@ export default function GaleriPage({ galeri, sekolahInfo }) {
         </div>
       </section>
 
-      {/* Gallery Grid (Instagram Style) */}
-      <section className="py-12 bg-[#F8F8FF] min-h-screen">
+      {/* Grid Gallery Section */}
+      <section className="py-12 bg-[#F8F8FF] min-h-screen" data-section="gallery/grid" aria-label="Galeri Grid">
         <div className="container mx-auto px-6">
           <motion.div 
             layout

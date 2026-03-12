@@ -21,14 +21,27 @@ export default function Navbar() {
     
     // Fetch Jurusan dynamically
     async function loadJurusan() {
-      const data = await getJurusan();
-      if (data) {
-        setJurusanItems(data.map(j => ({ 
-          name: j.name, 
-          href: `/jurusan/${j.slug}`, 
-          desc: j.short_desc ? j.short_desc.substring(0, 30) + '...' : (j.deskripsi ? j.deskripsi.substring(0, 30) + '...' : 'Program Keahlian'),
-          isHighlight: false 
-        })));
+      try {
+        const data = await getJurusan();
+        if (data && Array.isArray(data)) {
+          const items = data.map(j => {
+            if (!j) return null;
+            return { 
+              name: j.name || 'Jurusan', 
+              href: `/jurusan/${j.slug || '#'}`, 
+              desc: j.short_desc 
+                ? (j.short_desc.length > 30 ? j.short_desc.substring(0, 30) + '...' : j.short_desc) 
+                : (j.description ? (j.description.length > 30 ? j.description.substring(0, 30) + '...' : j.description) : (j.deskripsi ? (j.deskripsi.length > 30 ? j.deskripsi.substring(0, 30) + '...' : j.deskripsi) : 'Program Keahlian')),
+              isHighlight: false 
+            };
+          }).filter(Boolean);
+          setJurusanItems(items);
+        } else {
+          setJurusanItems([]);
+        }
+      } catch (err) {
+        console.error('Navbar loadJurusan error:', err);
+        setJurusanItems([]);
       }
     }
     loadJurusan();
@@ -112,6 +125,7 @@ export default function Navbar() {
                 >
                   <Link 
                     href={link.href}
+                    prefetch={true}
                     className={`flex items-center gap-1 font-medium text-sm transition-colors py-2 ${
                       scrolled 
                         ? 'text-slate-700 hover:text-[#C0161C]' 
@@ -130,6 +144,7 @@ export default function Navbar() {
                           <Link 
                             key={subIdx} 
                             href={item.href}
+                            prefetch={true}
                             className="block px-4 py-3 hover:bg-slate-50 rounded-lg transition-colors group/item"
                           >
                             <div className={`font-medium text-sm group-hover/item:text-[#C0161C] ${item.isHighlight ? 'text-[#C0161C] font-bold' : 'text-slate-700'}`}>

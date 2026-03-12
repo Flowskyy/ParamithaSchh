@@ -82,7 +82,7 @@ function HeroAdmin() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-beranda-hero/header" aria-label="Beranda Hero Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">General Settings</h1>
           <p className="text-slate-500">Manage hero section and school information</p>
@@ -96,14 +96,13 @@ function HeroAdmin() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Hero Section */}
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" data-section="admin-beranda-hero/grid" aria-label="Beranda Hero Grid">
+        <div className="lg:col-span-2 space-y-8" data-section="admin-beranda-hero/left-column" aria-label="Kolom Kiri">
+          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" data-section="admin-beranda-hero/hero-section" aria-label="Hero Section">
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
               <Upload size={20} className="text-primary-600" /> Hero Section
             </h2>
-            <div className="space-y-6">
+            <div className="space-y-6" data-section="admin-beranda-hero/hero-fields" aria-label="Hero Fields">
               <div className="space-y-2">
                 <label className="text-slate-700 text-sm font-bold">Main Title</label>
                 <input 
@@ -139,13 +138,12 @@ function HeroAdmin() {
             </div>
           </section>
 
-          {/* School Info Section */}
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" data-section="admin-beranda-hero/school-info" aria-label="School Information">
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
               <Info size={20} className="text-primary-600" /> School Information
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-section="admin-beranda-hero/school-fields" aria-label="School Fields">
               <div className="space-y-2">
                 <label className="text-slate-700 text-sm font-bold">School Name</label>
                 <input 
@@ -223,13 +221,12 @@ function HeroAdmin() {
             </div>
           </section>
 
-          {/* Principal Info Section */}
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" data-section="admin-beranda-hero/principal-info" aria-label="Principal Information">
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 pb-4 border-b border-slate-100">
               <User size={20} className="text-primary-600" /> Principal Information
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-section="admin-beranda-hero/principal-fields" aria-label="Principal Fields">
               <div className="space-y-2">
                 <label className="text-slate-700 text-sm font-bold">Principal Name</label>
                 <input 
@@ -276,8 +273,8 @@ function HeroAdmin() {
           </section>
         </div>
 
-        <div className="space-y-8">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm sticky top-6">
+        <div className="space-y-8" data-section="admin-beranda-hero/right-column" aria-label="Kolom Kanan">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm sticky top-6" data-section="admin-beranda-hero/preview-card" aria-label="Preview Card">
             <h3 className="text-slate-900 font-bold mb-4">Hero Preview</h3>
             <div className="relative h-48 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-4 group">
               {data.image_url ? (

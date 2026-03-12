@@ -31,8 +31,9 @@ export default function SambutanSection({ info }) {
               <SmartImage 
                 src={info.kepsek_photo || "/images/Kepsek.JPG"} 
                 alt={info.kepsek_name}
-                width={600}
-                height={800}
+                width={400}
+                height={500}
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="w-full h-auto"
                 style={{ objectFit: 'cover' }}
               />

@@ -70,7 +70,7 @@ function AlumniAdmin() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8" data-section="admin-beranda-alumni/header" aria-label="Beranda Alumni Header">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Manage Alumni</h1>
           <p className="text-slate-500 text-sm">Kelola data alumni berprestasi</p>
@@ -84,13 +84,13 @@ function AlumniAdmin() {
       </div>
 
       {editing ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm" data-section="admin-beranda-alumni/form-card" aria-label="Form Alumni">
           <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
             <h3 className="text-xl font-bold text-slate-900">{editing === 'new' ? 'New Alumni' : 'Edit Alumni'}</h3>
             <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 bg-slate-100 p-1 rounded-full"><X size={20} /></button>
           </div>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSave} className="space-y-4" data-section="admin-beranda-alumni/form" aria-label="Form Alumni Fields">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-section="admin-beranda-alumni/form-grid" aria-label="Form Grid">
               <div className="space-y-4">
                  <div className="space-y-2">
                   <label className="text-slate-600 text-sm font-medium">Nama Lengkap</label>
@@ -183,9 +183,9 @@ function AlumniAdmin() {
           </form>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm" data-section="admin-beranda-alumni/table-card" aria-label="Tabel Alumni">
+          <div className="overflow-x-auto" data-section="admin-beranda-alumni/table-wrapper" aria-label="Pembungkus Tabel">
+            <table className="w-full text-left border-collapse" data-section="admin-beranda-alumni/table" aria-label="Tabel Data Alumni">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                   <th className="p-4 font-bold">Foto</th>
@@ -195,9 +195,9 @@ function AlumniAdmin() {
                   <th className="p-4 font-bold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100" data-section="admin-beranda-alumni/table-body" aria-label="Body Tabel Alumni">
                 {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                  <tr key={item.id} className="hover:bg-slate-50 transition-colors group" data-section="admin-beranda-alumni/table-row" aria-label={`Alumni ${item.nama}`}>
                     <td className="p-4 w-20">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 border border-slate-200">
                         <SmartImage src={item.foto_url} fill className="object-cover" />

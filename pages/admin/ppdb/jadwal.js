@@ -116,8 +116,8 @@ export default function AdminJadwalPPDB() {
         <title>Kelola Jadwal PPDB - Admin SMK Paramitha</title>
       </Head>
 
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="space-y-6" data-section="admin-ppdb-jadwal/root" aria-label="PPDB Jadwal Root">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-section="admin-ppdb-jadwal/header" aria-label="Header Jadwal">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Jadwal Gelombang PPDB</h1>
             <p className="text-slate-500">Kelola jadwal pendaftaran siswa baru</p>
@@ -131,9 +131,9 @@ export default function AdminJadwalPPDB() {
           </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" data-section="admin-ppdb-jadwal/table-card" aria-label="Tabel Jadwal">
+          <div className="overflow-x-auto" data-section="admin-ppdb-jadwal/table-wrapper">
+            <table className="w-full text-left text-sm" data-section="admin-ppdb-jadwal/table">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-4 font-semibold text-slate-700">Gelombang</th>
@@ -143,7 +143,7 @@ export default function AdminJadwalPPDB() {
                   <th className="px-6 py-4 font-semibold text-slate-700 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100" data-section="admin-ppdb-jadwal/table-body">
                 {loading ? (
                   <tr>
                     <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
@@ -209,8 +209,8 @@ export default function AdminJadwalPPDB() {
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" data-section="admin-ppdb-jadwal/modal-overlay" aria-label="Overlay Form Jadwal">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden" data-section="admin-ppdb-jadwal/modal-card" aria-label="Form Jadwal">
             <div className="flex items-center justify-between p-6 border-b border-slate-100">
               <h3 className="font-bold text-lg text-slate-900">
                 {editingItem ? 'Edit Jadwal' : 'Tambah Jadwal Baru'}
@@ -223,7 +223,7 @@ export default function AdminJadwalPPDB() {
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4" data-section="admin-ppdb-jadwal/form" aria-label="Form Jadwal Fields">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Nama Gelombang</label>
                 <input

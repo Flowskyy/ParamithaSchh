@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, ChevronRight } from 'lucide-react';
 import { getSekolahInfo, getJurusan } from '../services/api';
+import { fallbackSekolahInfo } from '../utils/fallbackData';
 
 // TikTok Icon Component (Inline SVG)
 const TikTokIcon = ({ size = 18, className = "" }) => (
@@ -22,25 +23,20 @@ const TikTokIcon = ({ size = 18, className = "" }) => (
 );
 
 export default function Footer() {
-  const [info, setInfo] = useState({
-    name: 'SMK Paramitha 2 Jakarta',
-    phone: '021-8650377 | 021-8651435',
-    email: 'smkparamitha2@gmail.com',
-    address: 'Jl. Komp. DDN Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Kec. Duren Sawit, Kota Jakarta Timur, 13450',
-    facebook: 'https://facebook.com/smkparamitha2',
-    instagram: 'https://instagram.com/smkparamitha2',
-    youtube: 'https://youtube.com/@smkparamitha2',
-    tiktok: 'https://tiktok.com/@smkparamitha2'
-  });
+  const [info, setInfo] = useState(fallbackSekolahInfo);
   const [jurusanList, setJurusanList] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getSekolahInfo();
-      if (data) setInfo(prev => ({ ...prev, ...data }));
+      try {
+        const data = await getSekolahInfo();
+        if (data) setInfo(prev => ({ ...prev, ...data }));
 
-      const jur = await getJurusan();
-      if (jur) setJurusanList(jur);
+        const jur = await getJurusan();
+        if (jur && Array.isArray(jur)) setJurusanList(jur);
+      } catch (err) {
+        console.error('Footer fetchData error:', err);
+      }
     }
     fetchData();
 

@@ -7,8 +7,8 @@ import WaveSeparator from '../WaveSeparator';
 export default function HeroSection({ info }) {
   // Animation variants
   const fadeInUp = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
   const staggerContainer = {
@@ -16,7 +16,7 @@ export default function HeroSection({ info }) {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.1
       }
     }
   };

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import { getSekolahInfo } from '../services/api';
+import { fallbackSekolahInfo } from '../utils/fallbackData';
 
 // TikTok Icon Component
 const TikTokIcon = ({ size = 18, className = "" }) => (
@@ -24,7 +25,7 @@ const TikTokIcon = ({ size = 18, className = "" }) => (
 
 export default function SidebarModal({ isOpen, onClose, links }) {
   const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [info, setInfo] = useState(null);
+  const [info, setInfo] = useState(fallbackSekolahInfo);
 
   useEffect(() => {
     async function loadInfo() {
@@ -121,7 +122,12 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                               {link.name}
                             </span>
                           ) : (
-                            <Link href={link.href} className="flex-1 font-bold text-sm md:text-base text-slate-800 hover:text-[#C0161C] transition-colors" onClick={onClose}>
+                            <Link 
+                              href={link.href} 
+                              prefetch={true}
+                              className="flex-1 font-bold text-sm md:text-base text-slate-800 hover:text-[#C0161C] transition-colors" 
+                              onClick={onClose}
+                            >
                               {link.name}
                             </Link>
                           )}
@@ -148,6 +154,7 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                                   <Link 
                                     key={subIdx} 
                                     href={item.href}
+                                    prefetch={true}
                                     onClick={onClose}
                                     className={`block px-3 py-1.5 rounded-md text-xs hover:bg-slate-50 transition-colors ${item.isHighlight ? 'text-[#C0161C] font-semibold' : 'text-slate-600 hover:text-[#C0161C]'}`}
                                   >
@@ -182,6 +189,7 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                   
                   <Link 
                     href="/ppdb"
+                    prefetch={true}
                     onClick={onClose}
                     className="inline-flex items-center justify-center px-6 py-2.5 bg-[#C0161C] hover:bg-[#a01217] text-white font-bold rounded-xl transition-all shadow-lg shadow-red-900/30 group text-sm border border-white/10 w-full sm:w-auto"
                   >
@@ -196,16 +204,16 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                     <div className="flex items-start gap-3">
                       <MapPin className="shrink-0 mt-0.5 text-[#F5C400]" size={16} />
                       <p className="text-xs text-white/90 leading-snug">
-                        Jl. Raya Kalimalang No. 68 I2, Pondok Kelapa, Jakarta Timur
+                        {info.address || fallbackSekolahInfo.address}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Phone className="shrink-0 text-[#F5C400]" size={16} />
-                      <p className="text-xs text-white/90">021-8650377</p>
+                      <p className="text-xs text-white/90">{info.phone || fallbackSekolahInfo.phone}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Mail className="shrink-0 text-[#F5C400]" size={16} />
-                      <p className="text-xs text-white/90">info@smkparamitha2.sch.id</p>
+                      <p className="text-xs text-white/90">{info.email || fallbackSekolahInfo.email}</p>
                     </div>
                   </div>
 

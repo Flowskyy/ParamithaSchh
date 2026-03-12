@@ -15,6 +15,7 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  Phone,
 } from 'lucide-react';
 import { showToast } from '../utils/toast';
 import Image from 'next/image';
@@ -79,6 +80,12 @@ export default function AdminLayout({ children }) {
         { href: '/admin/tentang/fasilitas', label: 'Fasilitas' },
         { href: '/admin/tentang/galeri', label: 'Galeri Foto' },
       ]
+    },
+    {
+      type: 'single',
+      href: '/admin/hubungi-kami', 
+      icon: Phone, 
+      label: 'Hubungi Kami' 
     },
     {
       type: 'dropdown',
@@ -182,10 +189,10 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FF] font-sans text-slate-900">
+    <div className="flex min-h-screen bg-[#F8F9FF] font-sans text-slate-900" data-section="admin-layout/root" aria-label="Admin Layout Root">
       
-      {/* MOBILE HEADER (Visible only on mobile) */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#1E1E8F] text-white px-4 py-3 flex items-center justify-between shadow-md">
+      {/* SECTION: Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#1E1E8F] text-white px-4 py-3 flex items-center justify-between shadow-md" data-section="admin-layout/mobile-header" aria-label="Mobile Header">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white">
             <Image src="/images/logo.jpg" alt="Logo" width={32} height={32} className="object-cover" />
@@ -197,20 +204,22 @@ export default function AdminLayout({ children }) {
         </button>
       </div>
 
-      {/* OVERLAY (Mobile only) */}
+      {/* SECTION: Overlay (Mobile only) */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
+          data-section="admin-layout/overlay"
+          aria-label="Overlay"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* SIDEBAR — selalu visible di desktop (lg:translate-x-0) */}
+      {/* SECTION: Sidebar */}
       <aside className={`
         fixed top-0 left-0 bottom-0 w-64 bg-[#1E1E8F] text-white z-50 
         transform transition-transform duration-300 ease-in-out shadow-xl
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+      `} data-section="admin-layout/sidebar" aria-label="Sidebar Navigation">
         {/* Sidebar Header */}
         <div className="h-16 flex items-center px-6 border-b border-white/10 bg-[#151570]">
           <div className="flex items-center gap-3">
@@ -230,8 +239,8 @@ export default function AdminLayout({ children }) {
           </button>
         </div>
 
-        {/* Sidebar Menu */}
-        <div className="p-4 overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar">
+        {/* SECTION: Sidebar Menu */}
+        <div className="p-4 overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar" data-section="admin-layout/menu" aria-label="Sidebar Menu">
           <div className="space-y-1">
             {menuStructure.map((item) => {
               if (item.type === 'single') {
@@ -337,7 +346,12 @@ export default function AdminLayout({ children }) {
         </header>
 
         {/* Content Wrapper */}
-        <main className="p-4 lg:p-8 pt-20 lg:pt-8 flex-1">
+        <main 
+          className="p-4 lg:p-8 pt-20 lg:pt-8 flex-1" 
+          data-section="admin-layout/content" 
+          aria-label="Admin Layout Content"
+          data-page={router.pathname.replace(/\//g, '-').replace(/\[|\]/g, '').replace(/^-+/, '')}
+        >
           {children}
         </main>
       </div>

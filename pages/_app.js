@@ -10,29 +10,6 @@ import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const handleStart = (url, { shallow }) => {
-      if (!shallow) {
-        setLoading(true);
-      }
-    };
-    const handleStop = () => {
-      // Add a small delay to prevent flickering on fast loads
-      setTimeout(() => setLoading(false), 500);
-    };
-
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleStop);
-    router.events.on('routeChangeError', handleStop);
-
-    return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeComplete', handleStop);
-      router.events.off('routeChangeError', handleStop);
-    };
-  }, [router]);
 
   return (
     <>
@@ -42,9 +19,7 @@ function MyApp({ Component, pageProps }) {
         <meta name="description" content="SMK Paramitha 2 Jakarta - Vocational School" />
       </Head>
       
-      {loading && <PageLoader />}
-      
-      <RealtimeReloader />
+      {/* <RealtimeReloader /> */}
       <Component {...pageProps} />
       <Toaster position="top-right" />
     </>
