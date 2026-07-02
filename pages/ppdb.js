@@ -112,7 +112,7 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
     }
   };
 
-  // Fallback data if Supabase returns empty
+  // Fallback data if the API returns empty
   const jadwal = jadwalInfo?.length > 0 ? jadwalInfo : [
     { title: "Gelombang 1", date: "Januari - Maret 2026", status: "Sedang Berlangsung" },
     { title: "Gelombang 2", date: "April - Juni 2026", status: "Akan Datang" },

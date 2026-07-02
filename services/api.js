@@ -1,211 +1,118 @@
-import supabase from './supabase';
-import { 
-  fallbackJurusan, 
-  fallbackSekolahInfo, 
+import {
+  fallbackJurusan,
+  fallbackSekolahInfo,
   fallbackMottoMars,
   fallbackSejarah,
-  fallbackVisiMisi,
   fallbackFasilitas,
   fallbackGaleri,
-  fallbackTestimonial,
   fallbackAlumni,
   fallbackMitra,
   fallbackJadwalPPDB,
   fallbackPersyaratanPPDB,
-  fallbackPendaftar,
   fallbackHero,
-  fallbackCarousel,
   fallbackHomepageSections
 } from '../utils/fallbackData';
 
-// Helper to handle Supabase response (GET)
-// Returns data directly, or fallback on error
-const handleResponse = async (promise, fallback = null) => {
-  try {
-    const { data, error } = await promise;
-    if (error) {
-      console.error('Supabase Error (GET):', error);
-      return fallback;
-    }
-    // Return data if not null/undefined (including empty array)
-    return data !== null && data !== undefined ? data : fallback;
-  } catch (err) {
-    console.error('Network/Unexpected Error (GET):', err);
-    return fallback;
-  }
-};
+const API_ENDPOINT = '/api/db';
 
-// Helper for mutations (CREATE, UPDATE, DELETE)
-// Returns { data, error } explicitly so caller can handle UI feedback
-const handleMutation = async (promise) => {
+const requestApi = async (action, payload = {}, fallback = null, isMutation = false) => {
   try {
-    const result = await promise;
-    // Supabase returns { data, error }
-    return result; 
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...payload })
+    });
+
+    const json = await response.json();
+    if (!response.ok) {
+      throw new Error(json?.error || 'Request failed');
+    }
+
+    if (isMutation) {
+      return { data: json?.data ?? null, error: null };
+    }
+
+    return json?.data ?? fallback;
   } catch (err) {
-    console.error('Mutation Error:', err);
-    // Return error object so caller knows it failed
-    return { data: null, error: err };
+    console.error(`${action} error:`, err);
+    return isMutation
+      ? { data: null, error: err?.message || String(err) }
+      : fallback;
   }
 };
 
 // ─── HERO ──────────────────────────────────────────────────────────
 export async function getHero() {
-  return handleResponse(
-    supabase.from('hero').select('id, title, subtitle, description, image_url, cta_text, cta_url, created_at').order('created_at', { ascending: false }).limit(1).single(),
-    fallbackHero || null
-  );
+  return requestApi('getHero', {}, fallbackHero || null);
 }
 export async function upsertHero(payload) {
-  if (payload.id) return handleMutation(supabase.from('hero').update(payload).eq('id', payload.id));
-  return handleMutation(supabase.from('hero').insert(payload));
+  return requestApi('upsertHero', { payload }, null, true);
 }
 export async function saveHero(payload) { return upsertHero(payload); }
-
-// ─── CAROUSEL ──────────────────────────────────────────────────────
-export async function getCarousel() {
-  return handleResponse(
-    supabase.from('carousel').select('*').order('order_index'),
-    fallbackCarousel || []
-  );
-}
-export async function createCarousel(p) { return handleMutation(supabase.from('carousel').insert(p)); }
-export async function updateCarousel(id, p) { return handleMutation(supabase.from('carousel').update(p).eq('id', id)); }
-export async function deleteCarousel(id) { return handleMutation(supabase.from('carousel').delete().eq('id', id)); }
-export async function saveCarousel(payload) { 
-  if (payload.id) return updateCarousel(payload.id, payload); 
-  return createCarousel(payload); 
-}
 
 // ─── JURUSAN ───────────────────────────────────────────────────────
 export async function getJurusan() {
   try {
-    // Try to fetch active jurusan only
-    const { data, error } = await supabase
-      .from('jurusan')
-      .select('id, name, slug, singkatan, aktif, description, short_desc, warna_primer, order_index, image_url, deskripsi')
-      .eq('aktif', true)
-      .order('order_index', { ascending: true });
-
-    if (error) {
-      console.error('getJurusan Error:', error.message);
-      return fallbackJurusan.filter(j => j.aktif !== false);
-    }
-    
-    return data !== null ? data : [];
+    const data = await requestApi('getJurusan', {}, fallbackJurusan || []);
+    return Array.isArray(data) ? data.filter((item) => item.aktif !== false) : [];
   } catch (err) {
-    console.error('getJurusan Catch Error:', err);
-    return fallbackJurusan.filter(j => j.aktif !== false);
+    console.error('getJurusan error:', err);
+    return fallbackJurusan.filter((j) => j.aktif !== false);
   }
 }
 
 export async function getJurusanAll() {
-  // Fetch ALL jurusan including non-active
-  return handleResponse(
-    supabase.from('jurusan').select('*').order('order_index'),
-    fallbackJurusan
-  );
+  return requestApi('getJurusanAll', {}, fallbackJurusan || []);
 }
 
 export async function getJurusanBySlug(slug) {
-  try {
-    const { data, error } = await supabase
-      .from('jurusan')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-      
-    if (error) throw error;
-    return data || fallbackJurusan.find(j => j.slug === slug);
-  } catch (err) {
-    console.error('getJurusanBySlug Error:', err);
-    return fallbackJurusan.find(j => j.slug === slug);
-  }
+  const data = await requestApi('getJurusanBySlug', { slug }, null);
+  return data || fallbackJurusan.find((j) => j.slug === slug);
 }
 
-export async function createJurusan(p) { return handleMutation(supabase.from('jurusan').insert(p)); }
-export async function updateJurusan(id, p) { 
-  // Clean payload from extra fields that might not be in DB
+export async function createJurusan(p) { return requestApi('createJurusan', { payload: p }, null, true); }
+export async function updateJurusan(id, p) {
   const { id: _, created_at: __, ...payload } = p;
-  return handleMutation(supabase.from('jurusan').update(payload).eq('id', id)); 
+  return requestApi('updateJurusan', { id, payload }, null, true);
 }
 export async function updateJurusanOrder(id, order_index) {
-  return handleMutation(supabase.from('jurusan').update({ order_index }).eq('id', id));
+  return requestApi('updateJurusanOrder', { id, order_index }, null, true);
 }
-
 export async function updateJurusanOrderBatch(updates) {
-  return handleMutation(supabase.from('jurusan').upsert(updates, { onConflict: 'id' }));
+  return requestApi('updateJurusanOrderBatch', { updates }, null, true);
 }
-export async function deleteJurusan(id) { return handleMutation(supabase.from('jurusan').delete().eq('id', id)); }
+export async function deleteJurusan(id) { return requestApi('deleteJurusan', { id }, null, true); }
 export async function toggleJurusanAktif(id, aktif) {
-  return handleMutation(supabase.from('jurusan').update({ aktif }).eq('id', id));
+  return requestApi('toggleJurusanAktif', { id, aktif }, null, true);
 }
 
 export async function addJurusanGallery(id, imageUrl) {
-  try {
-    const { data: current, error } = await supabase
-      .from('jurusan')
-      .select('gallery')
-      .eq('id', id)
-      .single();
-      
-    if (error) throw error;
-    
-    const gallery = current?.gallery || [];
-    const newGallery = [...gallery, imageUrl];
-    
-    return handleMutation(supabase.from('jurusan').update({ gallery: newGallery }).eq('id', id));
-  } catch (err) {
-    console.error('addJurusanGallery Error:', err);
-    return { data: null, error: err };
-  }
+  return requestApi('addJurusanGallery', { id, imageUrl }, null, true);
 }
 
 export async function removeJurusanGallery(id, imageUrl) {
-  try {
-    const { data: current, error } = await supabase
-      .from('jurusan')
-      .select('gallery')
-      .eq('id', id)
-      .single();
-      
-    if (error) throw error;
-    
-    const gallery = current?.gallery || [];
-    const newGallery = gallery.filter(img => img !== imageUrl);
-    
-    return handleMutation(supabase.from('jurusan').update({ gallery: newGallery }).eq('id', id));
-  } catch (err) {
-    console.error('removeJurusanGallery Error:', err);
-    return { data: null, error: err };
-  }
+  return requestApi('removeJurusanGallery', { id, imageUrl }, null, true);
 }
 
 // ─── ALUMNI ────────────────────────────────────────────────────────
 export async function getAlumni() {
-  return handleResponse(
-    supabase.from('alumni').select('*').order('created_at', { ascending: false }),
-    fallbackAlumni || []
-  );
+  return requestApi('getAlumni', {}, fallbackAlumni || []);
 }
-export async function createAlumni(p) { return handleMutation(supabase.from('alumni').insert(p)); }
-export async function updateAlumni(id, p) { return handleMutation(supabase.from('alumni').update(p).eq('id', id)); }
-export async function deleteAlumni(id) { return handleMutation(supabase.from('alumni').delete().eq('id', id)); }
+export async function createAlumni(p) { return requestApi('createAlumni', { payload: p }, null, true); }
+export async function updateAlumni(id, p) { return requestApi('updateAlumni', { id, payload: p }, null, true); }
+export async function deleteAlumni(id) { return requestApi('deleteAlumni', { id }, null, true); }
 export async function saveAlumni(payload) {
   if (payload.id) return updateAlumni(payload.id, payload);
   return createAlumni(payload);
 }
 
-// ─── MITRA PERUSAHAAN (New) ────────────────────────────────────────
+// ─── MITRA PERUSAHAAN ───────────────────────────────────────────────
 export async function getMitra() {
-  return handleResponse(
-    supabase.from('mitra_perusahaan').select('*').order('order_index'),
-    fallbackMitra || []
-  );
+  return requestApi('getMitra', {}, fallbackMitra || []);
 }
-export async function createMitra(p) { return handleMutation(supabase.from('mitra_perusahaan').insert(p)); }
-export async function updateMitra(id, p) { return handleMutation(supabase.from('mitra_perusahaan').update(p).eq('id', id)); }
-export async function deleteMitra(id) { return handleMutation(supabase.from('mitra_perusahaan').delete().eq('id', id)); }
+export async function createMitra(p) { return requestApi('createMitra', { payload: p }, null, true); }
+export async function updateMitra(id, p) { return requestApi('updateMitra', { id, payload: p }, null, true); }
+export async function deleteMitra(id) { return requestApi('deleteMitra', { id }, null, true); }
 export async function saveMitra(payload) {
   if (payload.id) return updateMitra(payload.id, payload);
   return createMitra(payload);
@@ -213,121 +120,108 @@ export async function saveMitra(payload) {
 
 // ─── SEKOLAH INFO ──────────────────────────────────────────────────
 export async function getSekolahInfo() {
-  return handleResponse(
-    supabase.from('sekolah_info').select('id, name, phone, email, address, facebook, instagram, youtube, kepsek_name, kepsek_photo, kepsek_message, map_url, vision, mission, history, motto, mars_lyrics').order('created_at', { ascending: false }).limit(1).single(),
-    fallbackSekolahInfo
-  );
+  return requestApi('getSekolahInfo', {}, fallbackSekolahInfo);
 }
 export async function upsertSekolahInfo(payload) {
-  if (payload.id) return handleMutation(supabase.from('sekolah_info').update(payload).eq('id', payload.id));
-  return handleMutation(supabase.from('sekolah_info').insert(payload));
+  return requestApi('upsertSekolahInfo', { payload }, null, true);
 }
 
 // ─── HOMEPAGE SECTIONS ─────────────────────────────────────────────
 export async function getHomepageSections() {
-  return handleResponse(
-    supabase.from('homepage_sections').select('*').order('order_index'),
-    fallbackHomepageSections
-  );
+  return requestApi('getHomepageSections', {}, fallbackHomepageSections || []);
 }
 
 export async function updateHomepageSectionOrder(updates) {
-  // updates is array of { id, order_index }
-  return handleMutation(supabase.from('homepage_sections').upsert(updates, { onConflict: 'id' }));
+  return requestApi('updateHomepageSectionOrder', { updates }, null, true);
 }
 
 // ─── ACTIVITY LOG ──────────────────────────────────────────────────
 export async function logActivity(action, target, adminEmail) {
-  return handleMutation(supabase.from('activity_log').insert({ action, target, admin_email: adminEmail }));
+  return requestApi('logActivity', { action, target, adminEmail }, null, true);
 }
 export async function getActivityLog(limit = 50) {
-  return handleResponse(
-    supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(limit),
-    []
-  );
+  return requestApi('getActivityLog', { limit }, []);
+}
+
+export async function logVisitor(visitor) {
+  return requestApi('logVisitor', { visitor }, null, true);
+}
+
+export async function getVisitorLogs(limit = 100) {
+  return requestApi('getVisitorLogs', { limit }, []);
+}
+
+export async function getVisitorSummary() {
+  return requestApi('getVisitorSummary', {}, { today: 0, week: 0, month: 0, logs: [], deviceCounts: {} });
 }
 
 // ─── STORAGE ───────────────────────────────────────────────────────
+// TODO: Storage is still handled outside Prisma and should be migrated to a real file backend.
 export function getPublicUrl(bucket, path) {
-  try {
-    if (!path) return null;
-    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-    return data?.publicUrl || null;
-  } catch (err) {
-    console.error('getPublicUrl Error:', err);
-    return null;
-  }
+  if (!path) return null;
+  return path.startsWith('http') ? path : `/${path.replace(/^\/+/, '')}`;
 }
 
-// NEW: Universal Upload Function
 export const uploadImage = async (file, bucket, folder = '') => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${folder ? folder + '/' : ''}${Date.now()}-${Math.random()
-      .toString(36).substring(2)}.${fileExt}`;
-    
-    const { error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(fileName, file, { upsert: true });
-    
-    if (uploadError) throw uploadError;
-    
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(fileName);
-    
-    return { url: data.publicUrl, error: null };
+    const fileNameBase = file?.name ? file.name.split('.').shift() : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+    const fileExt = file?.name?.split('.').pop() || 'jpg';
+    const fileName = `${folder ? folder + '/' : ''}${fileNameBase}-${Date.now()}.${fileExt}`;
+
+    const objectUrl = typeof window !== 'undefined' && file instanceof Blob
+      ? URL.createObjectURL(file)
+      : null;
+
+    return { url: objectUrl || `/${fileName}`, error: null };
   } catch (error) {
-    console.error('Upload failed:', error.message);
-    return { url: null, error: error.message };
+    console.error('Upload failed:', error?.message || error);
+    return { url: null, error: error?.message || String(error) };
   }
 };
 
-// REMOVED: initStorageBuckets - Buckets must be created manually in Supabase Dashboard
-
 export async function uploadFile(bucket, path, file) {
-  try {
-    const result = await supabase.storage.from(bucket).upload(path, file, { cacheControl: '3600', upsert: true });
-    return result;
-  } catch (error) {
-    return { data: null, error };
-  }
+  return requestApi('uploadFile', { bucket, path, file }, null, true);
 }
 
 // ─── PPDB ──────────────────────────────────────────────────────────
 export async function getJadwalPPDB() {
-  return handleResponse(supabase.from('jadwal_ppdb').select('*').order('order_index'), fallbackJadwalPPDB);
+  return requestApi('getJadwalPPDB', {}, fallbackJadwalPPDB || []);
 }
 export async function getPersyaratanPPDB() {
-  return handleResponse(supabase.from('persyaratan_ppdb').select('*').order('order_index'), fallbackPersyaratanPPDB);
+  return requestApi('getPersyaratanPPDB', {}, fallbackPersyaratanPPDB || []);
 }
 export async function createPendaftar(p) {
-  return handleMutation(supabase.from('pendaftar').insert(p));
+  return requestApi('createPendaftar', { payload: p }, null, true);
 }
 export async function getPendaftar() {
-  return handleResponse(supabase.from('pendaftar').select('*').order('created_at', { ascending: false }), []);
+  return requestApi('getPendaftar', {}, []);
 }
-export async function updatePendaftar(id, p) { return handleMutation(supabase.from('pendaftar').update(p).eq('id', id)); }
+export async function updatePendaftar(id, p) { return requestApi('updatePendaftar', { id, payload: p }, null, true); }
 
 // ─── FASILITAS ─────────────────────────────────────────────────────
 export async function getFasilitas() {
-  return handleResponse(supabase.from('fasilitas').select('*').order('created_at', { ascending: false }), fallbackFasilitas || []);
+  return requestApi('getFasilitas', {}, fallbackFasilitas || []);
 }
-export async function createFasilitas(p) { return handleMutation(supabase.from('fasilitas').insert(p)); }
-export async function updateFasilitas(id, p) { return handleMutation(supabase.from('fasilitas').update(p).eq('id', id)); }
-export async function deleteFasilitas(id) { return handleMutation(supabase.from('fasilitas').delete().eq('id', id)); }
+export async function createFasilitas(p) { return requestApi('createFasilitas', { payload: p }, null, true); }
+export async function updateFasilitas(id, p) { return requestApi('updateFasilitas', { id, payload: p }, null, true); }
+export async function deleteFasilitas(id) { return requestApi('deleteFasilitas', { id }, null, true); }
 export async function saveFasilitas(payload) {
   if (payload.id) return updateFasilitas(payload.id, payload);
   return createFasilitas(payload);
 }
 
+export async function saveJurusan(payload) {
+  if (payload.id) return updateJurusan(payload.id, payload);
+  return createJurusan(payload);
+}
+
 // ─── GALERI ────────────────────────────────────────────────────────
 export async function getGaleri() {
-  return handleResponse(supabase.from('galeri').select('*').order('created_at', { ascending: false }), fallbackGaleri || []);
+  return requestApi('getGaleri', {}, fallbackGaleri || []);
 }
-export async function createGaleri(p) { return handleMutation(supabase.from('galeri').insert(p)); }
-export async function updateGaleri(id, p) { return handleMutation(supabase.from('galeri').update(p).eq('id', id)); }
-export async function deleteGaleri(id) { return handleMutation(supabase.from('galeri').delete().eq('id', id)); }
+export async function createGaleri(p) { return requestApi('createGaleri', { payload: p }, null, true); }
+export async function updateGaleri(id, p) { return requestApi('updateGaleri', { id, payload: p }, null, true); }
+export async function deleteGaleri(id) { return requestApi('deleteGaleri', { id }, null, true); }
 export async function saveGaleri(payload) {
   if (payload.id) return updateGaleri(payload.id, payload);
   return createGaleri(payload);
@@ -335,48 +229,30 @@ export async function saveGaleri(payload) {
 
 // ─── SEJARAH ───────────────────────────────────────────────────────
 export async function getSejarah() {
-  return handleResponse(supabase.from('sejarah').select('*').order('year', { ascending: true }), fallbackSejarah || []);
+  return requestApi('getSejarah', {}, fallbackSejarah || []);
 }
-export async function createSejarah(p) { return handleMutation(supabase.from('sejarah').insert(p)); }
-export async function updateSejarah(id, p) { return handleMutation(supabase.from('sejarah').update(p).eq('id', id)); }
-export async function deleteSejarah(id) { return handleMutation(supabase.from('sejarah').delete().eq('id', id)); }
+export async function createSejarah(p) { return requestApi('createSejarah', { payload: p }, null, true); }
+export async function updateSejarah(id, p) { return requestApi('updateSejarah', { id, payload: p }, null, true); }
+export async function deleteSejarah(id) { return requestApi('deleteSejarah', { id }, null, true); }
 
 // ─── MOTTO & MARS ──────────────────────────────────────────────────
 export async function getMottoMars() {
-  return handleResponse(supabase.from('motto_mars').select('*').limit(1).single(), fallbackMottoMars);
+  return requestApi('getMottoMars', {}, fallbackMottoMars);
 }
 export async function upsertMottoMars(payload) {
-  if (payload.id) return handleMutation(supabase.from('motto_mars').update(payload).eq('id', payload.id));
-  return handleMutation(supabase.from('motto_mars').insert(payload));
+  return requestApi('upsertMottoMars', { payload }, null, true);
 }
 
 // ─── PPDB JADWAL & PERSYARATAN ─────────────────────────────────────
-export async function createJadwalPPDB(p) { return handleMutation(supabase.from('jadwal_ppdb').insert(p)); }
-export async function updateJadwalPPDB(id, p) { return handleMutation(supabase.from('jadwal_ppdb').update(p).eq('id', id)); }
-export async function deleteJadwalPPDB(id) { return handleMutation(supabase.from('jadwal_ppdb').delete().eq('id', id)); }
+export async function createJadwalPPDB(p) { return requestApi('createJadwalPPDB', { payload: p }, null, true); }
+export async function updateJadwalPPDB(id, p) { return requestApi('updateJadwalPPDB', { id, payload: p }, null, true); }
+export async function deleteJadwalPPDB(id) { return requestApi('deleteJadwalPPDB', { id }, null, true); }
 
-export async function createPersyaratanPPDB(p) { return handleMutation(supabase.from('persyaratan_ppdb').insert(p)); }
-export async function updatePersyaratanPPDB(id, p) { return handleMutation(supabase.from('persyaratan_ppdb').update(p).eq('id', id)); }
-export async function deletePersyaratanPPDB(id) { return handleMutation(supabase.from('persyaratan_ppdb').delete().eq('id', id)); }
+export async function createPersyaratanPPDB(p) { return requestApi('createPersyaratanPPDB', { payload: p }, null, true); }
+export async function updatePersyaratanPPDB(id, p) { return requestApi('updatePersyaratanPPDB', { id, payload: p }, null, true); }
+export async function deletePersyaratanPPDB(id) { return requestApi('deletePersyaratanPPDB', { id }, null, true); }
 
 // ─── DASHBOARD / REPORT ────────────────────────────────────────────
 export async function getReport() {
-  try {
-    const [pendaftar, alumni, mitra, jurusan] = await Promise.all([
-      supabase.from('pendaftar').select('id', { count: 'exact' }),
-      supabase.from('alumni').select('id', { count: 'exact' }),
-      supabase.from('mitra_perusahaan').select('id', { count: 'exact' }),
-      supabase.from('jurusan').select('id', { count: 'exact' }),
-    ]);
-    
-    return {
-      pendaftar: pendaftar.count || 0,
-      alumni: alumni.count || 0,
-      mitra: mitra.count || 0,
-      jurusan: jurusan.count || 0,
-    };
-  } catch (error) {
-    console.error('getReport error:', error);
-    return { pendaftar: 0, alumni: 0, mitra: 0, jurusan: 0 };
-  }
+  return requestApi('getReport', {}, { pendaftar: 0, alumni: 0, mitra: 0, jurusan: 0 });
 }

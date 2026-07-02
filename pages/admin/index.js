@@ -1,157 +1,115 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { supabase } from '../../services/supabase';
-import { showToast } from '../../utils/toast';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
-import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import AdminLayout from '../../components/AdminLayout';
+import { getReport, getVisitorSummary } from '../../services/api';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
-export default function AdminLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+export default function AdminDashboardPage() {
+  const [report, setReport] = useState({ pendaftar: 0, alumni: 0, mitra: 0, jurusan: 0 });
+  const [visitorSummary, setVisitorSummary] = useState({ today: 0, week: 0, month: 0, deviceCounts: {}, logs: [] });
 
-  // Check session on mount
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.push('/admin/dashboard');
-      }
-    };
-    checkSession();
-  }, [router]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      showToast.error('Please fill in all fields');
-      return;
+    async function load() {
+      const data = await getReport();
+      const visitors = await getVisitorSummary();
+      setReport(data);
+      setVisitorSummary(visitors);
     }
-    
-    if (password.length < 6) {
-      showToast.error('Password must be at least 6 characters');
-      return;
-    }
+    load();
+  }, []);
 
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      showToast.error(error.message);
-      setLoading(false);
-    } else {
-      showToast.success('Login successful!');
-      router.push('/admin/dashboard');
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (!email) {
-      showToast.error('Please enter your email first');
-      return;
-    }
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/admin/update-password`,
-    });
-
-    if (error) {
-      showToast.error(error.message);
-    } else {
-      showToast.success('Password reset email sent!');
-    }
-  };
+  const deviceData = Object.entries(visitorSummary.deviceCounts || {}).map(([name, value]) => ({ name, value }));
 
   return (
-    <>
-      <Head>
-        <title>Admin Login - SMK Paramitha 2</title>
-      </Head>
-      
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden" data-section="admin-login/root" aria-label="Admin Login Root">
-        {/* Background Mesh */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-100 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-100 rounded-full blur-[120px]" />
+    <AdminLayout title="Admin Dashboard">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 mb-8">
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <h2 className="text-sm font-medium text-slate-500 uppercase">Pendaftar</h2>
+          <p className="mt-4 text-4xl font-semibold text-slate-900">{report.pendaftar}</p>
         </div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-2xl relative z-10"
-          data-section="admin-login/card"
-          aria-label="Admin Login Card"
-        >
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 shadow-2xl shadow-primary-200 mb-4 bg-white">
-              <Image src="/images/logo.jpg" alt="Logo" fill className="object-cover" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-1">Admin Portal</h1>
-            <p className="text-slate-500 text-sm">Sign in to manage your school website</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-5" data-section="admin-login/form" aria-label="Admin Login Form">
-            <div className="space-y-2">
-              <label className="text-slate-700 text-sm font-medium ml-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all"
-                  placeholder="admin@paramitha.sch.id"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-slate-700 text-sm font-medium ml-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none transition-all"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end" data-section="admin-login/reset-password" aria-label="Reset Password">
-              <button
-                type="button"
-                onClick={handleResetPassword}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
-              >
-                Forgot Password?
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
-              {!loading && <ArrowRight size={20} />}
-            </button>
-          </form>
-        </motion.div>
-        
-        <div className="absolute bottom-6 text-slate-500 text-xs text-center w-full">
-          &copy; {new Date().getFullYear()} SMK Paramitha 2 Jakarta. All rights reserved.
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <h2 className="text-sm font-medium text-slate-500 uppercase">Alumni</h2>
+          <p className="mt-4 text-4xl font-semibold text-slate-900">{report.alumni}</p>
+        </div>
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <h2 className="text-sm font-medium text-slate-500 uppercase">Mitra</h2>
+          <p className="mt-4 text-4xl font-semibold text-slate-900">{report.mitra}</p>
+        </div>
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <h2 className="text-sm font-medium text-slate-500 uppercase">Jurusan</h2>
+          <p className="mt-4 text-4xl font-semibold text-slate-900">{report.jurusan}</p>
         </div>
       </div>
-    </>
+
+      <div className="grid gap-6 lg:grid-cols-3 mb-8">
+        <div className="lg:col-span-2 rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Visitor Device Breakdown</h3>
+            <span className="text-sm text-slate-500">Last 100 logs</span>
+          </div>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={deviceData} margin={{ top: 10, right: 12, left: -12, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#475569' }} />
+                <YAxis tick={{ fontSize: 12, fill: '#475569' }} />
+                <Tooltip contentStyle={{ borderRadius: 12, borderColor: '#CBD5E1' }} />
+                <Bar dataKey="value" fill="#C0161C" radius={[12, 12, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+          <h3 className="text-lg font-semibold">Quick Visitor Summary</h3>
+          <div className="mt-6 grid gap-4">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Today</p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">{visitorSummary.today}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">This Week</p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">{visitorSummary.week}</p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">This Month</p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">{visitorSummary.month}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Latest Visitor Logs</h3>
+          <span className="text-sm text-slate-500">Top recent activity</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">Time</th>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">IP</th>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">Device</th>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">OS</th>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">Browser</th>
+                <th className="px-4 py-3 font-medium text-slate-500 uppercase">Page</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {(visitorSummary.logs || []).slice(0, 10).map((log) => (
+                <tr key={log.id || `${log.ip}-${log.created_at}`}>
+                  <td className="px-4 py-3 text-slate-700">{new Date(log.created_at).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-slate-700 break-all">{log.ip || '-'}</td>
+                  <td className="px-4 py-3 text-slate-700">{log.device_type || '-'}</td>
+                  <td className="px-4 py-3 text-slate-700">{log.os_name || '-'}</td>
+                  <td className="px-4 py-3 text-slate-700">{log.browser_name || '-'}</td>
+                  <td className="px-4 py-3 text-slate-700">{log.current_url || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </AdminLayout>
   );
 }

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle, Briefcase, Phone, GraduationCap, Award, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import Image from 'next/image';
+import { normalizeJurusanContent } from '../utils/jurusanContent';
 
 const SectionHeader = ({ title, subtitle, center }) => (
   <div className={`mb-12 ${center ? 'text-center' : ''}`}>
@@ -52,8 +53,25 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
     gallery = [] // Default to empty array
   } = jurusan;
 
-  const finalDescription = description || deskripsi;
+  const content = normalizeJurusanContent(jurusan?.content, name || 'Jurusan');
+  const finalDescription = description || deskripsi || content.hero_description;
   const finalProspek = prospek && prospek.length > 0 ? prospek : prospek_karir;
+  const benefitItems = Array.isArray(content.benefits_items) && content.benefits_items.length > 0
+    ? content.benefits_items.map((item, index) => ({
+        ...item,
+        icon: [GraduationCap, Users, Award][index] || GraduationCap
+      }))
+    : [
+        { title: 'Kurikulum Industri', description: 'Materi pembelajaran update sesuai standar industri.', icon: GraduationCap },
+        { title: 'Pengajar Praktisi', description: 'Diajar langsung oleh ahli di bidangnya.', icon: Users },
+        { title: 'Sertifikasi Kompetensi', description: 'Lulusan dibekali sertifikat BNSP yang diakui.', icon: Award }
+      ];
+  const learningItems = Array.isArray(content.learning_items) && content.learning_items.length > 0
+    ? content.learning_items
+    : kompetensi.map((item) => ({ title: item, description: `Menguasai keahlian ${item.toLowerCase()} secara mendalam dengan praktik intensif.` }));
+  const careerItems = Array.isArray(content.career_items) && content.career_items.length > 0
+    ? content.career_items
+    : finalProspek;
 
   // Animation variants
   const fadeInUp = {
@@ -102,7 +120,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             >
               <motion.div variants={fadeInUp} className="inline-block mb-4">
                 <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-bold tracking-wider border border-white/30">
-                  KOMPETENSI KEAHLIAN
+                  {content.hero_title || 'KOMPETENSI KEAHLIAN'}
                 </span>
               </motion.div>
               
@@ -111,7 +129,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               </motion.h1>
               
               <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl leading-relaxed">
-                {finalDescription}
+                {content.hero_description || finalDescription}
               </motion.p>
               
               <motion.div variants={fadeInUp}>
@@ -165,15 +183,13 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               variants={stagger}
             >
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-                Mengapa Memilih <span style={{ color: warna_primer }}>{name}</span>?
+                {content.about_title || `Mengapa Memilih ${name}?`}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed mb-6">
-                Program keahlian {name} di SMK Paramitha 2 dirancang untuk mencetak lulusan yang siap kerja dan kompeten. 
-                Kurikulum kami disesuaikan dengan kebutuhan industri terkini, didukung fasilitas modern dan pengajar praktisi.
+                {content.about_description || `Program keahlian ${name} di SMK Paramitha 2 dirancang untuk mencetak lulusan yang siap kerja dan kompeten.`}
               </motion.p>
               <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed">
-                Siswa tidak hanya belajar teori, tetapi juga praktik langsung melalui Project Based Learning dan 
-                program magang di perusahaan mitra terkemuka.
+                {content.about_highlight || 'Siswa tidak hanya belajar teori, tetapi juga praktik langsung melalui Project Based Learning dan program magang di perusahaan mitra terkemuka.'}
               </motion.p>
             </motion.div>
 
@@ -184,11 +200,9 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               variants={stagger}
               className="space-y-4"
             >
-              {[
-                { icon: GraduationCap, title: "Kurikulum Industri", desc: "Materi pembelajaran update sesuai standar industri." },
-                { icon: Users, title: "Pengajar Praktisi", desc: "Diajar langsung oleh ahli di bidangnya." },
-                { icon: Award, title: "Sertifikasi Kompetensi", desc: "Lulusan dibekali sertifikat BNSP yang diakui." }
-              ].map((item, idx) => (
+              {benefitItems.map((item, idx) => {
+                const Icon = item.icon;
+                return (
                 <motion.div 
                   key={idx}
                   variants={fadeInUp}
@@ -197,15 +211,16 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
                 >
                   <div className="flex items-start gap-4">
                     <div className="p-3 rounded-lg bg-white shadow-sm text-white" style={{ backgroundColor: warna_primer }}>
-                      <item.icon className="w-6 h-6" />
+                      <Icon className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
-                      <p className="text-gray-600">{item.desc}</p>
+                      <p className="text-gray-600">{item.description}</p>
                     </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </motion.div>
           </div>
         </div>
@@ -215,8 +230,8 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
       <section className="py-20 bg-[#F8F8FF]">
         <div className="container mx-auto px-4">
           <SectionHeader 
-            title="Apa yang Dipelajari?" 
-            subtitle={`Materi dan kompetensi utama jurusan ${name}`}
+            title={content.learning_title || 'Apa yang Dipelajari?'} 
+            subtitle={content.learning_description || `Materi dan kompetensi utama jurusan ${name}`}
             center
           />
           
@@ -227,7 +242,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             variants={stagger}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
           >
-            {kompetensi.map((item, idx) => (
+            {learningItems.map((item, idx) => (
               <motion.div 
                 key={idx}
                 variants={fadeInUp}
@@ -238,10 +253,10 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
                   <CheckCircle className="w-8 h-8" style={{ color: warna_primer }} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[color:var(--hover-color)]" style={{ '--hover-color': warna_primer }}>
-                  {item}
+                  {item.title}
                 </h3>
                 <p className="text-gray-500">
-                  Menguasai keahlian {item.toLowerCase()} secara mendalam dengan praktik intensif.
+                  {item.description || `Menguasai keahlian ${item.title?.toLowerCase()} secara mendalam dengan praktik intensif.`}
                 </p>
               </motion.div>
             ))}
@@ -253,9 +268,9 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Peluang Karir</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">{content.career_title || 'Peluang Karir'}</h2>
             <p className="text-gray-600 text-lg">
-              Lulusan {name} memiliki kesempatan luas untuk bekerja di berbagai sektor industri.
+              {content.career_description || `Lulusan ${name} memiliki kesempatan luas untuk bekerja di berbagai sektor industri.`}
             </p>
           </div>
 
@@ -266,7 +281,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             variants={stagger}
             className="flex flex-wrap justify-center gap-4"
           >
-            {finalProspek.map((career, idx) => (
+            {careerItems.map((career, idx) => (
               <motion.div 
                 key={idx}
                 variants={fadeInUp}
@@ -274,7 +289,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
                 style={{ borderColor: `${warna_primer}30` }}
               >
                 <Briefcase className="w-5 h-5" style={{ color: warna_primer }} />
-                <span className="text-lg font-medium text-gray-800">{career}</span>
+                <span className="text-lg font-medium text-gray-800">{career.title || career}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -334,24 +349,24 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Siap Bergabung?</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">{content.cta_title || 'Siap Bergabung?'}</h2>
             <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-              Jadilah bagian dari {name} SMK Paramitha 2 dan raih masa depan gemilangmu sekarang juga.
+              {content.cta_description || `Jadilah bagian dari ${name} SMK Paramitha 2 dan raih masa depan gemilangmu sekarang juga.`}
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link 
-                href="/ppdb" 
+                href={content.cta_primary_url || '/ppdb'} 
                 className="px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-lg hover:bg-gray-100 transition-transform hover:scale-105 shadow-lg"
                 style={{ color: warna_primer }}
               >
-                Daftar PPDB Online
+                {content.cta_primary_text || 'Daftar PPDB Online'}
               </Link>
               <Link 
-                href="/contact" 
+                href={content.cta_secondary_url || '/contact'} 
                 className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-bold text-lg hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
               >
                 <Phone className="w-5 h-5" />
-                Hubungi Kami
+                {content.cta_secondary_text || 'Hubungi Kami'}
               </Link>
             </div>
           </motion.div>

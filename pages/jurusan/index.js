@@ -8,8 +8,9 @@ import Layout from '../../components/Layout'
 
 export default function JurusanList({ jurusanList, sekolahInfo }) {
   const info = sekolahInfo || fallbackSekolahInfo
-  // Filter active jurusan from fallback if jurusanList is null/undefined
-  const jurusans = jurusanList?.length > 0 ? jurusanList : fallbackJurusan.filter(j => j.aktif)
+  const jurusans = Array.isArray(jurusanList)
+    ? jurusanList.filter((item) => item?.aktif !== false)
+    : fallbackJurusan.filter((item) => item?.aktif !== false)
 
   const containerVariants = {
     hidden: { opacity: 0 },

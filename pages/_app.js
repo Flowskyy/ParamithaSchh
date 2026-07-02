@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
 import PageLoader from '../components/PageLoader';
-import RealtimeReloader from '../components/RealtimeReloader';
 import '../styles/globals.css';
 
 // Note: NProgress removed in favor of PageLoader overlay

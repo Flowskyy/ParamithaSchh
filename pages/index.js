@@ -37,7 +37,9 @@ export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, 
   const info = sekolahInfo || {};
   const alumni = Array.isArray(alumniList) ? alumniList : [];
   const mitra = Array.isArray(mitraList) ? mitraList : [];
-  const jurusan = Array.isArray(jurusanList) ? jurusanList : [];
+  const jurusan = Array.isArray(jurusanList)
+    ? jurusanList.filter((item) => item?.aktif !== false)
+    : [];
   
   // Ensure sections is always an array
   const sections = Array.isArray(sectionsOrder) && sectionsOrder.length > 0

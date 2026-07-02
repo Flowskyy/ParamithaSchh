@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Upload, X, Check, Loader2 } from 'lucide-react';
-import { supabase } from '../services/supabase';
+import { uploadImage as uploadImageFile } from '../services/api';
 import { showToast } from '../utils/toast';
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
@@ -74,7 +74,7 @@ export default function ImageUploader({
     }
   };
 
-  async function uploadImage() {
+  async function handleUploadImage() {
     if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
       return;
     }
@@ -125,23 +125,11 @@ export default function ImageUploader({
           throw new Error('Canvas is empty');
         }
         
-        const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from(bucket)
-          .upload(fileName, blob, {
-            contentType: 'image/jpeg',
-            cacheControl: '3600',
-            upsert: false
-          });
+        // TODO: This still uses the temporary non-Prisma storage helper.
+        const { url, error: uploadError } = await uploadImageFile(blob, bucket, folder);
+        if (uploadError || !url) throw uploadError || new Error('Upload failed');
 
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from(bucket)
-          .getPublicUrl(fileName);
-
-        onUploadComplete(publicUrl);
+        onUploadComplete(url);
         setImgSrc('');
         setLoading(false);
         showToast.success('Image uploaded successfully!');
@@ -237,7 +225,7 @@ export default function ImageUploader({
             </button>
             <button
               type="button"
-              onClick={uploadImage}
+              onClick={handleUploadImage}
               disabled={loading}
               className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
