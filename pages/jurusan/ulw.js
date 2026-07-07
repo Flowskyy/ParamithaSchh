@@ -2,14 +2,13 @@ import Head from 'next/head'
 import Layout from '../../components/Layout'
 import JurusanDetail from '../../components/JurusanDetail'
 import { getJurusanBySlug, getSekolahInfo } from '../../services/api'
-import { fallbackJurusan, fallbackSekolahInfo } from '../../utils/fallbackData'
 
 export default function Page({ jurusan, sekolahInfo }) {
-  const finalJurusan = jurusan || fallbackJurusan.find(j => j.slug === 'ulw');
+  const finalJurusan = jurusan;
   
   return (
     <Layout 
-      sekolahInfo={sekolahInfo || fallbackSekolahInfo}
+      sekolahInfo={sekolahInfo || {}}
       title={`${finalJurusan?.name || 'ULW'} — SMK Paramitha 2 Jakarta`}
       description={`Pelajari kompetensi keahlian ${finalJurusan?.name} (Usaha Layanan Wisata) di SMK Paramitha 2 Jakarta. Jelajahi dunia pariwisata profesional.`}
       keywords={`ULW SMK Paramitha 2, Jurusan Pariwisata Jakarta, Usaha Layanan Wisata`}
@@ -27,12 +26,12 @@ export async function getServerSideProps() {
       getSekolahInfo()
     ])
     return { props: {
-      jurusan: jurusan || fallbackJurusan.find(j => j.slug === 'ulw') || null,
+      jurusan: jurusan || null,
       sekolahInfo: sekolahInfo || null
     }}
   } catch {
     return { props: {
-      jurusan: fallbackJurusan.find(j => j.slug === 'ulw') || null,
+      jurusan: null,
       sekolahInfo: null
     }}
   }

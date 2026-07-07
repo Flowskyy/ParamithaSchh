@@ -3,13 +3,13 @@ import { motion } from 'framer-motion'
 import { Play, Music } from 'lucide-react'
 import Layout from '../../components/Layout'
 import { getMottoMars, getSekolahInfo } from '../../services/api'
-import { fallbackMottoMars } from '../../utils/fallbackData'
 import { useState, useRef } from 'react'
 
 export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
   const dbData = mottoMars || {}
-  const pink = (dbData.pink_values && dbData.pink_values.length > 0) ? dbData.pink_values : fallbackMottoMars.pink_values
-  const jitu = (dbData.jitu_values && dbData.jitu_values.length > 0) ? dbData.jitu_values : fallbackMottoMars.jitu_values
+  const pink = (dbData.pink_values && dbData.pink_values.length > 0) ? dbData.pink_values : []
+  const jitu = (dbData.jitu_values && dbData.jitu_values.length > 0) ? dbData.jitu_values : []
+  const marsLyrics = (dbData.mars_lyrics && dbData.mars_lyrics.length > 0) ? dbData.mars_lyrics : []
   
   // Combine all values for the grid, but we might want to keep them visually distinct rows as per image
   // Image shows PINK in one row, JITU in another.
@@ -103,72 +103,40 @@ export default function MottoMarsPage({ mottoMars, sekolahInfo }) {
           </div>
           
           <h2 className="text-4xl font-bold text-[#1E1E8F] mb-2">Mars SMK Paramitha 2</h2>
-          <p className="text-slate-500 mb-12">Cipt. Yayasan Pendidikan Paramitha</p>
+          <p className="text-slate-500 mb-12">Cipt. Yayasan Kolese Dharma Paramitha</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
-            {/* Verse 1 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
-            >
-              <div className="absolute top-4 left-4 text-6xl font-serif text-slate-100 font-bold select-none -z-10">1</div>
-              <div className="space-y-2 text-slate-700 font-medium">
-                <p>Singsingkan lengan bajumu</p>
-                <p>Tataplah masa depanmu</p>
-                <p>SMK Paramitha 2</p>
-                <p>Wadah insan cendekia</p>
+            {Array.isArray(marsLyrics) && marsLyrics.length > 0 ? (
+              marsLyrics.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
+                >
+                  <div className="absolute top-4 left-4 text-6xl font-serif text-slate-100 font-bold select-none -z-10">
+                    {item.verse || index + 1}
+                  </div>
+                  <div className="space-y-2 text-slate-700 font-medium">
+                    {Array.isArray(item.text) ? (
+                      item.text.map((line, lineIndex) => (
+                        <p key={lineIndex}>{line}</p>
+                      ))
+                    ) : (
+                      <p>{item.text || 'No lyrics available'}</p>
+                    )}
+                  </div>
+                  <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10 text-slate-500">
+                <p>Belum ada lirik Mars yang tersedia.</p>
               </div>
-              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
-            </motion.div>
-
-            {/* Verse 2 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
-            >
-              <div className="absolute top-4 left-4 text-6xl font-serif text-slate-100 font-bold select-none -z-10">2</div>
-              <div className="space-y-2 text-slate-700 font-medium">
-                <p>Berlandaskan iman dan taqwa</p>
-                <p>Berakhlak mulia utama</p>
-                <p>Menguasai teknologi</p>
-                <p>Siap membangun negeri</p>
-              </div>
-              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
-            </motion.div>
-
-            {/* Reff */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="relative p-8 border border-slate-100 rounded-2xl bg-slate-50/50"
-            >
-              <div className="absolute top-4 left-4 text-5xl font-serif text-slate-100 font-bold select-none -z-10 italic">Reff</div>
-              <div className="space-y-2 text-slate-700 font-medium">
-                <p>Maju terus pantang mundur</p>
-                <p>Raih prestasi yang luhur</p>
-                <p>SMK Paramitha 2</p>
-                <p>Jayalah s&apos;lama-lamanya</p>
-              </div>
-              <div className="w-8 h-1 bg-red-400 mx-auto mt-6 rounded-full"></div>
-            </motion.div>
+            )}
           </div>
-
-          <button 
-            onClick={togglePlay}
-            className="inline-flex items-center gap-2 bg-[#1E1E8F] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-colors shadow-lg shadow-blue-900/20"
-          >
-            {isPlaying ? <span className="w-3 h-3 bg-white block animate-pulse"></span> : <Play size={20} fill="currentColor" />}
-            {isPlaying ? 'Pause Mars' : 'Putar Mars'}
-          </button>
-          
-          <audio ref={audioRef} src="/mars-paramitha.mp3" onEnded={() => setIsPlaying(false)} />
         </div>
       </div>
     </Layout>

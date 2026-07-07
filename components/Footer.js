@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, ChevronRight } from 'lucide-react';
 import { getSekolahInfo, getJurusan } from '../services/api';
-import { fallbackSekolahInfo } from '../utils/fallbackData';
 
 // TikTok Icon Component (Inline SVG)
 const TikTokIcon = ({ size = 18, className = "" }) => (
@@ -23,7 +22,7 @@ const TikTokIcon = ({ size = 18, className = "" }) => (
 );
 
 export default function Footer() {
-  const [info, setInfo] = useState(fallbackSekolahInfo);
+  const [info, setInfo] = useState({});
   const [jurusanList, setJurusanList] = useState([]);
 
   useEffect(() => {

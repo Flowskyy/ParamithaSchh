@@ -3,14 +3,12 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { getJurusan, getSekolahInfo } from '../../services/api'
-import { fallbackJurusan, fallbackSekolahInfo } from '../../utils/fallbackData'
+import { fallbackSekolahInfo } from '../../utils/fallbackData'
 import Layout from '../../components/Layout'
 
 export default function JurusanList({ jurusanList, sekolahInfo }) {
   const info = sekolahInfo || fallbackSekolahInfo
-  const jurusans = Array.isArray(jurusanList)
-    ? jurusanList.filter((item) => item?.aktif !== false)
-    : fallbackJurusan.filter((item) => item?.aktif !== false)
+  const jurusans = Array.isArray(jurusanList) ? jurusanList : []
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -48,7 +46,7 @@ export default function JurusanList({ jurusanList, sekolahInfo }) {
              style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,13 +68,19 @@ export default function JurusanList({ jurusanList, sekolahInfo }) {
 
       {/* Jurusan Grid */}
       <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <motion.div 
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className={`grid gap-8 ${
+              jurusans.length === 1
+                ? 'grid-cols-1 max-w-md mx-auto'
+                : jurusans.length === 2
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto'
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            }`}
           >
             {jurusans.map((jurusan) => (
               <motion.div
@@ -122,6 +126,11 @@ export default function JurusanList({ jurusanList, sekolahInfo }) {
               </motion.div>
             ))}
           </motion.div>
+          {jurusans.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-slate-500 text-lg">Belum ada jurusan yang tersedia saat ini.</p>
+            </div>
+          )}
         </div>
       </section>
     </Layout>

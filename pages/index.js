@@ -1,8 +1,7 @@
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import Layout from '../components/Layout';
-import { getSekolahInfo, getAlumni, getMitra, getJurusan, getHomepageSections } from '../services/api';
-import { fallbackHomepageSections } from '../utils/fallbackData';
+import { getSekolahInfo, getAlumni, getMitra, getJurusan, getHomepageSections, getHero } from '../services/api';
 
 // Dynamic Imports for Sections with Loading States
 const HeroSection = dynamic(() => import('../components/home/HeroSection'), { 
@@ -32,19 +31,18 @@ const MitraSection = dynamic(() => import('../components/home/MitraSection'), {
   loading: () => <div className="h-48 bg-white animate-pulse" />
 });
 
-export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, sectionsOrder }) {
+export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, sectionsOrder, heroData }) {
   // Safe extraction with fallbacks to avoid crashes if data is null/undefined
   const info = sekolahInfo || {};
   const alumni = Array.isArray(alumniList) ? alumniList : [];
   const mitra = Array.isArray(mitraList) ? mitraList : [];
-  const jurusan = Array.isArray(jurusanList)
-    ? jurusanList.filter((item) => item?.aktif !== false)
-    : [];
+  const jurusan = Array.isArray(jurusanList) ? jurusanList : [];
+  const hero = heroData || null;
   
   // Ensure sections is always an array
   const sections = Array.isArray(sectionsOrder) && sectionsOrder.length > 0
     ? sectionsOrder 
-    : (Array.isArray(fallbackHomepageSections) ? fallbackHomepageSections : []);
+    : [];
 
   // Wrap section rendering in try-catch to prevent whole page crash
   const renderSection = (section) => {
@@ -53,12 +51,12 @@ export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, 
     try {
       switch (section.id) {
         case 'hero':
-          return <HeroSection info={info} />;
+          return <HeroSection info={info} hero={hero} />;
         case 'sambutan':
           return <SambutanSection info={info} />;
         case 'jurusan':
           return <HomeJurusan jurusanList={jurusan} />;
-        case 'teaching_factory':
+        case 'proyek_pkk':
           return <TeachingFactorySection />;
         case 'alumni':
           return <AlumniSection alumni={alumni} />;
@@ -110,33 +108,36 @@ export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, 
 
 export async function getServerSideProps() {
   try {
-    const [sekolahInfo, alumniList, mitraList, jurusanList, sectionsOrder] = await Promise.all([
+    const [sekolahInfo, alumniList, mitraList, jurusanList, sectionsOrder, heroData] = await Promise.all([
       getSekolahInfo(),
       getAlumni(),
       getMitra(),
       getJurusan(),
       getHomepageSections(),
+      getHero(),
     ]);
 
-    return { 
-      props: { 
+    return {
+      props: {
         sekolahInfo: sekolahInfo || null,
         alumniList: alumniList || [],
         mitraList: mitraList || [],
         jurusanList: jurusanList || [],
         sectionsOrder: sectionsOrder || null,
-      } 
+        heroData: heroData || null,
+      }
     };
   } catch (error) {
     console.error('Error fetching homepage data:', error);
-    return { 
-      props: { 
+    return {
+      props: {
         sekolahInfo: null,
         alumniList: [],
         mitraList: [],
         jurusanList: [],
         sectionsOrder: null,
-      } 
+        heroData: null,
+      }
     };
   }
 }

@@ -1,22 +1,15 @@
-import {
-  fallbackJurusan,
-  fallbackSekolahInfo,
-  fallbackMottoMars,
-  fallbackSejarah,
-  fallbackFasilitas,
-  fallbackGaleri,
-  fallbackAlumni,
-  fallbackMitra,
-  fallbackJadwalPPDB,
-  fallbackPersyaratanPPDB,
-  fallbackHero,
-  fallbackHomepageSections
-} from '../utils/fallbackData';
-
-const API_ENDPOINT = '/api/db';
+const getApiEndpoint = () => {
+  // Server-side: use absolute URL
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3000/api/db';
+  }
+  // Client-side: use relative URL
+  return '/api/db';
+};
 
 const requestApi = async (action, payload = {}, fallback = null, isMutation = false) => {
   try {
+    const API_ENDPOINT = getApiEndpoint();
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -43,7 +36,7 @@ const requestApi = async (action, payload = {}, fallback = null, isMutation = fa
 
 // ─── HERO ──────────────────────────────────────────────────────────
 export async function getHero() {
-  return requestApi('getHero', {}, fallbackHero || null);
+  return requestApi('getHero', {}, null);
 }
 export async function upsertHero(payload) {
   return requestApi('upsertHero', { payload }, null, true);
@@ -53,21 +46,21 @@ export async function saveHero(payload) { return upsertHero(payload); }
 // ─── JURUSAN ───────────────────────────────────────────────────────
 export async function getJurusan() {
   try {
-    const data = await requestApi('getJurusan', {}, fallbackJurusan || []);
+    const data = await requestApi('getJurusan', {}, []);
     return Array.isArray(data) ? data.filter((item) => item.aktif !== false) : [];
   } catch (err) {
     console.error('getJurusan error:', err);
-    return fallbackJurusan.filter((j) => j.aktif !== false);
+    return [];
   }
 }
 
 export async function getJurusanAll() {
-  return requestApi('getJurusanAll', {}, fallbackJurusan || []);
+  return requestApi('getJurusanAll', {}, []);
 }
 
 export async function getJurusanBySlug(slug) {
   const data = await requestApi('getJurusanBySlug', { slug }, null);
-  return data || fallbackJurusan.find((j) => j.slug === slug);
+  return data || null;
 }
 
 export async function createJurusan(p) { return requestApi('createJurusan', { payload: p }, null, true); }
@@ -96,7 +89,7 @@ export async function removeJurusanGallery(id, imageUrl) {
 
 // ─── ALUMNI ────────────────────────────────────────────────────────
 export async function getAlumni() {
-  return requestApi('getAlumni', {}, fallbackAlumni || []);
+  return requestApi('getAlumni', {}, []);
 }
 export async function createAlumni(p) { return requestApi('createAlumni', { payload: p }, null, true); }
 export async function updateAlumni(id, p) { return requestApi('updateAlumni', { id, payload: p }, null, true); }
@@ -108,7 +101,7 @@ export async function saveAlumni(payload) {
 
 // ─── MITRA PERUSAHAAN ───────────────────────────────────────────────
 export async function getMitra() {
-  return requestApi('getMitra', {}, fallbackMitra || []);
+  return requestApi('getMitra', {}, []);
 }
 export async function createMitra(p) { return requestApi('createMitra', { payload: p }, null, true); }
 export async function updateMitra(id, p) { return requestApi('updateMitra', { id, payload: p }, null, true); }
@@ -120,7 +113,7 @@ export async function saveMitra(payload) {
 
 // ─── SEKOLAH INFO ──────────────────────────────────────────────────
 export async function getSekolahInfo() {
-  return requestApi('getSekolahInfo', {}, fallbackSekolahInfo);
+  return requestApi('getSekolahInfo', {}, {});
 }
 export async function upsertSekolahInfo(payload) {
   return requestApi('upsertSekolahInfo', { payload }, null, true);
@@ -128,11 +121,23 @@ export async function upsertSekolahInfo(payload) {
 
 // ─── HOMEPAGE SECTIONS ─────────────────────────────────────────────
 export async function getHomepageSections() {
-  return requestApi('getHomepageSections', {}, fallbackHomepageSections || []);
+  return requestApi('getHomepageSections', {}, []);
 }
 
 export async function updateHomepageSectionOrder(updates) {
   return requestApi('updateHomepageSectionOrder', { updates }, null, true);
+}
+
+export async function setDefaultHomepageSections() {
+  const defaultSections = [
+    { id: 'hero', label: 'Hero Section', component: 'hero', order_index: 0, is_active: true },
+    { id: 'sambutan', label: 'Sambutan Kepsek', component: 'sambutan', order_index: 1, is_active: true },
+    { id: 'jurusan', label: 'Jurusan', component: 'jurusan', order_index: 2, is_active: true },
+    { id: 'alumni', label: 'Alumni', component: 'alumni', order_index: 3, is_active: true },
+    { id: 'proyek_pkk', label: 'Proyek PKK', component: 'proyek_pkk', order_index: 4, is_active: true },
+    { id: 'mitra', label: 'Mitra Perusahaan', component: 'mitra', order_index: 5, is_active: true },
+  ];
+  return requestApi('updateHomepageSectionOrder', { updates: defaultSections }, null, true);
 }
 
 // ─── ACTIVITY LOG ──────────────────────────────────────────────────
@@ -155,6 +160,30 @@ export async function getVisitorSummary() {
   return requestApi('getVisitorSummary', {}, { today: 0, week: 0, month: 0, logs: [], deviceCounts: {} });
 }
 
+export async function getVisitorLogsByDate(startDate, endDate) {
+  return requestApi('getVisitorLogsByDate', { startDate, endDate }, []);
+}
+
+export async function logWhatsappClick(clickData) {
+  return requestApi('logWhatsappClick', { clickData }, null, true);
+}
+
+export async function getWhatsappClicks(startDate, endDate) {
+  return requestApi('getWhatsappClicks', { startDate, endDate }, []);
+}
+
+export async function getAllImages() {
+  return requestApi('getAllImages', {}, []);
+}
+
+export async function checkImageUsage(imageUrl) {
+  return requestApi('checkImageUsage', { imageUrl }, { used: false, references: [] });
+}
+
+export async function deleteImage(imageUrl) {
+  return requestApi('deleteImage', { imageUrl }, null, true);
+}
+
 // ─── STORAGE ───────────────────────────────────────────────────────
 // TODO: Storage is still handled outside Prisma and should be migrated to a real file backend.
 export function getPublicUrl(bucket, path) {
@@ -162,22 +191,7 @@ export function getPublicUrl(bucket, path) {
   return path.startsWith('http') ? path : `/${path.replace(/^\/+/, '')}`;
 }
 
-export const uploadImage = async (file, bucket, folder = '') => {
-  try {
-    const fileNameBase = file?.name ? file.name.split('.').shift() : `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-    const fileExt = file?.name?.split('.').pop() || 'jpg';
-    const fileName = `${folder ? folder + '/' : ''}${fileNameBase}-${Date.now()}.${fileExt}`;
 
-    const objectUrl = typeof window !== 'undefined' && file instanceof Blob
-      ? URL.createObjectURL(file)
-      : null;
-
-    return { url: objectUrl || `/${fileName}`, error: null };
-  } catch (error) {
-    console.error('Upload failed:', error?.message || error);
-    return { url: null, error: error?.message || String(error) };
-  }
-};
 
 export async function uploadFile(bucket, path, file) {
   return requestApi('uploadFile', { bucket, path, file }, null, true);
@@ -185,10 +199,10 @@ export async function uploadFile(bucket, path, file) {
 
 // ─── PPDB ──────────────────────────────────────────────────────────
 export async function getJadwalPPDB() {
-  return requestApi('getJadwalPPDB', {}, fallbackJadwalPPDB || []);
+  return requestApi('getJadwalPPDB', {}, []);
 }
 export async function getPersyaratanPPDB() {
-  return requestApi('getPersyaratanPPDB', {}, fallbackPersyaratanPPDB || []);
+  return requestApi('getPersyaratanPPDB', {}, []);
 }
 export async function createPendaftar(p) {
   return requestApi('createPendaftar', { payload: p }, null, true);
@@ -200,7 +214,7 @@ export async function updatePendaftar(id, p) { return requestApi('updatePendafta
 
 // ─── FASILITAS ─────────────────────────────────────────────────────
 export async function getFasilitas() {
-  return requestApi('getFasilitas', {}, fallbackFasilitas || []);
+  return requestApi('getFasilitas', {}, []);
 }
 export async function createFasilitas(p) { return requestApi('createFasilitas', { payload: p }, null, true); }
 export async function updateFasilitas(id, p) { return requestApi('updateFasilitas', { id, payload: p }, null, true); }
@@ -217,7 +231,7 @@ export async function saveJurusan(payload) {
 
 // ─── GALERI ────────────────────────────────────────────────────────
 export async function getGaleri() {
-  return requestApi('getGaleri', {}, fallbackGaleri || []);
+  return requestApi('getGaleri', {}, []);
 }
 export async function createGaleri(p) { return requestApi('createGaleri', { payload: p }, null, true); }
 export async function updateGaleri(id, p) { return requestApi('updateGaleri', { id, payload: p }, null, true); }
@@ -229,15 +243,18 @@ export async function saveGaleri(payload) {
 
 // ─── SEJARAH ───────────────────────────────────────────────────────
 export async function getSejarah() {
-  return requestApi('getSejarah', {}, fallbackSejarah || []);
+  return requestApi('getSejarah', {}, []);
 }
 export async function createSejarah(p) { return requestApi('createSejarah', { payload: p }, null, true); }
 export async function updateSejarah(id, p) { return requestApi('updateSejarah', { id, payload: p }, null, true); }
 export async function deleteSejarah(id) { return requestApi('deleteSejarah', { id }, null, true); }
+export async function updateSejarahOrder(updates) {
+  return requestApi('updateSejarahOrder', { updates }, null, true);
+}
 
 // ─── MOTTO & MARS ──────────────────────────────────────────────────
 export async function getMottoMars() {
-  return requestApi('getMottoMars', {}, fallbackMottoMars);
+  return requestApi('getMottoMars', {}, {});
 }
 export async function upsertMottoMars(payload) {
   return requestApi('upsertMottoMars', { payload }, null, true);
@@ -251,6 +268,14 @@ export async function deleteJadwalPPDB(id) { return requestApi('deleteJadwalPPDB
 export async function createPersyaratanPPDB(p) { return requestApi('createPersyaratanPPDB', { payload: p }, null, true); }
 export async function updatePersyaratanPPDB(id, p) { return requestApi('updatePersyaratanPPDB', { id, payload: p }, null, true); }
 export async function deletePersyaratanPPDB(id) { return requestApi('deletePersyaratanPPDB', { id }, null, true); }
+
+// ─── PROYEK PKK ───────────────────────────────────────────────────
+export async function getProyekPkk() {
+  return requestApi('getProyekPkk', {}, null);
+}
+export async function upsertProyekPkk(payload) {
+  return requestApi('upsertProyekPkk', { payload }, null, true);
+}
 
 // ─── DASHBOARD / REPORT ────────────────────────────────────────────
 export async function getReport() {

@@ -5,8 +5,7 @@ import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, Loader2, Instagram, Youtube, Facebook } from 'lucide-react';
 import { toast } from 'react-hot-toast'; // Using direct toast as per common pattern, or utils if preferred. The prompt mentioned toastSuccess.
-import { getSekolahInfo } from '../services/api';
-import { fallbackSekolahInfo } from '../utils/fallbackData';
+import { getSekolahInfo, logWhatsappClick } from '../services/api';
 import { showToast } from '../utils/toast';
 
 // TikTok Icon Component (Outlined to match Lucide)
@@ -40,7 +39,7 @@ const WhatsAppIcon = ({ size = 20, className = "" }) => (
 );
 
 export default function ContactPage({ sekolahInfo }) {
-  const [info, setInfo] = useState(sekolahInfo || fallbackSekolahInfo);
+  const [info, setInfo] = useState(sekolahInfo || {});
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -66,7 +65,7 @@ export default function ContactPage({ sekolahInfo }) {
 
     try {
       // Use wa_kontak from API data, fallback to fallbackSekolahInfo
-      const waNumber = info.wa_kontak || fallbackSekolahInfo.wa_kontak;
+      const waNumber = info.wa_kontak || '';
       const cleanNumber = waNumber.replace(/\D/g, '');
       const finalNumber = cleanNumber;
 
@@ -79,7 +78,15 @@ export default function ContactPage({ sekolahInfo }) {
         `_Pesan dikirim dari website SMK Paramitha 2 Jakarta._`;
 
       showToast.success('Mengarahkan ke WhatsApp...', toastId);
-      
+
+      // Track WhatsApp click
+      logWhatsappClick({
+        page_url: '/contact',
+        button_type: 'contact_form',
+        user_agent: navigator.userAgent,
+        ip_address: null
+      }).catch(err => console.error('Failed to track WhatsApp click:', err));
+
       setTimeout(() => {
         window.open(`https://wa.me/${finalNumber}?text=${message}`, '_blank');
         setFormData({
@@ -161,7 +168,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Alamat</h3>
                       <p className="text-white/80 leading-relaxed">
-                        {info.address || fallbackSekolahInfo.address}
+                        {info.address || '-' }
                       </p>
                     </div>
                   </div>
@@ -173,7 +180,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Telepon</h3>
                       <p className="text-white/80">
-                        {info.phone || fallbackSekolahInfo.phone}
+                        {info.phone || '-' }
                       </p>
                     </div>
                   </div>
@@ -185,7 +192,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Email</h3>
                       <p className="text-white/80">
-                        {info.email || fallbackSekolahInfo.email}
+                        {info.email || '-' }
                       </p>
                     </div>
                   </div>
@@ -197,8 +204,7 @@ export default function ContactPage({ sekolahInfo }) {
                     <div>
                       <h3 className="font-semibold text-lg mb-1">Jam Operasional</h3>
                       <p className="text-white/80">
-                        Senin - Jumat: 07:00 - 16:00<br />
-                        Sabtu: 08:00 - 12:00
+                        {info.operating_hours || info.jam_operasional || '-' }
                       </p>
                     </div>
                   </div>
@@ -371,7 +377,7 @@ export default function ContactPage({ sekolahInfo }) {
             </p>
             
             <a
-              href={`https://wa.me/${info.wa_ppdb || fallbackSekolahInfo.wa_ppdb}`}
+              href={`https://wa.me/${info.wa_ppdb || ''}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 bg-[#25D366] text-white font-bold px-8 py-4 rounded-full hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-xl"

@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 import { CheckCircle, ClipboardList, Loader2 } from 'lucide-react';
-import { getSekolahInfo, createPendaftar, getJadwalPPDB, getPersyaratanPPDB, getJurusan } from '../services/api';
+import { getSekolahInfo, createPendaftar, getJadwalPPDB, getPersyaratanPPDB, getJurusan, logWhatsappClick } from '../services/api';
 import { showToast } from '../utils/toast';
 
 // WhatsApp Icon Component
@@ -32,36 +32,13 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
     pesan: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState(null);
 
-  // Countdown Timer Logic
-  useEffect(() => {
-    const targetDate = new Date('2026-03-31T00:00:00').getTime();
 
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-
-      if (distance < 0) {
-        clearInterval(interval);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        setTimeLeft({
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000)
-        });
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Use fetched jurusan data or fallback
   const jurusanOptions = jurusanList && jurusanList.length > 0 
     ? jurusanList.map(j => j.slug.toUpperCase()) 
-    : ["RPL", "TKJ", "MM", "AK", "PH"]; // Fallback codes
+    : [];
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -83,9 +60,10 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
       await createPendaftar(payload);
 
       // 2. Redirect ke WhatsApp
-      const waNumber = '6282124706301';
+      const waNumber = (sekolahInfo?.wa_kontak || sekolahInfo?.wa_ppdb || '').toString();
       const cleanNumber = waNumber.replace(/\D/g, '');
       const finalNumber = cleanNumber;
+
 
       const message = `*PENDAFTARAN PPDB ONLINE - SMK PARAMITHA 2*%0A%0A` +
         `*Nama:* ${formData.nama}%0A` +
@@ -98,7 +76,15 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
         `_Mohon informasi selanjutnya terkait pendaftaran ini. Terima kasih._`;
 
       showToast.success('Mengarahkan ke WhatsApp...', toastId);
-      
+
+      // Track WhatsApp click
+      logWhatsappClick({
+        page_url: '/ppdb',
+        button_type: 'ppdb_form',
+        user_agent: navigator.userAgent,
+        ip_address: null
+      }).catch(err => console.error('Failed to track WhatsApp click:', err));
+
       // Small delay before redirect
       setTimeout(() => {
         window.open(`https://wa.me/${finalNumber}?text=${message}`, '_blank');
@@ -112,20 +98,10 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
     }
   };
 
-  // Fallback data if the API returns empty
-  const jadwal = jadwalInfo?.length > 0 ? jadwalInfo : [
-    { title: "Gelombang 1", date: "Januari - Maret 2026", status: "Sedang Berlangsung" },
-    { title: "Gelombang 2", date: "April - Juni 2026", status: "Akan Datang" },
-    { title: "Gelombang 3", date: "Juli 2026", status: "Akan Datang" },
-  ];
+  const jadwal = jadwalInfo?.length > 0 ? jadwalInfo : [];
+  const persyaratan = persyaratanInfo?.length > 0 ? persyaratanInfo.map(p => p.deskripsi || p.teks) : [];
 
-  const persyaratan = persyaratanInfo?.length > 0 ? persyaratanInfo.map(p => p.deskripsi) : [
-    "Fotocopy Ijazah SMP/MTs (legalisir)",
-    "Fotocopy Kartu Keluarga (KK)",
-    "Fotocopy Akta Kelahiran",
-    "Pas Foto 3x4 (4 lembar)",
-    "Fotocopy KTP Orang Tua"
-  ];
+
 
 
 
@@ -136,7 +112,7 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
       keywords="PPDB SMK 2026, Pendaftaran SMK Jakarta, Jurusan RPL Jakarta, Beasiswa SMK Jakarta"
     >
       {/* 1. Hero Section */}
-      <section className="relative min-h-screen md:min-h-[80vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[60vh] md:min-h-[50vh] flex items-center justify-center overflow-hidden pb-10">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <div 
@@ -161,30 +137,16 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
 
             {/* Badge */}
             <span className="inline-block px-4 py-2 bg-[#F5C400] text-[#1E1E8F] font-bold rounded-full text-sm mb-6 shadow-lg shadow-yellow-500/20">
-              PPDB 2025/2026
+              {sekolahInfo?.ppdb_badge || 'PPDB 2025/2026'}
             </span>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-              Bergabunglah Bersama<br/>Generasi Juara
+              {sekolahInfo?.ppdb_hero_title || 'Bergabunglah Bersama'}<br/>Generasi Juara
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto mb-10 font-light">
-              Daftarkan dirimu sekarang di SMK Paramitha 2 Jakarta
+              {sekolahInfo?.ppdb_hero_description || 'Daftarkan dirimu sekarang di SMK Paramitha 2 Jakarta'}
             </p>
 
-            {/* Countdown Timer */}
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
-              {['Hari', 'Jam', 'Menit', 'Detik'].map((label, idx) => {
-                const values = [timeLeft.days, timeLeft.hours, timeLeft.minutes, timeLeft.seconds];
-                return (
-                  <div key={idx} className="flex flex-col items-center">
-                    <div className="w-20 h-20 md:w-24 md:h-24 bg-[#F5C400] rounded-xl flex items-center justify-center text-[#1E1E8F] text-3xl md:text-4xl font-bold shadow-lg border-2 border-[#1E1E8F]/20">
-                      {String(values[idx]).padStart(2, '0')}
-                    </div>
-                    <span className="text-white text-sm mt-2 font-medium uppercase tracking-wider">{label}</span>
-                  </div>
-                );
-              })}
-            </div>
           </motion.div>
         </div>
       </section>
@@ -202,44 +164,54 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
             <div className="w-20 h-1 bg-[#C0161C] mx-auto rounded-full"></div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {jadwal.map((item, idx) => (
-              <motion.div
-                key={idx}
+          {jadwal.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {jadwal.map((item, idx) => (
+
+                <motion.div
+                  key={idx}
+
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, duration: 0.5 }}
                 className={`bg-white rounded-2xl p-6 shadow-lg border-t-4 h-full flex flex-col justify-between ${
-                  item.status === 'Sedang Berlangsung' 
-                    ? 'border-[#C0161C] shadow-red-100' 
-                    : item.status === 'Akan Datang' && item.title.includes('2') 
-                      ? 'border-[#1E1E8F]' 
+                  item.status === 'Sedang Berlangsung'
+                    ? 'border-[#C0161C] shadow-red-100'
+                    : item.status === 'Akan Datang' && item.title.includes('2')
+                      ? 'border-[#1E1E8F]'
                       : 'border-slate-400'
                 }`}
               >
                 <div>
-                  <h3 className="text-xl font-bold text-[#0A0A1A] mb-2">{item.title}</h3>
-                  <p className="text-[#6B7280] mb-4">{item.date}</p>
+                  <h3 className="text-xl font-bold text-[#0A0A1A] mb-2">{item.nama}</h3>
+                  <p className="text-[#6B7280] mb-4">
+                    {item.tanggal_mulai ? new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+                    {item.tanggal_selesai && ` - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                  </p>
                 </div>
                 <div className="mt-4">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                    item.status === 'Sedang Berlangsung' 
-                      ? 'bg-red-100 text-[#C0161C] animate-pulse' 
-                      : item.status === 'Akan Datang' && item.title.includes('2') 
-                        ? 'bg-indigo-100 text-[#1E1E8F]' 
+                    item.status === 'sedang_berlangsung'
+                      ? 'bg-red-100 text-[#C0161C] animate-pulse'
+                      : item.status === 'akan_datang'
+                        ? 'bg-indigo-100 text-[#1E1E8F]'
                         : 'bg-slate-100 text-slate-500'
                   }`}>
-                    {item.status}
+                    {item.status === 'sedang_berlangsung' ? 'Sedang Berlangsung' : item.status === 'akan_datang' ? 'Akan Datang' : item.status === 'selesai' ? 'Selesai' : item.status}
                   </span>
                 </div>
               </motion.div>
             ))}
           </div>
+        ) : (
+          <div className="text-center text-slate-500">Belum ada jadwal.</div>
+        )}
         </div>
       </section>
 
       {/* 3. Section Persyaratan Berkas */}
+
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -251,14 +223,20 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
               transition={{ duration: 0.6 }}
             >
               <h2 className="text-3xl font-bold text-[#1E1E8F] mb-8">Persyaratan Berkas</h2>
-              <ul className="space-y-4">
-                {persyaratan.map((req, idx) => (
+              {persyaratan.length > 0 ? (
+                <ul className="space-y-4">
+                  {persyaratan.map((req, idx) => (
+
                   <li key={idx} className="flex items-start gap-4 p-4 rounded-xl hover:bg-[#F8F8FF] transition-colors border border-transparent hover:border-slate-100">
                     <CheckCircle className="text-[#F5C400] shrink-0 mt-0.5" size={24} />
                     <span className="text-[#0A0A1A] font-medium">{req}</span>
                   </li>
-                ))}
-              </ul>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-slate-500">Belum ada data persyaratan.</div>
+              )}
+
             </motion.div>
 
             {/* Decorative Card */}
@@ -371,17 +349,29 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-[#0A0A1A]">Pilihan Jurusan</label>
-                      <select
-                        name="jurusan"
-                        value={formData.jurusan}
-                        onChange={handleChange}
-                        className="input-field w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#C0161C] focus:ring-1 focus:ring-[#C0161C] outline-none transition-all"
-                      >
-                        {jurusanOptions.map((opt, idx) => (
-                          <option key={idx} value={opt}>{opt}</option>
-                        ))}
-                      </select>
+                      {jurusanOptions.length > 0 ? (
+                        <div className="relative">
+                          <select
+                            name="jurusan"
+                            value={formData.jurusan}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#C0161C] focus:ring-2 focus:ring-[#C0161C]/10 outline-none transition-all appearance-none bg-white cursor-pointer hover:border-[#C0161C]/50"
+                          >
+                            {jurusanOptions.map((opt, idx) => (
+                              <option key={idx} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-slate-500">Belum ada data jurusan.</div>
+                      )}
                     </div>
+
                   </div>
                 </div>
 
@@ -418,33 +408,10 @@ export default function PPDB({ sekolahInfo, jadwalInfo, persyaratanInfo, jurusan
         </div>
       </section>
 
-      {/* 5. Section CTA WhatsApp */}
-      <section className="py-20 bg-gradient-to-r from-[#C0161C] to-[#1E1E8F] text-center">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Butuh Bantuan Pendaftaran?
-            </h2>
-            <a
-              href="https://wa.me/6282124706301"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-[#25D366] text-white font-bold px-8 py-4 rounded-full hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-xl"
-            >
-              <WhatsAppIcon size={24} />
-              Chat WhatsApp Sekarang
-            </a>
-          </motion.div>
-        </div>
-      </section>
     </Layout>
   );
 }
+
 
 export async function getServerSideProps() {
   try {

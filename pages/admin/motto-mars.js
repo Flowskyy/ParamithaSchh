@@ -4,81 +4,102 @@ import { getMottoMars, upsertMottoMars } from '../../services/api';
 import { toastSuccess, toastError } from '../../utils/toast';
 
 export default function MottoMarsAdminPage() {
-  const [data, setData] = useState({ pink_values: [], jitu_values: [], mars_lyrics: [], id: null });
+  const [motto, setMotto] = useState('PINK JITU\n\nProfesional\nInovatif\nNasionalis\nKompeten\n\nJujur\nIman\nTangguh\nUnggul');
+  const [marsLyrics, setMarsLyrics] = useState(`Kami Para Putra-Putri Siswa Paramitha
+Pewaris Penerus Cita Pembangunan Negara
+Kami Semua Berusaha Tuk Mencapai Cita-Cita
+Giat Belajar Bekerja Berjuang Bersama Gembira
+
+Sekolah Menengah Industri Pariwisata
+Serta Teknologi Informatika
+Dibina Dididik Jiwa Raganya
+Agar Berguna Tuk Nusa Bangsa
+
+Dunia Usaha Kita Memanggil Kita Semua
+Marilah Giat Belajar
+Jayalah Paramitha Kita
+Marilah Giat Belajar
+Jayalah Paramitha Kita`);
+  const [id, setId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function load() {
       const result = await getMottoMars();
-      setData({
-        id: result?.id || null,
-        pink_values: result?.pink_values || [],
-        jitu_values: result?.jitu_values || [],
-        mars_lyrics: result?.mars_lyrics || []
-      });
+      if (result) {
+        setId(result?.id || null);
+        if (result?.motto) setMotto(result.motto);
+        if (result?.mars_lyrics) {
+          if (Array.isArray(result.mars_lyrics)) {
+            setMarsLyrics(result.mars_lyrics.join('\n\n'));
+          } else {
+            setMarsLyrics(result.mars_lyrics);
+          }
+        }
+      }
     }
     load();
   }, []);
 
-  const setJsonField = (field, value) => {
-    setData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const response = await upsertMottoMars(data);
+    
+    const marsArray = marsLyrics.split('\n\n').filter(m => m.trim());
+    const payload = { id, motto, mars_lyrics: marsArray };
+    
+    const response = await upsertMottoMars(payload);
     setLoading(false);
     if (response.error) {
-      toastError('Gagal menyimpan nilai dan mars.');
+      toastError('Gagal menyimpan motto dan mars.');
     } else {
-      toastSuccess('Nilai dan Mars berhasil disimpan.');
+      toastSuccess('Motto dan Mars berhasil disimpan.');
     }
   };
 
   return (
     <AdminLayout title="Motto & Mars">
-      <form onSubmit={handleSubmit} className="space-y-8 rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
-        <section className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex justify-between items-start">
           <div>
-            <label className="text-sm font-semibold text-slate-700">Pink Values (JSON)</label>
-            <textarea
-              rows={8}
-              value={JSON.stringify(data.pink_values || [], null, 2)}
-              onChange={(e) => setJsonField('pink_values', e.target.value)}
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono text-sm focus:border-primary-500 focus:ring-primary-100 focus:outline-none"
-            />
-            <p className="text-xs text-slate-500">Gunakan format array JSON berisi object {`{ char, title, desc }`}.</p>
+            <h1 className="text-2xl font-bold text-[#1E1E8F]">Motto & Mars</h1>
+            <p className="text-sm text-slate-500 mt-1">Kelola motto dan lirik mars sekolah</p>
           </div>
+        </div>
 
-          <div>
-            <label className="text-sm font-semibold text-slate-700">Jitu Values (JSON)</label>
-            <textarea
-              rows={8}
-              value={JSON.stringify(data.jitu_values || [], null, 2)}
-              onChange={(e) => setJsonField('jitu_values', e.target.value)}
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono text-sm focus:border-primary-500 focus:ring-primary-100 focus:outline-none"
-            />
-            <p className="text-xs text-slate-500">Gunakan format array JSON berisi object {`{ char, title, desc }`}.</p>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+          <div className="space-y-5">
+            <div>
+              <label className="text-sm font-medium text-slate-700 block mb-1.5">Motto Sekolah</label>
+              <p className="text-xs text-slate-500 mb-2">PINK JITU - Profesional Inovatif Nasionalis Kompeten, Jujur Iman Tangguh Unggul</p>
+              <textarea
+                value={motto}
+                onChange={(e) => setMotto(e.target.value)}
+                rows={8}
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-[#C0161C] focus:ring-2 focus:ring-[#C0161C]/10 focus:outline-none"
+                placeholder="Masukkan motto sekolah..."
+              />
+            </div>
 
-          <div>
-            <label className="text-sm font-semibold text-slate-700">Mars Lyrics (JSON)</label>
-            <textarea
-              rows={8}
-              value={JSON.stringify(data.mars_lyrics || [], null, 2)}
-              onChange={(e) => setJsonField('mars_lyrics', e.target.value)}
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono text-sm focus:border-primary-500 focus:ring-primary-100 focus:outline-none"
-            />
-            <p className="text-xs text-slate-500">Gunakan format array JSON berisi object {`{ verse, text }`}.</p>
+            <div>
+              <label className="text-sm font-medium text-slate-700 block mb-1.5">Lirik Mars Sekolah</label>
+              <p className="text-xs text-slate-500 mb-2">Setiap paragraf dipisahkan dengan baris kosong</p>
+              <textarea
+                value={marsLyrics}
+                onChange={(e) => setMarsLyrics(e.target.value)}
+                rows={12}
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:border-[#C0161C] focus:ring-2 focus:ring-[#C0161C]/10 focus:outline-none"
+                placeholder="Masukkan lirik mars sekolah..."
+              />
+            </div>
           </div>
-        </section>
+        </div>
 
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={loading}
-            className="rounded-2xl bg-primary-600 px-6 py-3 text-white font-semibold transition hover:bg-primary-700 disabled:opacity-60"
+            className="bg-[#C0161C] text-white font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-[#a01217] transition-colors disabled:opacity-60"
           >
             {loading ? 'Menyimpan...' : 'Simpan Motto & Mars'}
           </button>

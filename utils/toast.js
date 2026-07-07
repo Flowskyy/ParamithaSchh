@@ -1,41 +1,22 @@
 import toast from 'react-hot-toast';
+import CustomToast from '../components/CustomToast';
 
-export const toastSuccess = (message, toastId = null) => {
+export const toastSuccess = (message, details = null, toastId = null) => {
   if (toastId) toast.dismiss(toastId);
-  return toast.success(message, {
-    style: {
-      background: '#151525',
-      color: '#fff',
-      border: '1px solid rgba(255,255,255,0.1)',
-    },
-    iconTheme: {
-      primary: '#4F8EF7',
-      secondary: '#fff',
-    },
+  return toast.custom((t) => <CustomToast t={t} type="success" message={message} details={details} />, {
+    duration: 3000,
   });
 };
 
-export const toastError = (message, toastId = null) => {
+export const toastError = (message, details = null, toastId = null) => {
   if (toastId) toast.dismiss(toastId);
-  return toast.error(message, {
-    style: {
-      background: '#151525',
-      color: '#fff',
-      border: '1px solid rgba(255,255,255,0.1)',
-    },
-    iconTheme: {
-      primary: '#EF4444',
-      secondary: '#fff',
-    },
+  return toast.custom((t) => <CustomToast t={t} type="error" message={message} details={details} />, {
+    duration: 5000,
   });
 };
 
-export const toastLoading = (message) => toast.loading(message, {
-  style: {
-    background: '#151525',
-    color: '#fff',
-    border: '1px solid rgba(255,255,255,0.1)',
-  },
+export const toastLoading = (message, details = null) => toast.custom((t) => <CustomToast t={t} type="loading" message={message} details={details} />, {
+  duration: Infinity,
 });
 
 export const toastDismiss = (toastId) => toast.dismiss(toastId);

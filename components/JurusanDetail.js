@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Briefcase, Phone, GraduationCap, Award, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import Image from 'next/image';
+import { ArrowRight, CheckCircle, Briefcase, Phone, GraduationCap, Award, Users, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { normalizeJurusanContent } from '../utils/jurusanContent';
+import FormattedDescription from './FormattedDescription';
 
 const SectionHeader = ({ title, subtitle, center }) => (
   <div className={`mb-12 ${center ? 'text-center' : ''}`}>
@@ -50,26 +51,24 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
     kompetensi = [], 
     prospek = [], // Fix: prospek_karir -> prospek
     prospek_karir = [], // Keep for fallback
-    gallery = [] // Default to empty array
+    gallery = [], // Default to empty array
+    articles = [],
+    kompetensi_cards = [],
+    apa_yang_dipelajari = [],
+    peluang_karir = []
   } = jurusan;
 
   const content = normalizeJurusanContent(jurusan?.content, name || 'Jurusan');
-  const finalDescription = description || deskripsi || content.hero_description;
-  const finalProspek = prospek && prospek.length > 0 ? prospek : prospek_karir;
-  const benefitItems = Array.isArray(content.benefits_items) && content.benefits_items.length > 0
-    ? content.benefits_items.map((item, index) => ({
-        ...item,
-        icon: [GraduationCap, Users, Award][index] || GraduationCap
-      }))
-    : [
-        { title: 'Kurikulum Industri', description: 'Materi pembelajaran update sesuai standar industri.', icon: GraduationCap },
-        { title: 'Pengajar Praktisi', description: 'Diajar langsung oleh ahli di bidangnya.', icon: Users },
-        { title: 'Sertifikasi Kompetensi', description: 'Lulusan dibekali sertifikat BNSP yang diakui.', icon: Award }
-      ];
-  const learningItems = Array.isArray(content.learning_items) && content.learning_items.length > 0
-    ? content.learning_items
+  const finalProspek = peluang_karir && peluang_karir.length > 0 ? peluang_karir : prospek;
+  const finalArticles = Array.isArray(articles) && articles.length > 0 ? articles : [];
+  const finalKompetensiCards = Array.isArray(apa_yang_dipelajari) && apa_yang_dipelajari.length > 0
+    ? apa_yang_dipelajari
+    : Array.isArray(kompetensi_cards) && kompetensi_cards.length > 0
+    ? kompetensi_cards
     : kompetensi.map((item) => ({ title: item, description: `Menguasai keahlian ${item.toLowerCase()} secara mendalam dengan praktik intensif.` }));
-  const careerItems = Array.isArray(content.career_items) && content.career_items.length > 0
+  const careerItems = Array.isArray(peluang_karir) && peluang_karir.length > 0
+    ? peluang_karir
+    : Array.isArray(content.career_items) && content.career_items.length > 0
     ? content.career_items
     : finalProspek;
 
@@ -110,7 +109,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
              style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}>
         </div>
 
-        <div className="container mx-auto px-4 relative z-10 text-center md:text-left">
+        <div className="container mx-auto px-6 md:px-12 lg:px-20 relative z-10 text-center md:text-left">
           <div className="flex flex-col md:flex-row items-center justify-between gap-12">
             <motion.div 
               initial="hidden"
@@ -129,7 +128,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               </motion.h1>
               
               <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl leading-relaxed">
-                {content.hero_description || finalDescription}
+                {deskripsi || description}
               </motion.p>
               
               <motion.div variants={fadeInUp}>
@@ -174,79 +173,70 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
 
       {/* 2. SECTION TENTANG */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-            >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-                {content.about_title || `Mengapa Memilih ${name}?`}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed mb-6">
-                {content.about_description || `Program keahlian ${name} di SMK Paramitha 2 dirancang untuk mencetak lulusan yang siap kerja dan kompeten.`}
-              </motion.p>
-              <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed">
-                {content.about_highlight || 'Siswa tidak hanya belajar teori, tetapi juga praktik langsung melalui Project Based Learning dan program magang di perusahaan mitra terkemuka.'}
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="space-y-4"
-            >
-              {benefitItems.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                <motion.div 
-                  key={idx}
-                  variants={fadeInUp}
-                  className="p-6 rounded-xl bg-gray-50 border-l-4 hover:shadow-md transition-shadow"
-                  style={{ borderColor: warna_primer }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-white shadow-sm text-white" style={{ backgroundColor: warna_primer }}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
-                      <p className="text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
+        {finalArticles.length > 0 ? (
+          <div className="px-6 md:px-12 lg:px-20 space-y-12">
+            {finalArticles.map((article, idx) => (
+              <motion.div
+                key={idx}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={stagger}
+              >
+                <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                  {article.title}
+                </motion.h2>
+                <motion.div variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed">
+                  <FormattedDescription text={article.description} />
                 </motion.div>
-                );
-              })}
-            </motion.div>
+              </motion.div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={stagger}
+              >
+                <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                  {content.about_title || `Mengapa Memilih ${name}?`}
+                </motion.h2>
+                <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed mb-6">
+                  {content.about_description || `Program keahlian ${name} di SMK Paramitha 2 dirancang untuk mencetak lulusan yang siap kerja dan kompeten.`}
+                </motion.p>
+                <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed">
+                  {content.about_highlight || 'Siswa tidak hanya belajar teori, tetapi juga praktik langsung melalui Project Based Learning dan program magang di perusahaan mitra terkemuka.'}
+                </motion.p>
+              </motion.div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 3. SECTION KOMPETENSI */}
       <section className="py-20 bg-[#F8F8FF]">
-        <div className="container mx-auto px-4">
-          <SectionHeader 
-            title={content.learning_title || 'Apa yang Dipelajari?'} 
+        <div className="container mx-auto px-6 md:px-12 lg:px-20">
+          <SectionHeader
+            title={content.learning_title || 'Apa yang Dipelajari?'}
             subtitle={content.learning_description || `Materi dan kompetensi utama jurusan ${name}`}
             center
           />
-          
-          <motion.div 
+
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={stagger}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
+            className="flex flex-wrap justify-center gap-6 mt-12 max-w-5xl mx-auto"
           >
-            {learningItems.map((item, idx) => (
-              <motion.div 
+            {finalKompetensiCards.map((item, idx) => (
+              <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border-t-4 group"
+                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border-t-4 group w-full md:w-[calc(33.333%-16px)]"
                 style={{ borderColor: warna_primer }}
               >
                 <div className="mb-4 inline-flex p-3 rounded-full bg-gray-50 group-hover:bg-gray-100 transition-colors">
@@ -255,9 +245,9 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[color:var(--hover-color)]" style={{ '--hover-color': warna_primer }}>
                   {item.title}
                 </h3>
-                <p className="text-gray-500">
-                  {item.description || `Menguasai keahlian ${item.title?.toLowerCase()} secara mendalam dengan praktik intensif.`}
-                </p>
+                <div className="text-gray-500">
+                  <FormattedDescription text={item.description || `Menguasai keahlian ${item.title?.toLowerCase()} secara mendalam dengan praktik intensif.`} />
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -266,7 +256,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
 
       {/* 4. SECTION PROSPEK KARIR */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-6 md:px-12 lg:px-20">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">{content.career_title || 'Peluang Karir'}</h2>
             <p className="text-gray-600 text-lg">
@@ -274,22 +264,29 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
             </p>
           </div>
 
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={stagger}
-            className="flex flex-wrap justify-center gap-4"
+            className="flex flex-wrap justify-center gap-6 mt-12 max-w-5xl mx-auto"
           >
             {careerItems.map((career, idx) => (
-              <motion.div 
+              <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="px-6 py-4 rounded-full border bg-white shadow-sm hover:shadow-md transition-all cursor-default flex items-center gap-3"
-                style={{ borderColor: `${warna_primer}30` }}
+                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border-t-4 group w-full md:w-[calc(33.333%-16px)]"
+                style={{ borderColor: warna_primer }}
               >
-                <Briefcase className="w-5 h-5" style={{ color: warna_primer }} />
-                <span className="text-lg font-medium text-gray-800">{career.title || career}</span>
+                <div className="mb-4 inline-flex p-3 rounded-full bg-gray-50 group-hover:bg-gray-100 transition-colors">
+                  <Briefcase className="w-8 h-8" style={{ color: warna_primer }} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[color:var(--hover-color)]" style={{ '--hover-color': warna_primer }}>
+                  {career.title}
+                </h3>
+                <div className="text-gray-500">
+                  <FormattedDescription text={career.description} />
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -299,31 +296,34 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
       {/* 5. SECTION GALERI FOTO (NEW) */}
       {gallery && gallery.length > 0 && (
         <section className="py-20 bg-[#F8F8FF]">
-          <div className="container mx-auto px-4">
-            <SectionHeader 
+          <div className="container mx-auto px-6 md:px-12 lg:px-20">
+            <SectionHeader
               title={`Galeri Kegiatan ${name}`}
               subtitle="Dokumentasi kegiatan praktik dan pembelajaran siswa"
               center
             />
 
-            <motion.div 
+            <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={stagger}
-              className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+              className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-6xl mx-auto"
             >
               {gallery.map((imgUrl, idx) => (
                 <motion.div 
                   key={idx}
                   variants={fadeInUp}
-                  className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-pointer shadow-md"
+                  className="relative aspect-[4/3] rounded-xl overflow-hidden group cursor-pointer shadow-md w-full sm:w-[calc(50%-8px)] md:w-[calc(33.333%-16px)]"
                   onClick={() => openLightbox(idx)}
                 >
-                  <img 
-                    src={imgUrl} 
-                    alt={`Galeri ${name} ${idx + 1}`} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  <Image
+                    src={imgUrl}
+                    alt={`Galeri ${name} ${idx + 1}`}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                     <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-8 h-8" />
@@ -342,7 +342,7 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
           background: `linear-gradient(to right, ${warna_primer}, ${warna_sekunder})` 
         }}
       >
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-6 md:px-12 lg:px-20">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -408,10 +408,13 @@ export default function JurusanDetail({ jurusan, sekolahInfo }) {
               className="relative w-full max-w-5xl h-[80vh] flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <img 
-                src={gallery[lightboxIndex]} 
-                alt={`Lightbox ${lightboxIndex + 1}`} 
-                className="max-w-full max-h-full object-contain rounded-md shadow-2xl"
+              <Image
+                src={gallery[lightboxIndex]}
+                alt={`Lightbox ${lightboxIndex + 1}`}
+                fill
+                unoptimized
+                sizes="100vw"
+                className="object-contain rounded-md shadow-2xl"
               />
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 bg-black/40 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
                 {lightboxIndex + 1} / {gallery.length}

@@ -63,6 +63,8 @@ export const normalizeJurusanContent = (content, name = 'Jurusan') => {
     try {
       return normalizeJurusanContent(JSON.parse(content), name);
     } catch (err) {
+      console.error('JSON parse error in normalizeJurusanContent:', err.message);
+      console.error('Content being parsed (first 200 chars):', content.substring(0, 200));
       return defaults;
     }
   }

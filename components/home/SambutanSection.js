@@ -5,7 +5,7 @@ import SmartImage from '../SmartImage';
 import WaveSeparator from '../WaveSeparator';
 
 const Section = ({ children, className, id }) => (
-  <section id={id} className={`relative py-20 ${className}`}>
+  <section id={id} className={`relative py-20 w-full ${className}`}>
     {children}
   </section>
 );
@@ -16,8 +16,9 @@ export default function SambutanSection({ info }) {
     : "Belum ada sambutan.";
 
   return (
-    <Section className="bg-white pb-32">
-      <div className="container mx-auto px-6">
+    <div className="w-full bg-white">
+      <section className="relative py-20 w-full">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           {/* Photo */}
           <motion.div 
@@ -78,7 +79,8 @@ export default function SambutanSection({ info }) {
           </motion.div>
         </div>
       </div>
-      <WaveSeparator position="bottom" color="#FFF8F8" height="100px" />
-    </Section>
+      </section>
+      
+    </div>
   );
 }

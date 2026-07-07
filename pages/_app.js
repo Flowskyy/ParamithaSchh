@@ -10,6 +10,36 @@ import '../styles/globals.css';
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
 
+  useEffect(() => {
+    // Track visitor on page load (except admin pages)
+    if (typeof window !== 'undefined' && !router.pathname.startsWith('/admin')) {
+      const trackVisitor = async () => {
+        try {
+          const deviceType = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 
+                           /Tablet/i.test(navigator.userAgent) ? 'tablet' : 'desktop';
+          
+          const visitorData = {
+            device_type: deviceType,
+            page_url: router.pathname,
+            user_agent: navigator.userAgent,
+            ip_address: null, // IP will be captured server-side if needed
+            referrer: document.referrer || null
+          };
+
+          await fetch('/api/db', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'logVisitor', visitor: visitorData })
+          });
+        } catch (error) {
+          console.error('Visitor tracking error:', error);
+        }
+      };
+
+      trackVisitor();
+    }
+  }, [router.pathname]);
+
   return (
     <>
       <Head>

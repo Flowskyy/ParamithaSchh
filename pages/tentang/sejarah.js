@@ -40,7 +40,7 @@ export default function SejarahPage({ sekolahInfo, sejarahList }) {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto whitespace-pre-wrap"
           >
-            {info.history || "Belum ada sejarah."}
+            {info.history || "Mari Kita Buat Sejarah Bersama!"}
           </motion.p>
         </div>
       </section>

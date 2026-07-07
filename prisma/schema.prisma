@@ -9,7 +9,7 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model activity_log {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   action      String
   target      String?
   details     String?
@@ -19,14 +19,13 @@ model activity_log {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model alumni {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   nama        String
   jurusan     String?
-  angkatan    String?
+  tahun_lulus String?
+  tempat_kerja String?
+  jabatan     String?
   foto_url    String?
-  perusahaan  String?
-  posisi      String?
-  deskripsi   String?
   order_index Int?      @default(0)
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   updated_at  DateTime? @default(now()) @db.Timestamptz(6)
@@ -34,7 +33,7 @@ model alumni {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model fasilitas {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   title       String
   description String?
   image_url   String?
@@ -44,7 +43,7 @@ model fasilitas {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model galeri {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   title      String?
   category   String?
   image_url  String
@@ -54,11 +53,17 @@ model galeri {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model hero {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
+  badge      String?
   title      String?
   subtitle   String?
+  description String?
+  cta_text   String?
+  cta_url    String?
+  cta2_text  String?
+  cta2_url   String?
   image_url  String?
-  created_at DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -72,7 +77,7 @@ model homepage_sections {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model jadwal_ppdb {
-  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id              String    @id @default(uuid()) @db.Uuid
   nama            String
   tanggal_mulai   DateTime? @db.Date
   tanggal_selesai DateTime? @db.Date
@@ -82,7 +87,7 @@ model jadwal_ppdb {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model jurusan {
-  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id             String    @id @default(uuid()) @db.Uuid
   name           String
   slug           String    @unique
   short_desc     String?
@@ -92,8 +97,9 @@ model jurusan {
   order_index    Int?      @default(0)
   created_at     DateTime  @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamptz(6)
   description    String?
-  kompetensi     String[]
-  prospek        String[]
+  apa_yang_dipelajari Json?   @default("[]")
+  peluang_karir  Json?     @default("[]")
+  articles       Json?     @default("[]")
   fasilitas      String[]
   gallery        String[]
   warna_primer   String?   @default("#C0161C")
@@ -108,10 +114,9 @@ model jurusan {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model mitra_perusahaan {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  nama        String
+  id          String    @id @default(uuid()) @db.Uuid
+  nama        String?
   logo_url    String?
-  website     String?
   order_index Int?      @default(0)
   aktif       Boolean?  @default(true)
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
@@ -124,12 +129,25 @@ model motto_mars {
   jitu_values    Json?    @default("[]")
   mars_lyrics    Json?    @default("[]")
   mars_audio_url String?
+  motto          String?
   created_at     DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamptz(6)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model proyek_pkk {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String?
+  subtitle     String?
+  description  String?
+  services     String[] @default([])
+  website_url  String?
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model persyaratan {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   teks        String
   order_index Int?      @default(0)
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
@@ -142,12 +160,13 @@ model sejarah {
   title       String?
   description String?
   icon        String?
+  order_index Int?     @default(0)
   created_at  DateTime @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamptz(6)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sekolah_info {
-  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                  String    @id @default(uuid()) @db.Uuid
   name                String?
   phone               String?
   email               String?
@@ -160,21 +179,36 @@ model sekolah_info {
   kepsek_photo        String?
   kepsek_message      String?
   created_at          DateTime  @default(dbgenerated("timezone('utc'::text, now())")) @db.Timestamptz(6)
+
   cta_title           String?
   cta_description     String?
   cta_link            String?
   cta_button_text     String?
   tiktok              String?
+
+  wa_ppdb             String?
+  wa_kontak           String?
+  jam_operasional     String?
+
+  ppdb_badge          String?
+  ppdb_hero_title     String?
+  ppdb_hero_description String?
+  ppdb_countdown_date String?
+  ppdb_cta_text       String?
+  ppdb_cta_url        String?
+
   sosmed_ig_aktif     Boolean?  @default(true)
   sosmed_yt_aktif     Boolean?  @default(true)
   sosmed_fb_aktif     Boolean?  @default(true)
   sosmed_tiktok_aktif Boolean?  @default(true)
+
   vision              String?
   mission             String[]  @default([])
   history             String?
   motto               String?
   updated_at          DateTime? @default(now()) @db.Timestamptz(6)
 }
+
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model visi_misi {
@@ -186,7 +220,7 @@ model visi_misi {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model visitor_logs {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   device_type String
   page_url    String
   user_agent  String?
@@ -195,3 +229,25 @@ model visitor_logs {
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   updated_at  DateTime @default(now()) @db.Timestamptz(6)
 }
+
+model whatsapp_clicks {
+  id          String   @id @default(uuid()) @db.Uuid
+  page_url    String
+  button_type String?
+  user_agent  String?
+  ip_address  String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model pendaftar {
+  id            String   @id @default(uuid()) @db.Uuid
+  nama          String?
+  nisn          String?
+  asal_sekolah String?
+  email         String?
+  whatsapp      String?
+  jurusan       String?
+  pesan         String?
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+

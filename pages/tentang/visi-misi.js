@@ -1,4 +1,3 @@
-
 import Head from 'next/head'
 import { motion } from 'framer-motion'
 import { Target, CheckCircle, Globe } from 'lucide-react'
@@ -37,14 +36,6 @@ export default function VisiMisiPage({ sekolahInfo }) {
           >
             Visi & Misi
           </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-          >
-            Arah dan tujuan kami dalam mencetak generasi penerus bangsa yang berkualitas.
-          </motion.p>
         </div>
       </section>
 

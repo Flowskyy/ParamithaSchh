@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import { getSekolahInfo } from '../services/api';
-import { fallbackSekolahInfo } from '../utils/fallbackData';
 
 // TikTok Icon Component
 const TikTokIcon = ({ size = 18, className = "" }) => (
@@ -25,7 +24,7 @@ const TikTokIcon = ({ size = 18, className = "" }) => (
 
 export default function SidebarModal({ isOpen, onClose, links }) {
   const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [info, setInfo] = useState(fallbackSekolahInfo);
+  const [info, setInfo] = useState({});
 
   useEffect(() => {
     async function loadInfo() {
@@ -204,16 +203,16 @@ export default function SidebarModal({ isOpen, onClose, links }) {
                     <div className="flex items-start gap-3">
                       <MapPin className="shrink-0 mt-0.5 text-[#F5C400]" size={16} />
                       <p className="text-xs text-white/90 leading-snug">
-                        {info.address || fallbackSekolahInfo.address}
+                        {info.address || '-' }
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Phone className="shrink-0 text-[#F5C400]" size={16} />
-                      <p className="text-xs text-white/90">{info.phone || fallbackSekolahInfo.phone}</p>
+                      <p className="text-xs text-white/90">{info.phone || '-'}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Mail className="shrink-0 text-[#F5C400]" size={16} />
-                      <p className="text-xs text-white/90">{info.email || fallbackSekolahInfo.email}</p>
+                      <p className="text-xs text-white/90">{info.email || '-'}</p>
                     </div>
                   </div>
 

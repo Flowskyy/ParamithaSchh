@@ -1,4 +1,67 @@
+/**
+ * ============================================================================
+ * ADMIN API HANDLER
+ * ============================================================================
+ *
+ * @author Calvin
+ *
+ * Endpoint tunggal buat semua kebutuhan CRUD dashboard admin (jurusan, alumni,
+ * mitra, PPDB, galeri, dll). Semua request masuk lewat satu POST endpoint,
+ * dibedain lewat field `action` di body-nya.
+ *
+ * Contoh pemakaian:
+ *   POST /api/admin
+ *   { "action": "getJurusan" }
+ *
+ *   POST /api/admin
+ *   { "action": "createJurusan", "payload": { "name": "...", "slug": "..." } }
+ *
+ * Body yang dipakai (tergantung action-nya):
+ *   - action, payload, id, updates, slug, limit
+ *   - adminEmail, target (buat activity log)
+ *   - visitor (buat visitor log)
+ *   - imageUrl (galeri jurusan)
+ *   - aktif, order_index
+ *
+ * Response:
+ *   Sukses -> { success: true, data: ... }
+ *   Gagal  -> { success: false, error: "..." }
+ *
+ * Daftar action:
+ *   Hero          : getHero, upsertHero
+ *   Jurusan       : getJurusan, getJurusanAll, getJurusanBySlug, createJurusan,
+ *                   updateJurusan, deleteJurusan, updateJurusanOrder,
+ *                   updateJurusanOrderBatch, toggleJurusanAktif,
+ *                   addJurusanGallery, removeJurusanGallery
+ *   Alumni        : getAlumni, createAlumni, updateAlumni, deleteAlumni
+ *   Mitra         : getMitra, createMitra, updateMitra, deleteMitra
+ *   Info Sekolah  : getSekolahInfo, upsertSekolahInfo
+ *   Homepage      : getHomepageSections, updateHomepageSectionOrder
+ *   Log           : logActivity, getActivityLog, logVisitor, getVisitorLogs,
+ *                   getVisitorSummary
+ *   PPDB Jadwal   : getJadwalPPDB, createJadwalPPDB, updateJadwalPPDB, deleteJadwalPPDB
+ *   PPDB Syarat   : getPersyaratanPPDB, createPersyaratanPPDB,
+ *                   updatePersyaratanPPDB, deletePersyaratanPPDB
+ *   Pendaftar     : createPendaftar, getPendaftar, updatePendaftar
+ *   Fasilitas     : getFasilitas, createFasilitas, updateFasilitas, deleteFasilitas
+ *   Galeri        : getGaleri, createGaleri, updateGaleri, deleteGaleri
+ *   Sejarah       : getSejarah, createSejarah, updateSejarah, deleteSejarah
+ *   Motto & Mars  : getMottoMars, upsertMottoMars
+ *   Report        : getReport
+ *
+ * Catatan:
+ *   - Fungsi normalize* itu buat jembatanin beda nama kolom DB vs frontend
+ *     (misal description <-> deskripsi, image_url <-> photo_url).
+ *   - wa_ppdb & wa_kontak dicek dulu keberadaan kolomnya (via information_schema)
+ *     soalnya belum tentu ada di semua environment.
+ *   - Tabel pendaftar masih pakai raw SQL karena belum ada di schema Prisma.
+ * ============================================================================
+ */
+
 import prisma from '../../services/prisma';
+import UAParser from 'ua-parser-js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const cleanObject = (value) =>
   Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined));
@@ -17,10 +80,15 @@ const toSerializable = (value) => {
 };
 
 const sendData = (res, data) => {
-  res.status(200).json({ data: toSerializable(data) });
+  res.status(200).json({ success: true, data: toSerializable(data) });
 };
 
-const parseJsonValue = (value, fallback = []) => {
+const sendError = (res, statusCode, error) => {
+  res.status(statusCode).json({ success: false, error });
+};
+
+
+const parseJsonValue = (value, fallback = [], fieldName = 'unknown') => {
   if (Array.isArray(value)) return value;
   if (value && typeof value === 'object') return value;
   if (typeof value !== 'string') return fallback;
@@ -30,7 +98,9 @@ const parseJsonValue = (value, fallback = []) => {
 
   try {
     return JSON.parse(trimmed);
-  } catch {
+  } catch (err) {
+    console.error(`JSON parse error for field "${fieldName}":`, err.message);
+    console.error(`Value being parsed:`, trimmed.substring(0, 200));
     return fallback;
   }
 };
@@ -74,8 +144,8 @@ const normalizeJurusanInput = (payload = {}) =>
         ? undefined
         : Number(payload.order_index),
     description: payload.deskripsi ?? payload.description ?? null,
-    kompetensi: normalizeStringArrayInput(payload.kompetensi),
-    prospek: normalizeStringArrayInput(payload.prospek),
+    apa_yang_dipelajari: parseJsonValue(payload.apa_yang_dipelajari, payload.kompetensi, [], 'apa_yang_dipelajari'),
+    peluang_karir: parseJsonValue(payload.peluang_karir, payload.prospek, [], 'peluang_karir'),
     fasilitas: normalizeStringArrayInput(payload.fasilitas),
     gallery: Array.isArray(payload.gallery) ? payload.gallery.filter(Boolean) : [],
     warna_primer: payload.warna_primer ?? null,
@@ -83,16 +153,24 @@ const normalizeJurusanInput = (payload = {}) =>
     singkatan: payload.singkatan ?? null,
     aktif: payload.aktif === undefined ? undefined : Boolean(payload.aktif),
     sekolah: payload.sekolah ?? undefined,
-    materi: parseJsonValue(payload.materi, []),
-    activities: parseJsonValue(payload.activities, [])
+    materi: parseJsonValue(payload.materi, [], 'materi'),
+    activities: parseJsonValue(payload.activities, [], 'activities'),
+    articles: parseJsonValue(payload.articles, [], 'articles'),
+    updated_at: new Date()
   });
 
 const normalizeJurusanRecord = (record) => {
   const data = toSerializable(record);
-  return {
+  const result = {
     ...data,
-    deskripsi: data?.description ?? null
+    deskripsi: data?.description ?? null,
+    content: data?.content ?? null,
+    articles: parseJsonValue(data?.articles, [], 'articles'),
+    apa_yang_dipelajari: parseJsonValue(data?.apa_yang_dipelajari, [], 'apa_yang_dipelajari'),
+    peluang_karir: parseJsonValue(data?.peluang_karir, [], 'peluang_karir')
   };
+  console.log('Normalized jurusan record:', result.name, 'articles:', result.articles);
+  return result;
 };
 
 const normalizeFasilitasInput = (payload = {}) =>
@@ -119,7 +197,8 @@ const normalizeSejarahInput = (payload = {}) =>
     year: payload.year ?? null,
     title: payload.title ?? null,
     description: payload.content ?? payload.description ?? null,
-    icon: payload.icon ?? null
+    icon: payload.icon ?? null,
+    order_index: payload.order_index === undefined ? undefined : Number(payload.order_index)
   });
 
 const normalizeSejarahRecord = (record) => {
@@ -149,10 +228,11 @@ const normalizePersyaratanRecord = (record) => {
 
 const normalizeMottoMarsInput = (payload = {}) =>
   cleanObject({
-    pink_values: parseJsonValue(payload.pink_values, []),
-    jitu_values: parseJsonValue(payload.jitu_values, []),
-    mars_lyrics: parseJsonValue(payload.mars_lyrics, []),
-    mars_audio_url: payload.mars_audio_url ?? null
+    pink_values: parseJsonValue(payload.pink_values, [], 'pink_values'),
+    jitu_values: parseJsonValue(payload.jitu_values, [], 'jitu_values'),
+    mars_lyrics: parseJsonValue(payload.mars_lyrics, [], 'mars_lyrics'),
+    mars_audio_url: payload.mars_audio_url ?? null,
+    motto: payload.motto ?? null
   });
 
 const normalizeMissionInput = (value) => normalizeStringArrayInput(value);
@@ -226,6 +306,76 @@ const getSekolahInfoExtras = async (recordId) => {
     extras.wa_kontak = rows?.[0]?.wa_kontak ?? null;
   }
 
+  if (columns.has('ppdb_badge')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_badge
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_badge = rows?.[0]?.ppdb_badge ?? null;
+  }
+
+  if (columns.has('ppdb_hero_title')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_hero_title
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_hero_title = rows?.[0]?.ppdb_hero_title ?? null;
+  }
+
+  if (columns.has('ppdb_hero_description')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_hero_description
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_hero_description = rows?.[0]?.ppdb_hero_description ?? null;
+  }
+
+  if (columns.has('ppdb_countdown_date')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_countdown_date
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_countdown_date = rows?.[0]?.ppdb_countdown_date ?? null;
+  }
+
+  if (columns.has('ppdb_cta_text')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_cta_text
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_cta_text = rows?.[0]?.ppdb_cta_text ?? null;
+  }
+
+  if (columns.has('ppdb_cta_url')) {
+    const rows = await prisma.$queryRaw`
+      SELECT ppdb_cta_url
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.ppdb_cta_url = rows?.[0]?.ppdb_cta_url ?? null;
+  }
+
+  if (columns.has('jam_operasional')) {
+    const rows = await prisma.$queryRaw`
+      SELECT jam_operasional
+      FROM sekolah_info
+      WHERE id::text = ${String(recordId)}
+      LIMIT 1
+    `;
+    extras.jam_operasional = rows?.[0]?.jam_operasional ?? null;
+  }
+
   return extras;
 };
 
@@ -249,6 +399,62 @@ const updateSekolahInfoExtras = async (recordId, payload = {}) => {
       WHERE id::text = ${String(recordId)}
     `;
   }
+
+  if (columns.has('ppdb_badge')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_badge = ${payload.ppdb_badge ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('ppdb_hero_title')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_hero_title = ${payload.ppdb_hero_title ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('ppdb_hero_description')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_hero_description = ${payload.ppdb_hero_description ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('ppdb_countdown_date')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_countdown_date = ${payload.ppdb_countdown_date ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('ppdb_cta_text')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_cta_text = ${payload.ppdb_cta_text ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('ppdb_cta_url')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET ppdb_cta_url = ${payload.ppdb_cta_url ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
+
+  if (columns.has('jam_operasional')) {
+    await prisma.$executeRaw`
+      UPDATE sekolah_info
+      SET jam_operasional = ${payload.jam_operasional ?? null}
+      WHERE id::text = ${String(recordId)}
+    `;
+  }
 };
 
 const normalizeSekolahInfoRecord = async (record) => {
@@ -265,7 +471,7 @@ const normalizeSekolahInfoRecord = async (record) => {
     ...data,
     ...extras,
     mission: normalizeMissionInput(data?.mission),
-    mars_lyrics: parseJsonValue(mottoMars?.mars_lyrics, [])
+    mars_lyrics: parseJsonValue(mottoMars?.mars_lyrics, [], 'mars_lyrics')
   };
 };
 
@@ -280,12 +486,13 @@ const normalizeVisitorInput = (visitor = {}) =>
 
 const normalizeVisitorRecord = (record) => {
   const data = toSerializable(record);
+  const ua = record.user_agent ? UAParser(record.user_agent) : { browser: { name: null }, os: { name: null } };
   return {
     ...data,
     ip: data?.ip_address ?? null,
     current_url: data?.page_url ?? null,
-    browser_name: null,
-    os_name: null
+    browser_name: ua.browser?.name || null,
+    os_name: ua.os?.name || null
   };
 };
 
@@ -312,8 +519,8 @@ const formatDateRange = (start, end) => {
 const normalizeJadwalInput = (payload = {}) =>
   cleanObject({
     nama: payload.nama ?? payload.title ?? null,
-    tanggal_mulai: payload.tanggal_mulai ?? payload.start_date ?? null,
-    tanggal_selesai: payload.tanggal_selesai ?? payload.end_date ?? null,
+    tanggal_mulai: (payload.tanggal_mulai && payload.tanggal_mulai !== '') ? new Date(payload.tanggal_mulai) : ((payload.start_date && payload.start_date !== '') ? new Date(payload.start_date) : null),
+    tanggal_selesai: (payload.tanggal_selesai && payload.tanggal_selesai !== '') ? new Date(payload.tanggal_selesai) : ((payload.end_date && payload.end_date !== '') ? new Date(payload.end_date) : null),
     status: payload.status ?? null
   });
 
@@ -337,9 +544,10 @@ const getRawCount = async (tableName) => {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ success: false, error: 'Method not allowed' });
     return;
   }
+
 
   const {
     action,
@@ -368,8 +576,12 @@ export default async function handler(req, res) {
         const current = await prisma.hero.findFirst({ orderBy: { created_at: 'desc' } });
         const heroPayload = cleanObject({
           title: payload?.title ?? null,
-          subtitle: payload?.subtitle ?? null,
-          image_url: payload?.image_url ?? null
+          badge: payload?.badge ?? null,
+          description: payload?.description ?? null,
+          cta_text: payload?.cta_text ?? null,
+          cta_url: payload?.cta_url ?? null,
+          cta2_text: payload?.cta2_text ?? null,
+          cta2_url: payload?.cta2_url ?? null
         });
         const data = current
           ? await prisma.hero.update({ where: { id: current.id }, data: heroPayload })
@@ -528,7 +740,7 @@ export default async function handler(req, res) {
 
         if (payload?.mars_lyrics !== undefined) {
           const currentMotto = await prisma.motto_mars.findFirst({ orderBy: { created_at: 'desc' } });
-          const marsPayload = { mars_lyrics: parseJsonValue(payload.mars_lyrics, []) };
+          const marsPayload = { mars_lyrics: parseJsonValue(payload.mars_lyrics, [], 'mars_lyrics') };
 
           if (currentMotto) {
             await prisma.motto_mars.update({
@@ -572,6 +784,29 @@ export default async function handler(req, res) {
             })
           )
         );
+        sendData(res, data);
+        return;
+      }
+
+      case 'deleteHomepageSection': {
+        const data = await prisma.homepage_sections.delete({ where: { id } });
+        sendData(res, data);
+        return;
+      }
+
+      case 'cleanupHomepageSections': {
+        // Delete the duplicate teaching_factory section
+        await prisma.homepage_sections.deleteMany({
+          where: { id: 'teaching_factory' }
+        });
+
+        // Update proyek_pkk label to Proyek PKK
+        await prisma.homepage_sections.updateMany({
+          where: { id: 'proyek_pkk' },
+          data: { label: 'Proyek PKK' }
+        });
+
+        const data = await prisma.homepage_sections.findMany({ orderBy: { order_index: 'asc' } });
         sendData(res, data);
         return;
       }
@@ -635,11 +870,214 @@ export default async function handler(req, res) {
         return;
       }
 
-      case 'uploadFile': {
-        // TODO: Storage uploads still exist outside Prisma and need a dedicated storage backend.
-        res.status(501).json({ error: 'Storage uploads are not handled by Prisma.' });
+      case 'getVisitorLogsByDate': {
+        const { startDate, endDate } = req.body;
+        const start = startDate ? new Date(startDate) : new Date('1970-01-01');
+        const end = endDate ? new Date(endDate) : new Date();
+        end.setHours(23, 59, 59, 999);
+
+        const records = await prisma.visitor_logs.findMany({
+          where: {
+            created_at: {
+              gte: start,
+              lte: end
+            }
+          },
+          orderBy: { created_at: 'desc' }
+        });
+        sendData(res, records.map(normalizeVisitorRecord));
         return;
       }
+
+      case 'logWhatsappClick': {
+        const { clickData } = req.body;
+        const data = await prisma.whatsapp_clicks.create({
+          data: {
+            page_url: clickData.page_url || '/',
+            button_type: clickData.button_type || 'general',
+            user_agent: clickData.user_agent || null,
+            ip_address: clickData.ip_address || null
+          }
+        });
+        sendData(res, toSerializable(data));
+        return;
+      }
+
+      case 'getWhatsappClicks': {
+        const { startDate, endDate } = req.body;
+        const start = startDate ? new Date(startDate) : new Date('1970-01-01');
+        const end = endDate ? new Date(endDate) : new Date();
+        end.setHours(23, 59, 59, 999);
+
+        const records = await prisma.whatsapp_clicks.findMany({
+          where: {
+            created_at: {
+              gte: start,
+              lte: end
+            }
+          },
+          orderBy: { created_at: 'desc' }
+        });
+        sendData(res, records.map(toSerializable));
+        return;
+      }
+
+      case 'getAllImages': {
+        const images = [];
+
+        // Get images from all tables
+        const [hero, jurusan, fasilitas, galeri, alumni, mitra, sekolahInfo] = await Promise.all([
+          prisma.hero.findMany({ select: { image_url: true, created_at: true } }),
+          prisma.jurusan.findMany({ select: { image_url: true, icon: true, gallery: true, created_at: true } }),
+          prisma.fasilitas.findMany({ select: { image_url: true, created_at: true } }),
+          prisma.galeri.findMany({ select: { image_url: true, created_at: true } }),
+          prisma.alumni.findMany({ select: { foto_url: true, created_at: true } }),
+          prisma.mitra_perusahaan.findMany({ select: { logo_url: true, created_at: true } }),
+          prisma.sekolah_info.findMany({ select: { kepsek_photo: true, created_at: true } })
+        ]);
+
+        // Collect all image URLs with their sources
+        hero.forEach(item => {
+          if (item.image_url) images.push({ url: item.image_url, source: 'hero', created_at: item.created_at });
+        });
+
+        jurusan.forEach(item => {
+          if (item.image_url) images.push({ url: item.image_url, source: 'jurusan', created_at: item.created_at });
+          if (item.icon) images.push({ url: item.icon, source: 'jurusan_icon', created_at: item.created_at });
+          if (item.gallery && Array.isArray(item.gallery)) {
+            item.gallery.forEach(url => {
+              images.push({ url, source: 'jurusan_gallery', created_at: item.created_at });
+            });
+          }
+        });
+
+        fasilitas.forEach(item => {
+          if (item.image_url) images.push({ url: item.image_url, source: 'fasilitas', created_at: item.created_at });
+        });
+
+        galeri.forEach(item => {
+          if (item.image_url) images.push({ url: item.image_url, source: 'galeri', created_at: item.created_at });
+        });
+
+        alumni.forEach(item => {
+          if (item.foto_url) images.push({ url: item.foto_url, source: 'alumni', created_at: item.created_at });
+        });
+
+        mitra.forEach(item => {
+          if (item.logo_url) images.push({ url: item.logo_url, source: 'mitra', created_at: item.created_at });
+        });
+
+        sekolahInfo.forEach(item => {
+          if (item.kepsek_photo) images.push({ url: item.kepsek_photo, source: 'sekolah_info', created_at: item.created_at });
+        });
+
+        // Get unique images with usage count
+        const imageMap = new Map();
+        images.forEach(img => {
+          if (!img.url) return;
+          const existing = imageMap.get(img.url) || { url: img.url, sources: [], created_at: img.created_at, count: 0 };
+          existing.sources.push(img.source);
+          existing.count++;
+          imageMap.set(img.url, existing);
+        });
+
+        const uniqueImages = Array.from(imageMap.values()).map(img => ({
+          ...img,
+          size: 'Unknown', // Would need file system access to get actual size
+          used: img.count > 0
+        }));
+
+        sendData(res, uniqueImages);
+        return;
+      }
+
+      case 'checkImageUsage': {
+        const { imageUrl } = req.body;
+        const references = [];
+
+        // Check all tables for image usage
+        const [hero, jurusan, fasilitas, galeri, alumni, mitra, sekolahInfo] = await Promise.all([
+          prisma.hero.findMany({ where: { image_url: imageUrl } }),
+          prisma.jurusan.findMany({
+            where: {
+              OR: [
+                { image_url: imageUrl },
+                { icon: imageUrl },
+                { gallery: { has: imageUrl } }
+              ]
+            }
+          }),
+          prisma.fasilitas.findMany({ where: { image_url: imageUrl } }),
+          prisma.galeri.findMany({ where: { image_url: imageUrl } }),
+          prisma.alumni.findMany({ where: { foto_url: imageUrl } }),
+          prisma.mitra_perusahaan.findMany({ where: { logo_url: imageUrl } }),
+          prisma.sekolah_info.findMany({ where: { kepsek_photo: imageUrl } })
+        ]);
+
+        if (hero.length > 0) references.push({ table: 'hero', count: hero.length });
+        if (jurusan.length > 0) references.push({ table: 'jurusan', count: jurusan.length });
+        if (fasilitas.length > 0) references.push({ table: 'fasilitas', count: fasilitas.length });
+        if (galeri.length > 0) references.push({ table: 'galeri', count: galeri.length });
+        if (alumni.length > 0) references.push({ table: 'alumni', count: alumni.length });
+        if (mitra.length > 0) references.push({ table: 'mitra', count: mitra.length });
+        if (sekolahInfo.length > 0) references.push({ table: 'sekolah_info', count: sekolahInfo.length });
+
+        sendData(res, {
+          used: references.length > 0,
+          references,
+          totalUsage: references.reduce((sum, ref) => sum + ref.count, 0)
+        });
+        return;
+      }
+
+      case 'deleteImage': {
+        const { imageUrl } = req.body;
+
+        // Remove image from all tables where it might be referenced
+        await Promise.all([
+          prisma.hero.updateMany({ where: { image_url: imageUrl }, data: { image_url: null } }),
+          prisma.jurusan.updateMany({ where: { image_url: imageUrl }, data: { image_url: null } }),
+          prisma.jurusan.updateMany({ where: { icon: imageUrl }, data: { icon: null } }),
+          prisma.fasilitas.updateMany({ where: { image_url: imageUrl }, data: { image_url: null } }),
+          prisma.galeri.updateMany({ where: { image_url: imageUrl }, data: { image_url: null } }),
+          prisma.alumni.updateMany({ where: { foto_url: imageUrl }, data: { foto_url: null } }),
+          prisma.mitra_perusahaan.updateMany({ where: { logo_url: imageUrl }, data: { logo_url: null } }),
+          prisma.sekolah_info.updateMany({ where: { kepsek_photo: imageUrl }, data: { kepsek_photo: null } })
+        ]);
+
+        // Remove from gallery arrays
+        const jurusanWithGallery = await prisma.jurusan.findMany({
+          where: { gallery: { has: imageUrl } }
+        });
+
+        for (const jurusan of jurusanWithGallery) {
+          const updatedGallery = jurusan.gallery.filter(url => url !== imageUrl);
+          await prisma.jurusan.update({
+            where: { id: jurusan.id },
+            data: { gallery: updatedGallery }
+          });
+        }
+
+        // Delete the physical file from filesystem
+        try {
+          const filePath = path.join(process.cwd(), 'public', imageUrl.replace(/^\//, ''));
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (fileError) {
+          console.error('Error deleting file from filesystem:', fileError);
+          // Continue even if file deletion fails - database cleanup is more important
+        }
+
+        sendData(res, { success: true, message: 'Gambar berhasil dihapus' });
+        return;
+      }
+
+      case 'uploadFile': {
+        res.status(400).json({ success: false, error: 'Use /api/upload instead' });
+        return;
+      }
+
 
       case 'getJadwalPPDB': {
         const data = await prisma.jadwal_ppdb.findMany({
@@ -796,7 +1234,7 @@ export default async function handler(req, res) {
       }
 
       case 'getSejarah': {
-        const data = await prisma.sejarah.findMany({ orderBy: { year: 'asc' } });
+        const data = await prisma.sejarah.findMany({ orderBy: { order_index: 'asc' } });
         sendData(res, data.map(normalizeSejarahRecord));
         return;
       }
@@ -822,6 +1260,19 @@ export default async function handler(req, res) {
         return;
       }
 
+      case 'updateSejarahOrder': {
+        const data = await Promise.all(
+          (updates || []).map((item) =>
+            prisma.sejarah.update({
+              where: { id: normalizeBigIntId(item.id) },
+              data: { order_index: Number(item.order_index) }
+            })
+          )
+        );
+        sendData(res, data.map(normalizeSejarahRecord));
+        return;
+      }
+
       case 'getMottoMars': {
         const data = await prisma.motto_mars.findFirst({ orderBy: { created_at: 'desc' } });
         sendData(res, data);
@@ -840,6 +1291,28 @@ export default async function handler(req, res) {
         return;
       }
 
+      case 'getProyekPkk': {
+        const data = await prisma.proyek_pkk.findFirst({ orderBy: { created_at: 'desc' } });
+        sendData(res, data);
+        return;
+      }
+
+      case 'upsertProyekPkk': {
+        const current = await prisma.proyek_pkk.findFirst({ orderBy: { created_at: 'desc' } });
+        const proyekPayload = cleanObject({
+          title: payload?.title ?? null,
+          subtitle: payload?.subtitle ?? null,
+          description: payload?.description ?? null,
+          services: Array.isArray(payload?.services) ? payload.services : [],
+          website_url: payload?.website_url ?? null
+        });
+        const data = current
+          ? await prisma.proyek_pkk.update({ where: { id: current.id }, data: proyekPayload })
+          : await prisma.proyek_pkk.create({ data: proyekPayload });
+        sendData(res, data);
+        return;
+      }
+
       case 'getReport': {
         const [pendaftar, alumni, mitra, jurusan] = await Promise.all([
           getRawCount('pendaftar'),
@@ -852,9 +1325,10 @@ export default async function handler(req, res) {
       }
 
       default:
-        res.status(400).json({ error: 'Unknown action' });
+        res.status(400).json({ success: false, error: 'Unknown action' });
+
     }
   } catch (error) {
-    res.status(500).json({ error: error?.message || 'Prisma request failed' });
+    res.status(500).json({ success: false, error: error?.message || 'Prisma request failed' });
   }
 }

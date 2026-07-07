@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Upload, X, Check, Loader2 } from 'lucide-react';
-import { uploadImage as uploadImageFile } from '../services/api';
 import { showToast } from '../utils/toast';
+
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -30,6 +31,7 @@ export default function ImageUploader({
   variant = 'default', // 'default' | 'compact'
   showPreview = true
 }) {
+
   const [imgSrc, setImgSrc] = useState('');
   const [crop, setCrop] = useState();
   const [completedCrop, setCompletedCrop] = useState();
@@ -76,6 +78,7 @@ export default function ImageUploader({
 
   async function handleUploadImage() {
     if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
+      showToast.error('Please select and crop an image first');
       return;
     }
 
@@ -86,54 +89,104 @@ export default function ImageUploader({
       const canvas = previewCanvasRef.current;
       const crop = completedCrop;
 
+      // Validate image dimensions
+      if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth === 0 || image.naturalHeight === 0) {
+        throw new Error('Image has invalid dimensions');
+      }
+
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
       const ctx = canvas.getContext('2d');
-      const pixelRatio = window.devicePixelRatio;
+      const pixelRatio = window.devicePixelRatio || 1;
 
-      canvas.width = Math.floor(crop.width * scaleX * pixelRatio);
-      canvas.height = Math.floor(crop.height * scaleY * pixelRatio);
+      const canvasWidth = Math.floor(crop.width * scaleX * pixelRatio);
+      const canvasHeight = Math.floor(crop.height * scaleY * pixelRatio);
+
+      if (canvasWidth <= 0 || canvasHeight <= 0) {
+        throw new Error('Invalid canvas dimensions');
+      }
+
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
 
       ctx.scale(pixelRatio, pixelRatio);
       ctx.imageSmoothingQuality = 'high';
 
       const cropX = crop.x * scaleX;
       const cropY = crop.y * scaleY;
+      const cropWidth = crop.width * scaleX;
+      const cropHeight = crop.height * scaleY;
 
-      const centerX = image.naturalWidth / 2;
-      const centerY = image.naturalHeight / 2;
+      // Clear canvas before drawing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.save();
-      ctx.translate(-cropX, -cropY);
-      ctx.translate(centerX, centerY);
-      ctx.translate(-centerX, -centerY);
       ctx.drawImage(
         image,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
         0,
         0,
-        image.naturalWidth,
-        image.naturalHeight,
-        0,
-        0,
-        image.naturalWidth,
-        image.naturalHeight,
+        canvasWidth / pixelRatio,
+        canvasHeight / pixelRatio
       );
-      ctx.restore();
 
       canvas.toBlob(async (blob) => {
-        if (!blob) {
-          throw new Error('Canvas is empty');
+        if (!blob || blob.size === 0) {
+          // Fallback: upload original image without cropping
+          console.warn('Canvas blob is empty, using fallback');
+          try {
+            const formData = new FormData();
+            const fileInput = fileInputRef.current?.files?.[0];
+            if (fileInput) {
+              formData.append('file', fileInput);
+              const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+              });
+              const json = await response.json();
+              if (!response.ok || json?.success !== true) {
+                throw new Error(json?.error || 'Upload failed');
+              }
+              onUploadComplete(json.url);
+              setImgSrc('');
+              setLoading(false);
+              showToast.success('Image uploaded successfully!');
+              return;
+            }
+          } catch (fallbackErr) {
+            setLoading(false);
+            showToast.error('Upload failed: ' + (fallbackErr?.message || 'Unknown error'));
+            return;
+          }
+          throw new Error('Canvas is empty and no fallback available');
         }
-        
-        // TODO: This still uses the temporary non-Prisma storage helper.
-        const { url, error: uploadError } = await uploadImageFile(blob, bucket, folder);
-        if (uploadError || !url) throw uploadError || new Error('Upload failed');
 
-        onUploadComplete(url);
-        setImgSrc('');
-        setLoading(false);
-        showToast.success('Image uploaded successfully!');
+        try {
+          const formData = new FormData();
+          formData.append('file', blob, `upload-${Date.now()}.jpg`);
+
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const json = await response.json();
+          if (!response.ok || json?.success !== true) {
+            throw new Error(json?.error || 'Upload failed');
+          }
+
+          onUploadComplete(json.url);
+          setImgSrc('');
+          setLoading(false);
+          showToast.success('Image uploaded successfully!');
+        } catch (err) {
+          setLoading(false);
+          showToast.error(err?.message || 'Upload failed');
+        }
       }, 'image/jpeg', 0.9);
+
 
     } catch (err) {
       console.error(err);
@@ -144,11 +197,19 @@ export default function ImageUploader({
 
   return (
     <div className="w-full">
+
       {!imgSrc ? (
         <div className="relative">
           {showPreview && currentImage ? (
             <div className="mb-4 relative w-full aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
-               <img src={currentImage} alt="Current" className="w-full h-full object-cover" />
+               <Image
+                 src={currentImage}
+                 alt="Current"
+                 fill
+                 unoptimized
+                 sizes="(max-width: 768px) 100vw, 50vw"
+                 className="object-cover"
+               />
                <button 
                  type="button"
                  onClick={() => onUploadComplete('')}
@@ -204,6 +265,7 @@ export default function ImageUploader({
               aspect={aspectRatio}
               className="max-h-[500px] mx-auto"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 ref={imgRef}
                 alt="Crop me"
