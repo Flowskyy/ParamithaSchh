@@ -1,4 +1,13 @@
+# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
 
+# Disallow private and administrative routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /test-connection
+
+# Host & Sitemap
+Host: https://paramithasch.vercel.app
 Sitemap: https://paramithasch.vercel.app/sitemap.xml

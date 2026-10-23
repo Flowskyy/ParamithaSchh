@@ -26,7 +26,10 @@ export const fallbackSekolahInfo = {
   youtube: 'https://youtube.com/@smkparamitha2',
   tiktok: 'https://tiktok.com/@smkparamitha2',
   wa_ppdb: '6282124706301',
-  wa_kontak: '6282124706301'
+  wa_kontak: '6282124706301',
+  kepsek_name: 'Dwi Elvride',
+  kepsek_photo: '/images/Kepsek.JPG',
+  kepsek_message: "Assalamu’alaikum warahmatullahi wabarakatuh, Salam sejahtera bagi kita semua, Shalom, Om Swastiastu, Namo Buddhaya, Salam kebajikan,|||\nPuji syukur kita panjatkan kepada Tuhan Yang Maha Esa atas berkat dan rahmat-Nya sehingga website resmi SMK Paramitha 2 Jakarta dapat hadir sebagai sarana informasi dan komunikasi bagi seluruh warga sekolah maupun masyarakat luas.\n\nWebsite ini kami hadirkan sebagai bentuk keterbukaan informasi sekaligus wadah untuk memperkenalkan berbagai kegiatan, prestasi, serta program unggulan sekolah kami.\n\nSMK Paramitha 2 Jakarta berkomitmen untuk mencetak generasi yang kompeten, kreatif, dan siap menghadapi tantangan di dunia industri maupun dunia digital yang terus berkembang.\n\nKami berharap website ini dapat memberikan manfaat, inspirasi, dan gambaran nyata tentang semangat belajar serta lingkungan positif yang kami bangun di sekolah ini.\n\nTerima kasih atas kunjungan Anda."
 };
 
 export const fallbackJurusan = [

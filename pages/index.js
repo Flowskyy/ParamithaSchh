@@ -73,9 +73,9 @@ export default function Home({ sekolahInfo, alumniList, mitraList, jurusanList, 
 
   return (
     <Layout 
-      title="SMK Paramitha 2 Jakarta — Sekolah Pusat Keunggulan & Masa Depan Dimulai Di Sini"
-      description="Website resmi SMK Paramitha 2 Jakarta. Sekolah Pusat Keunggulan dengan jurusan RPL, DKV, Kuliner, Perhotelan, dan ULW. Daftar PPDB sekarang!"
-      keywords="SMK Paramitha 2 Jakarta, PPDB SMK 2026, SMK Pusat Keunggulan, Jurusan RPL, Jurusan DKV, Jurusan Perhotelan"
+      title="SMK Paramitha 2 Jakarta — Sekolah Pusat Keunggulan Vokasi"
+      description="Website resmi SMK Paramitha 2 Jakarta (Sekolah Paramitha). SMK Pusat Keunggulan di Jakarta Timur dengan kejuruan RPL, DKV, Kuliner, Perhotelan, dan ULW. Pendaftaran PPDB dibuka."
+      keywords="SMK Paramitha, paramitha sekolah, sekolah paramitha, smk paramitha 2, smk paramitha jakarta, smk paramitha 2 jakarta, smk jakarta timur, ppdb smk paramitha, jurusan smk paramitha, smk pariwisata paramitha"
     >
       <div className="flex flex-col" data-section="home/root" aria-label="Homepage Root">
         {sections.length > 0 ? (

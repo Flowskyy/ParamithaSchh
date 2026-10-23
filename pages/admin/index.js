@@ -72,6 +72,8 @@ export default function AdminLogin() {
     <>
       <Head>
         <title>Admin Login - SMK Paramitha 2</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="googlebot" content="noindex, nofollow" />
       </Head>
       
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden" data-section="admin-login/root" aria-label="Admin Login Root">

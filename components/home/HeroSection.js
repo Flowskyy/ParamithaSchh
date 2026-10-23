@@ -53,7 +53,10 @@ export default function HeroSection({ info }) {
           </motion.span>
           
           <motion.h1 variants={fadeInUp} className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Masa Depan <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5C400] to-orange-300">Dimulai Di Sini</span>
+            SMK Paramitha 2 Jakarta
+            <span className="block text-2xl md:text-4xl lg:text-5xl mt-3 font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#F5C400] to-orange-300">
+              Masa Depan Dimulai Di Sini
+            </span>
           </motion.h1>
           
           <motion.p variants={fadeInUp} className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">

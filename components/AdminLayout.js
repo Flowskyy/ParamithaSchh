@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -190,6 +191,10 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FF] font-sans text-slate-900" data-section="admin-layout/root" aria-label="Admin Layout Root">
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="googlebot" content="noindex, nofollow" />
+      </Head>
       
       {/* SECTION: Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#1E1E8F] text-white px-4 py-3 flex items-center justify-between shadow-md" data-section="admin-layout/mobile-header" aria-label="Mobile Header">

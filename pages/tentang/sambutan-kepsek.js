@@ -74,7 +74,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                   
                   <div className="mt-6 text-center pb-2">
                     <h3 className="text-2xl font-bold text-[#1E1E8F] mb-1 font-serif">
-                      {info.kepsek_name || 'Dr. H. Ahmad Fauzi, M.Pd'}
+                      {info.kepsek_name || 'Dwi Elvride'}
                     </h3>
                     <p className="text-[#C0161C] font-bold uppercase tracking-wider text-sm">
                       Kepala Sekolah
@@ -108,7 +108,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                   <div className="mt-12 pt-8 border-t border-slate-100 flex justify-end">
                     <div className="text-center">
                       <div className="text-3xl font-serif text-[#1E1E8F] italic mb-2 opacity-80 sign-font">
-                        {info.kepsek_name || 'Ahmad Fauzi'}
+                        {info.kepsek_name || 'Dwi Elvride'}
                       </div>
                       <div className="text-sm text-slate-400 uppercase tracking-widest">
                         Kepala Sekolah

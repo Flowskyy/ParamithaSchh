@@ -38,7 +38,7 @@ export default function SambutanSection({ info }) {
                 style={{ objectFit: 'cover' }}
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E1E8F] to-transparent p-6 pt-20">
-                <h3 className="text-white text-xl font-bold">{info.kepsek_name}</h3>
+                <h3 className="text-white text-xl font-bold">{info.kepsek_name || 'Dwi Elvride'}</h3>
                 <p className="text-white/80 text-sm">Kepala Sekolah</p>
               </div>
             </div>

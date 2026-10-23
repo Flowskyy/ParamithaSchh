@@ -213,14 +213,35 @@ export async function saveMitra(payload) {
 
 // ─── SEKOLAH INFO ──────────────────────────────────────────────────
 export async function getSekolahInfo() {
-  return handleResponse(
-    supabase.from('sekolah_info').select('id, name, phone, email, address, facebook, instagram, youtube, kepsek_name, kepsek_photo, kepsek_message, map_url, vision, mission, history, motto, mars_lyrics').order('created_at', { ascending: false }).limit(1).single(),
-    fallbackSekolahInfo
-  );
+  try {
+    const { data, error } = await supabase
+      .from('sekolah_info')
+      .select('id, name, phone, email, address, facebook, instagram, youtube, kepsek_name, kepsek_photo, kepsek_message, map_url, vision, mission, history, motto')
+      .not('name', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) console.error('getSekolahInfo Error:', error);
+      return fallbackSekolahInfo;
+    }
+
+    return {
+      ...fallbackSekolahInfo,
+      ...data,
+      kepsek_name: 'Dwi Elvride',
+    };
+  } catch (err) {
+    console.error('getSekolahInfo Catch Error:', err);
+    return fallbackSekolahInfo;
+  }
 }
 export async function upsertSekolahInfo(payload) {
-  if (payload.id) return handleMutation(supabase.from('sekolah_info').update(payload).eq('id', payload.id));
-  return handleMutation(supabase.from('sekolah_info').insert(payload));
+  const cleanPayload = { ...payload };
+  delete cleanPayload.mars_lyrics;
+  if (cleanPayload.id) return handleMutation(supabase.from('sekolah_info').update(cleanPayload).eq('id', cleanPayload.id));
+  return handleMutation(supabase.from('sekolah_info').insert(cleanPayload));
 }
 
 // ─── HOMEPAGE SECTIONS ─────────────────────────────────────────────

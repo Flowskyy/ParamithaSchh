@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <title>SMK Paramitha 2 Jakarta</title>
         <link rel="icon" href="/favicon.jpg" />
-        <meta name="description" content="SMK Paramitha 2 Jakarta - Vocational School" />
+        <meta name="description" content="SMK Paramitha 2 Jakarta (Sekolah Paramitha) — Sekolah Menengah Kejuruan Pusat Keunggulan dengan jurusan RPL, DKV, Kuliner, Perhotelan, dan ULW di Jakarta Timur." />
       </Head>
       
       {/* <RealtimeReloader /> */}
