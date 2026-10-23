@@ -27,17 +27,16 @@ export default function SambutanSection({ info }) {
             transition={{ duration: 0.8 }}
             className="w-full lg:w-1/3 relative"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform rotate-3 hover:rotate-0 transition-all duration-500">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform rotate-3 hover:rotate-0 transition-all duration-500 aspect-[3/4] w-full">
               <SmartImage 
                 src={info.kepsek_photo || "/images/Kepsek.JPG"} 
-                alt={info.kepsek_name}
-                width={400}
-                height={500}
+                alt={info.kepsek_name || 'Dwi Elvride'}
+                fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className="w-full h-auto"
-                style={{ objectFit: 'cover' }}
+                className="w-full h-full"
+                style={{ objectFit: 'cover', objectPosition: 'top center' }}
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E1E8F] to-transparent p-6 pt-20">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E1E8F] via-[#1E1E8F]/70 to-transparent p-6 pt-16 z-10">
                 <h3 className="text-white text-xl font-bold">{info.kepsek_name || 'Dwi Elvride'}</h3>
                 <p className="text-white/80 text-sm">Kepala Sekolah</p>
               </div>

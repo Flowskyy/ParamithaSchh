@@ -67,7 +67,7 @@ export default function SambutanKepsek({ sekolahInfo }) {
                       alt={info.kepsek_name || 'Kepala Sekolah'}
                       fill
                       priority
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: 'cover', objectPosition: 'top center' }}
                       className="hover:scale-105 transition-transform duration-700"
                     />
                   </div>
