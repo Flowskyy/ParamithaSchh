@@ -158,7 +158,8 @@ export default function Layout({
 
         {/* Mobile & App Theme */}
         <meta name="theme-color" content="#1E1E8F" />
-        <meta name="apple-mobile-web-app-title" content="SMK Paramitha" />
+        <meta name="application-name" content="SMK Paramitha 2 Jakarta" />
+        <meta name="apple-mobile-web-app-title" content="SMK Paramitha 2 Jakarta" />
 
         {/* Open Graph / Facebook & WhatsApp Preview */}
         <meta property="og:locale" content="id_ID" />
